@@ -1,0 +1,43 @@
+<% 
+  commitsPerUserDistribution = measure("scm-commits-per-user")
+  if commitsPerUserDistribution
+    if !commitsPerUserDistribution.data.blank?
+      commitsPerUser = commitsPerUserDistribution.data.split(";"); 
+    else
+      commitsPerUser = commitsPerUserDistribution.text_value.split(";"); 
+    end  
+
+%>  
+<table width="100%">
+  <tbody>
+    <tr>
+      <td valign="top" width="50%">
+          <div class="dashbox">
+          <p class="title"><%= message('widget.scm-stats-commits-per-user.title') -%></p>
+          <br>
+            <table>
+<% commitsPerUser.each do |the_measure|  %>
+<% the_measure =the_measure.split("="); %>
+              <tr>
+                <td align="right" width="40px"><p><%= number_with_delimiter(the_measure[1].to_i);-%></p></td>
+                <td style="width:10px;"></td>
+                <td><p><%= the_measure[0];-%></p></td>
+              </tr>
+<% end; %>
+            </table>
+          </div>
+      </td>
+        <td valign="top" width="50%">
+          <div class="dashbox">
+          <%= piechart(measure('scm-commits-per-user'), { :size => "400x120"}) -%>
+        </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<% else %>
+  <p class="title"><%= message('widget.scm-stats-commits-per-user.title') -%></p>
+  <br />
+  <p><%= message('scmstats.noData') -%></p>
+<% end %>

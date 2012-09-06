@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd" xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.codehaus.sonar-plugins</groupId>
+    <artifactId>parent</artifactId>
+    <version>13</version>
+    <relativePath>../parent</relativePath>
+  </parent>
+  
+  <artifactId>sonar-scm-stats-plugin</artifactId>
+  <packaging>sonar-plugin</packaging>
+  <version>0.1-SNAPSHOT</version>
+  <name>Sonar SCM Stats Plugin</name>
+  <description>Feed Sonar with Statistics about SCM system</description>
+  <url>http://docs.codehaus.org/display/SONAR/SCM+Stats+Plugin</url>
+  <inceptionYear>2012</inceptionYear>
+  
+  <organization>
+    <name>Patroklos PAPAPETROU</name>
+  </organization>
+  
+  <licenses>
+    <license>
+      <name>GNU LGPL v3</name>
+      <url>http://www.gnu.org/licenses/lgpl.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  
+  <scm>
+    <connection>scm:svn:http://svn.codehaus.org/sonar-plugins/trunk/scm-stats</connection>
+    <developerConnection>scm:svn:https://svn.codehaus.org/sonar-plugins/trunk/scm-stats</developerConnection>
+    <url>http://svn.sonar-plugins.codehaus.org</url>
+  </scm>
+  <developers>
+    <developer>
+      <name>Papapetrou P.Patroklos</name>
+      <email>ppapapetrou76@gmail.com</email>
+      <url>http://gr.linkedin.com/in/ppapapetrou</url>
+      <timezone>+3</timezone>
+    </developer>
+  </developers>
+  
+  <properties>
+    <sonar.minversion>2.8</sonar.minversion>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <sonar.pluginName>ScmStats</sonar.pluginName>
+    <sonar.pluginClass>org.sonar.plugins.scmstats.ScmStatsPlugin</sonar.pluginClass>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.codehaus.sonar</groupId>
+      <artifactId>sonar-plugin-api</artifactId>
+      <version>${sonar.minversion}</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.codehaus.sonar</groupId>
+      <artifactId>sonar-java-api</artifactId>
+      <version>${sonar.minversion}</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.codehaus.sonar</groupId>
+      <artifactId>sonar-testing-harness</artifactId>
+      <version>${sonar.minversion}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.10</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-model</artifactId>
+      <version>3.0.1</version>
+      <type>jar</type>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-project</artifactId>
+      <version>2.0.9</version>
+      <type>jar</type>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.scm</groupId>
+      <artifactId>maven-scm-api</artifactId>
+      <version>1.7</version>
+      <type>jar</type>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.scm</groupId>
+      <artifactId>maven-scm-provider-svnexe</artifactId>
+      <version>1.7</version>
+      <type>jar</type>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.scm</groupId>
+      <artifactId>maven-scm-provider-gitexe</artifactId>
+      <version>1.7</version>
+      <type>jar</type>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>native2ascii-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>native2ascii</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>
