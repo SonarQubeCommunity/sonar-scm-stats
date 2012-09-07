@@ -35,7 +35,7 @@
   <scm>
     <connection>scm:git:git@github.com:SonarCommunity/sonar-scm-stats</connection>
     <developerConnection>scm:git:git@github.com:SonarCommunity/sonar-scm-stats</developerConnection>
-    <url>https://github.com/SonarCommunity/sonar-groovy</url>
+    <url>https://github.com/SonarCommunity/sonar-scm-stats</url>
   </scm>
   <developers>
     <developer>
@@ -47,7 +47,7 @@
   </developers>
   
   <properties>
-    <sonar.minversion>2.8</sonar.minversion>
+    <sonar.minversion>2.13</sonar.minversion>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <sonar.pluginName>ScmStats</sonar.pluginName>
     <sonar.pluginClass>org.sonar.plugins.scmstats.ScmStatsPlugin</sonar.pluginClass>
