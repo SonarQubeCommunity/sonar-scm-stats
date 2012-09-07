@@ -56,7 +56,10 @@ public final class ScmStatsPlugin extends SonarPlugin {
             ScmConfiguration.class,
             ScmStatsSensor.class,
             ScmStatsMetrics.class,
+            ScmStatsDashboard.class,
             ScmStatsCommitsPerClockHourWidget.class,
+            ScmStatsCommitsPerMonthWidget.class,
+            ScmStatsCommitsPerWeekDayWidget.class,
             ScmStatsCommitsPerUserWidget.class);
   }
 }

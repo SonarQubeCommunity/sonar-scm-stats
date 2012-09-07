@@ -24,7 +24,6 @@ import java.util.List;
 import org.apache.maven.scm.ChangeSet;
 import org.apache.maven.scm.ScmException;
 import org.apache.maven.scm.command.changelog.ChangeLogScmResult;
-import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonar.api.batch.Sensor;
@@ -58,7 +57,7 @@ public class ScmStatsSensor implements Sensor {
         List<ChangeSet> changeSets = changeLogScmResult.getChangeLog().getChangeSets();
         ChangeLogInfoHolder holder = new ChangeLogInfoHolder();
         for (ChangeSet changeSet : changeSets) {
-          holder.addChangeLog(changeSet.getAuthor(),StringUtils.left(changeSet.getTimeFormatted(),2),changeSet.getRevision());
+          holder.addChangeLog(changeSet.getAuthor(),changeSet.getDate(),changeSet.getRevision());
         }
         holder.generateMeasures(context);
       }else{

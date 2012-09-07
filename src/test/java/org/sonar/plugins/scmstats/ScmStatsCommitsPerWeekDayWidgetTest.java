@@ -19,21 +19,17 @@
  */
 package org.sonar.plugins.scmstats;
 
-import static org.hamcrest.Matchers.equalTo;
-import java.util.List;
-import org.junit.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.Assert.assertThat;
+import org.junit.Test;
 
-public class ScmStatsPluginTest {
-  
-  private ScmStatsPlugin plugin;
-  @Before
-  public void setUp() {
-    plugin = new ScmStatsPlugin();
-  }
+public class ScmStatsCommitsPerWeekDayWidgetTest {
 
   @Test
-  public void testPluginDefinition() {
-    assertThat(plugin.getExtensions().size(), equalTo(12));
+  public void testWidgetDefinition() {
+    ScmStatsCommitsPerWeekDayWidget widget = new ScmStatsCommitsPerWeekDayWidget();
+    assertThat(widget.getId(), notNullValue());
+    assertThat(widget.getTitle(), notNullValue());
+    assertThat(getClass().getResource(widget.getTemplatePath()), notNullValue());
   }
 }

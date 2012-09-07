@@ -25,7 +25,6 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.scm.provider.svn.svnexe.SvnExeScmProvider;
 import org.junit.*;
 import org.sonar.api.resources.Project;
-import org.sonar.api.config.Settings;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.hamcrest.MatcherAssert.assertThat;

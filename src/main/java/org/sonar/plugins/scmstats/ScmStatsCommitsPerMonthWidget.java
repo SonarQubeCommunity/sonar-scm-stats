@@ -17,23 +17,31 @@
  * License along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
  */
+
 package org.sonar.plugins.scmstats;
 
-import static org.hamcrest.Matchers.equalTo;
-import java.util.List;
-import org.junit.*;
-import static org.junit.Assert.*;
+import org.sonar.api.web.AbstractRubyTemplate;
+import org.sonar.api.web.Description;
+import org.sonar.api.web.RubyRailsWidget;
+import org.sonar.api.web.UserRole;
+import org.sonar.api.web.WidgetCategory;
 
-public class ScmStatsPluginTest {
-  
-  private ScmStatsPlugin plugin;
-  @Before
-  public void setUp() {
-    plugin = new ScmStatsPlugin();
+@UserRole(UserRole.USER)
+@WidgetCategory("SCM")
+@Description("SCM Stats Commits per Month")
+public final class ScmStatsCommitsPerMonthWidget extends AbstractRubyTemplate implements RubyRailsWidget {
+
+  public String getId() {
+    return "scm-stats-commits-per-month";
   }
 
-  @Test
-  public void testPluginDefinition() {
-    assertThat(plugin.getExtensions().size(), equalTo(12));
+  public String getTitle() {
+    return "SCM Stats Commits per Month";
   }
+
+  @Override
+  protected String getTemplatePath() {
+    return "/org/sonar/plugins/scmstats/commits_per_month_widget.html.erb";
+  }
+
 }

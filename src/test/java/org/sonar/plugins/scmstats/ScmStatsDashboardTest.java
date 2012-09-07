@@ -17,23 +17,29 @@
  * License along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
  */
+
 package org.sonar.plugins.scmstats;
 
-import static org.hamcrest.Matchers.equalTo;
-import java.util.List;
 import org.junit.*;
-import static org.junit.Assert.*;
+import org.sonar.api.web.Dashboard;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import org.sonar.api.web.DashboardLayout;
 
-public class ScmStatsPluginTest {
+public class ScmStatsDashboardTest {
   
-  private ScmStatsPlugin plugin;
-  @Before
-  public void setUp() {
-    plugin = new ScmStatsPlugin();
-  }
-
+  private ScmStatsDashboard dashboard = new ScmStatsDashboard();
   @Test
-  public void testPluginDefinition() {
-    assertThat(plugin.getExtensions().size(), equalTo(12));
+  public void testGetName() {
+    String expResult = "SCM Stats";
+    assertThat(dashboard.getName(), is(expResult));
+  }
+  @Test
+  public void testCreateDashboard() {
+    Dashboard result = dashboard.createDashboard();
+    assertThat(result.getLayout(),is(DashboardLayout.TWO_COLUMNS));
+    assertThat(result.getWidgets().size(),is(4));
+    assertThat(result.getWidgetsOfColumn(1).size(),is(2));
+    assertThat(result.getWidgetsOfColumn(2).size(),is(2));
   }
 }

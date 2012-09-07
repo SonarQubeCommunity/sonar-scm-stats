@@ -19,10 +19,8 @@
  */
 package org.sonar.plugins.scmstats.model;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import org.joda.time.DateTime;
 import org.sonar.api.batch.SensorContext;
 import org.sonar.api.measures.Metric;
 import org.sonar.api.measures.PropertiesBuilder;
@@ -31,34 +29,51 @@ import org.sonar.plugins.scmstats.ScmStatsMetrics;
 public class ChangeLogInfoHolder {
   private final Map<String, Integer> commitsPerUser = new HashMap<String, Integer>();
   private final Map<String, Integer> commitsPerClockHour = new HashMap<String, Integer>();
+  private final Map<String, Integer> commitsPerWeekDay = new HashMap<String, Integer>();
+  private final Map<String, Integer> commitsPerMonth = new HashMap<String, Integer>();
   private final List<ChangeLogInfo> changeLogs = new ArrayList<ChangeLogInfo>();
 
   
   public ChangeLogInfoHolder(){
     initClockHourMap();
+    initMonthMap();
+    initDayOfWeekMap();
   }
   
-  public final void addChangeLog(String authorName, String clockHour, String revision) {
-    changeLogs.add(new ChangeLogInfo(authorName, clockHour, revision));
+  public final void addChangeLog(String authorName, Date commitDate, String revision) {
+    changeLogs.add(new ChangeLogInfo(authorName, commitDate, revision));
   }
 
   public void generateMeasures(SensorContext context) {
 
     for (ChangeLogInfo changeLogInfo : changeLogs) {
       updateMap(commitsPerUser, changeLogInfo.getAuthor());
-      updateMap(commitsPerClockHour, changeLogInfo.getClockHour());
+      
+      DateTime dt = new DateTime(changeLogInfo.getCommitDate());
+      
+      updateMap(commitsPerClockHour,String.format("%2d", dt.getHourOfDay()).replace(' ', '0') );
+      updateMap(commitsPerWeekDay, dt.dayOfWeek().getAsString());
+      updateMap(commitsPerMonth,String.format("%2d", dt.getMonthOfYear()).replace(' ', '0') );
     }
 
     final PropertiesBuilder<String, Integer> commitsPerUserMeasure =
             propertiesBuilder(ScmStatsMetrics.SCM_COMMITS_PER_USER);
     final PropertiesBuilder<String, Integer> commitsPerClockHourMeasure =
             propertiesBuilder(ScmStatsMetrics.SCM_COMMITS_PER_CLOCKTIME);
+    final PropertiesBuilder<String, Integer> commitsPerWeekDayMeasure =
+            propertiesBuilder(ScmStatsMetrics.SCM_COMMITS_PER_WEEKDAY);
+    final PropertiesBuilder<String, Integer> commitsPerMonthMeasure =
+            propertiesBuilder(ScmStatsMetrics.SCM_COMMITS_PER_MONTH);
     
     commitsPerUserMeasure.addAll(commitsPerUser);
     commitsPerClockHourMeasure.addAll(commitsPerClockHour);
+    commitsPerWeekDayMeasure.addAll(commitsPerWeekDay);
+    commitsPerMonthMeasure.addAll(commitsPerMonth);
     
     context.saveMeasure(commitsPerUserMeasure.build());
     context.saveMeasure(commitsPerClockHourMeasure.build());
+    context.saveMeasure(commitsPerWeekDayMeasure.build());
+    context.saveMeasure(commitsPerMonthMeasure.build());
 
   }
 
@@ -77,6 +92,19 @@ public class ChangeLogInfoHolder {
   private void initClockHourMap() {
     for (int i = 0; i < 24; i++) {
       commitsPerClockHour.put(String.format("%2d", i).replace(' ', '0'), 0);
+    }
+  }
+
+  private void initMonthMap() {
+    for (int i = 1; i <= 12; i++) {
+      DateTime dt = new DateTime (2012,i,1,0,0);
+      commitsPerMonth.put(String.format("%2d", dt.getMonthOfYear()).replace(' ', '0'), 0);
+    }
+  }
+  private void initDayOfWeekMap() {
+    for (int i = 1; i <= 7; i++) {
+      DateTime dt = new DateTime (2012,1,i,0,0);
+      commitsPerWeekDay.put(dt.dayOfWeek().getAsString(), 0);
     }
   }
 

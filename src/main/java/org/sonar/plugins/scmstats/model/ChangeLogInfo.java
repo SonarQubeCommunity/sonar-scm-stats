@@ -20,15 +20,17 @@
 
 package org.sonar.plugins.scmstats.model;
 
+import java.util.Date;
+
 public class ChangeLogInfo {
   
   private String author;
-  private String clockHour;
+  private Date commitDate;
   private String reviision;
 
-  public ChangeLogInfo(String author, String clockHour, String reviision) {
+  public ChangeLogInfo(String author, Date commitDate, String reviision) {
     this.author = author;
-    this.clockHour = clockHour;
+    this.commitDate = commitDate;
     this.reviision = reviision;
   }
   
@@ -40,12 +42,12 @@ public class ChangeLogInfo {
     this.author = author;
   }
 
-  public String getClockHour() {
-    return clockHour;
+  public Date getCommitDate() {
+    return commitDate;
   }
 
-  public void setClockHour(String clockHour) {
-    this.clockHour = clockHour;
+  public void setCommitDate(Date clockHour) {
+    this.commitDate = commitDate;
   }
 
   public String getReviision() {

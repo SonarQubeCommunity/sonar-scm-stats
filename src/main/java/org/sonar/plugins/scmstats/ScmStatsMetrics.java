@@ -30,7 +30,7 @@ public final class ScmStatsMetrics implements Metrics {
 
   public static final Metric SCM_COMMITS_PER_USER = 
           new Metric.Builder("scm-commits-per-user", "Commits per user", 
-          Metric.ValueType.DISTRIB)
+          Metric.ValueType.DATA)
       .setDescription("Commits per user")
       .setQualitative(false)
       .setDomain(CoreMetrics.DOMAIN_SCM)
@@ -44,9 +44,27 @@ public final class ScmStatsMetrics implements Metrics {
       .setDomain(CoreMetrics.DOMAIN_SCM)
       .create();
 
+  public static final Metric SCM_COMMITS_PER_WEEKDAY = 
+          new Metric.Builder("scm-commits-per-weekday", "Commits per week day", 
+          Metric.ValueType.DATA)
+      .setDescription("Commits per week day")
+      .setQualitative(false)
+      .setDomain(CoreMetrics.DOMAIN_SCM)
+      .create();
+
+  public static final Metric SCM_COMMITS_PER_MONTH = 
+          new Metric.Builder("scm-commits-per-month", "Commits per month", 
+          Metric.ValueType.DATA)
+      .setDescription("Commits per month")
+      .setQualitative(false)
+      .setDomain(CoreMetrics.DOMAIN_SCM)
+      .create();
+
 
   public List<Metric> getMetrics() {
-    return ImmutableList.of(SCM_COMMITS_PER_USER,SCM_COMMITS_PER_CLOCKTIME);
+    return ImmutableList.of(SCM_COMMITS_PER_USER,
+                            SCM_COMMITS_PER_CLOCKTIME,
+                            SCM_COMMITS_PER_WEEKDAY,
+                            SCM_COMMITS_PER_MONTH);
   }
-
 }
