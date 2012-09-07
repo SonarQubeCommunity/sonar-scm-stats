@@ -24,14 +24,10 @@ import com.google.common.base.Suppliers;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.maven.scm.provider.ScmUrlUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.sonar.api.BatchExtension;
-import org.sonar.api.utils.SonarException;
 
 public class ScmConfiguration implements BatchExtension {
 
-  private static final Logger LOG = LoggerFactory.getLogger(ScmConfiguration.class);
   private final Configuration configuration;
   private final MavenScmConfiguration mavenConfonfiguration;
   private final Supplier<String> url;
@@ -43,9 +39,7 @@ public class ScmConfiguration implements BatchExtension {
   }
 
   public ScmConfiguration(Configuration configuration) {
-    this(configuration,null /*
-             * not in maven environment
-             */);
+    this(configuration,null /** not in maven environment*/);
   }
 
   public String getScmProvider() {
@@ -69,6 +63,11 @@ public class ScmConfiguration implements BatchExtension {
       String mavenUrl = getMavenUrl();
       if (!StringUtils.isBlank(mavenUrl)) {
         return mavenUrl;
+      }
+
+      String urlPropertyFromScmActivity = configuration.getString("sonar.scm.url");
+      if (!StringUtils.isBlank(urlPropertyFromScmActivity)) {
+        return urlPropertyFromScmActivity;
       }
 
       String urlProperty = configuration.getString(ScmStatsPlugin.URL);
