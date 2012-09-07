@@ -13,6 +13,11 @@
   <name>Sonar SCM Stats Plugin</name>
   <description>Feed Sonar with Statistics about SCM system</description>
   <url>http://docs.codehaus.org/display/SONAR/SCM+Stats+Plugin</url>
+  
+  <ciManagement>
+    <system>>Jenkins</system>
+    <url>https://sonarplugins.ci.cloudbees.com/job/scm-stats/</url>
+  </ciManagement>
   <inceptionYear>2012</inceptionYear>
   
   <organization>
@@ -103,6 +108,12 @@
       <groupId>org.apache.maven.scm</groupId>
       <artifactId>maven-scm-provider-gitexe</artifactId>
       <version>1.7</version>
+      <type>jar</type>
+    </dependency>
+    <dependency>
+      <groupId>joda-time</groupId>
+      <artifactId>joda-time</artifactId>
+      <version>2.0</version>
       <type>jar</type>
     </dependency>
   </dependencies>
