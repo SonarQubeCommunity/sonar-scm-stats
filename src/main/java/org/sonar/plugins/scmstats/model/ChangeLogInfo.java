@@ -21,6 +21,7 @@
 package org.sonar.plugins.scmstats.model;
 
 import java.util.Date;
+import org.apache.commons.lang.StringUtils;
 
 public class ChangeLogInfo {
   
@@ -29,7 +30,7 @@ public class ChangeLogInfo {
   private String revision;
 
   public ChangeLogInfo(String author, Date commitDate, String revision) {
-    this.author = author;
+    this.setAuthor(author);
     this.commitDate = commitDate;
     this.revision = revision;
   }
@@ -39,7 +40,7 @@ public class ChangeLogInfo {
   }
 
   public void setAuthor(String author) {
-    this.author = author;
+    this.author = StringUtils.substringBefore(author, "<").trim();
   }
 
   public Date getCommitDate() {
