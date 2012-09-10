@@ -17,26 +17,22 @@
  * License along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
  */
-package org.sonar.plugins.scmstats;
 
-import java.util.List;
+package org.sonar.plugins.scmstats.measures;
+
+import java.util.HashMap;
 import org.junit.*;
 import static org.junit.Assert.*;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-
-import org.sonar.api.measures.CoreMetrics;
-import org.sonar.api.measures.Metric;
-
-public class ScmStatsMetricsTest {
+import static org.hamcrest.Matchers.is;
+public class CommitsPerUserMeasureTest {
+  
 
   @Test
-  public void testPluginMetris() {
-    List<Metric> metrics = new ScmStatsMetrics().getMetrics();
-
-    assertThat(metrics.size(), equalTo(4));
-    for (Metric metric : metrics) {
-      assertThat(metric.getDomain(), is(CoreMetrics.DOMAIN_SCM));
-    }
+  public void testInit() {
+    System.out.println("init");
+    CommitsPerUserMeasure measure = 
+            new CommitsPerUserMeasure( new HashMap<String, Integer>(), null);
+    measure.init();
+    assertThat(measure.getDataMap().size(), is(0));
   }
 }

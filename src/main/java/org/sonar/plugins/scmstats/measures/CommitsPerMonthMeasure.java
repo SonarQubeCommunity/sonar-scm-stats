@@ -1,3 +1,5 @@
+package org.sonar.plugins.scmstats.measures;
+
 /*
  * Sonar SCM Stats Plugin
  * Copyright (C) 2012 Patroklos PAPAPETROU
@@ -18,44 +20,24 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
  */
 
-package org.sonar.plugins.scmstats.model;
 
-import java.util.Date;
+import java.util.Map;
+import org.joda.time.DateTime;
+import org.sonar.api.batch.SensorContext;
 
-public class ChangeLogInfo {
+public class CommitsPerMonthMeasure extends AbstractScmStatsMeasure {
   
-  private String author;
-  private Date commitDate;
-  private String revision;
-
-  public ChangeLogInfo(String author, Date commitDate, String revision) {
-    this.author = author;
-    this.commitDate = commitDate;
-    this.revision = revision;
-  }
-  
-  public String getAuthor() {
-    return author;
+  public CommitsPerMonthMeasure(final Map<String, Integer> map, 
+                                final SensorContext context) {
+    super(ScmStatsMetrics.SCM_COMMITS_PER_MONTH, map, context);
   }
 
-  public void setAuthor(String author) {
-    this.author = author;
-  }
+  @Override
+  protected void init() {
+    for (int i = 1; i <= 12; i++) {
+      DateTime dt = new DateTime(2012, i, 1, 0, 0);
+      getDataMap().put(String.format("%2d", dt.getMonthOfYear()).replace(' ', '0'), 0);
+    }
 
-  public Date getCommitDate() {
-    return commitDate;
   }
-
-  public void setCommitDate(Date commitDate) {
-    this.commitDate = commitDate;
-  }
-
-  public String getRevision() {
-    return revision;
-  }
-
-  public void setRevision(String revision) {
-    this.revision = revision;
-  }
-
 }

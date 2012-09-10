@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.sonar.api.batch.Sensor;
 import org.sonar.api.batch.SensorContext;
 import org.sonar.api.resources.Project;
-import org.sonar.plugins.scmstats.model.ChangeLogInfoHolder;
+import org.sonar.plugins.scmstats.measures.ChangeLogHandler;
 
 public class ScmStatsSensor implements Sensor {
 
@@ -55,13 +55,16 @@ public class ScmStatsSensor implements Sensor {
       ChangeLogScmResult changeLogScmResult = scmFacade.getChangeLog(project.getFileSystem().getBasedir());
       if (changeLogScmResult.isSuccess()) {
         List<ChangeSet> changeSets = changeLogScmResult.getChangeLog().getChangeSets();
-        ChangeLogInfoHolder holder = new ChangeLogInfoHolder();
+        ChangeLogHandler holder = new ChangeLogHandler();
         for (ChangeSet changeSet : changeSets) {
           holder.addChangeLog(changeSet.getAuthor(),changeSet.getDate(),changeSet.getRevision());
         }
-        holder.generateMeasures(context);
+        holder.generateMeasures();
+        holder.saveMeasures(context);
       }else{
-        LOG.warn(String.format("Fail to retrieve SCM info. Reason: %s%n%s",changeLogScmResult.getProviderMessage(), changeLogScmResult.getCommandOutput()));
+        LOG.warn(String.format("Fail to retrieve SCM info. Reason: %s%n%s",
+                changeLogScmResult.getProviderMessage(), 
+                changeLogScmResult.getCommandOutput()));
       }
     } catch (ScmException e) {
       LOG.warn(String.format("Fail to retrieve SCM info."), e); // See SONARPLUGINS-368. Can occur on generated source

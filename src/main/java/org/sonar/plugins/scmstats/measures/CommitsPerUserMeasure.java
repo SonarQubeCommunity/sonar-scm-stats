@@ -1,3 +1,5 @@
+package org.sonar.plugins.scmstats.measures;
+
 /*
  * Sonar SCM Stats Plugin
  * Copyright (C) 2012 Patroklos PAPAPETROU
@@ -18,44 +20,18 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
  */
 
-package org.sonar.plugins.scmstats.model;
 
-import java.util.Date;
+import java.util.Map;
+import org.sonar.api.batch.SensorContext;
 
-public class ChangeLogInfo {
+public class CommitsPerUserMeasure extends AbstractScmStatsMeasure {
   
-  private String author;
-  private Date commitDate;
-  private String revision;
-
-  public ChangeLogInfo(String author, Date commitDate, String revision) {
-    this.author = author;
-    this.commitDate = commitDate;
-    this.revision = revision;
-  }
-  
-  public String getAuthor() {
-    return author;
+  public CommitsPerUserMeasure(final Map<String, Integer> map, 
+                                final SensorContext context) {
+    super(ScmStatsMetrics.SCM_COMMITS_PER_USER, map, context);
   }
 
-  public void setAuthor(String author) {
-    this.author = author;
+  @Override
+  protected void init() {
   }
-
-  public Date getCommitDate() {
-    return commitDate;
-  }
-
-  public void setCommitDate(Date commitDate) {
-    this.commitDate = commitDate;
-  }
-
-  public String getRevision() {
-    return revision;
-  }
-
-  public void setRevision(String revision) {
-    this.revision = revision;
-  }
-
 }

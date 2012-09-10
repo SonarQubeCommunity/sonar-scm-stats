@@ -17,18 +17,27 @@
  * License along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
  */
-package org.sonar.plugins.scmstats.model;
+package org.sonar.plugins.scmstats.measures;
 
+import org.sonar.plugins.scmstats.measures.ScmStatsMetrics;
+import java.util.List;
 import org.junit.*;
+import static org.junit.Assert.*;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
 
-public class ChangeLogInfoHolderTest {
-  ChangeLogInfoHolder instance = new ChangeLogInfoHolder();
-  
+import org.sonar.api.measures.CoreMetrics;
+import org.sonar.api.measures.Metric;
+
+public class ScmStatsMetricsTest {
+
   @Test
-  public void defaultContructor_should_initiale_ClockHour_Map() {
-    
-    Assert.assertThat(instance.getCommitsPerClockHour().size(), equalTo(24));
-  }
+  public void testPluginMetris() {
+    List<Metric> metrics = new ScmStatsMetrics().getMetrics();
 
+    assertThat(metrics.size(), equalTo(4));
+    for (Metric metric : metrics) {
+      assertThat(metric.getDomain(), is(CoreMetrics.DOMAIN_SCM));
+    }
+  }
 }
