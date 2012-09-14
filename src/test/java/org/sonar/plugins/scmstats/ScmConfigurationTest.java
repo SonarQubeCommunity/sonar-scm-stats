@@ -25,6 +25,7 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.scm.provider.svn.svnexe.SvnExeScmProvider;
 import org.junit.*;
 import org.sonar.api.resources.Project;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -37,7 +38,6 @@ public class ScmConfigurationTest {
   public void setUp() {
     
     myProject.setConfiguration(mock(Configuration.class));
-    when(myProject.getConfiguration().getString(ScmStatsPlugin.URL)).thenReturn(URL);
     when(myProject.getConfiguration().getBoolean(ScmStatsPlugin.ENABLED, ScmStatsPlugin.ENABLED_DEFAULT)).thenReturn(true);
   }
 
@@ -62,14 +62,13 @@ public class ScmConfigurationTest {
     ScmConfiguration scmConfiguration = new ScmConfiguration(myProject.getConfiguration());
     
     assertThat ( scmConfiguration.isEnabled() , is(true));
-    assertThat ( scmConfiguration.getUrl() , is(URL));
-    assertThat ( scmConfiguration.getScmProvider() , is(new SvnExeScmProvider().getScmType()));
+    assertNull ( scmConfiguration.getUrl());
+    assertNull ( scmConfiguration.getScmProvider());
   }
 
   @Test
   public void testConfigurationOfSCMActivityPlugin() {
     when(myProject.getConfiguration().getString("sonar.scm.url")).thenReturn(URL);
-    when(myProject.getConfiguration().getString(ScmStatsPlugin.URL)).thenReturn("");
 
     ScmConfiguration scmConfiguration = new ScmConfiguration(myProject.getConfiguration());
     

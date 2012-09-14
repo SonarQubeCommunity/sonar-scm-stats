@@ -70,11 +70,6 @@ public class ScmConfiguration implements BatchExtension {
         return urlPropertyFromScmActivity;
       }
 
-      String urlProperty = configuration.getString(ScmStatsPlugin.URL);
-      if (!StringUtils.isBlank(urlProperty)) {
-        return urlProperty;
-      }
-
       return null;
     }
 

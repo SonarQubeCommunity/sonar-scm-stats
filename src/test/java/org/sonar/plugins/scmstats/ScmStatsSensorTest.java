@@ -41,7 +41,6 @@ public class ScmStatsSensorTest {
   public void setUp() {
     myProject.setConfiguration(mock(Configuration.class));
     myProject.setLatestAnalysis(true);
-    when(myProject.getConfiguration().getString(ScmStatsPlugin.URL)).thenReturn(URL);
     when(myProject.getConfiguration().getBoolean(ScmStatsPlugin.ENABLED, ScmStatsPlugin.ENABLED_DEFAULT)).thenReturn(true);
     ScmConfiguration scmConfiguration = new ScmConfiguration(myProject.getConfiguration());
     sensor = new ScmStatsSensor(scmConfiguration, new UrlChecker(), new ScmFacade(null, scmConfiguration));

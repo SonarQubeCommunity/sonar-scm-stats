@@ -26,7 +26,7 @@ import org.sonar.api.BatchExtension;
 import org.sonar.api.utils.SonarException;
 
 public class UrlChecker implements BatchExtension {
-  public static final String PARAMETER_MESSAGE = String.format("Please check the parameter \"%s\" or the <scm> section of Maven pom.", ScmStatsPlugin.URL);
+  public static final String PARAMETER_MESSAGE = String.format("Please check the parameter SCM URL or the <scm> section of Maven pom.");
   public static final String FAILURE_BLANK = "SCM URL must not be blank";
   public static final String FAILURE_FORMAT = "URL does not respect the SCM URL format described in http://maven.apache.org/scm/scm-url-format.html: [%s]";
   public static final String FAILURE_NOT_SUPPORTED = "Unsupported SCM: [%s]. Check compatibility at http://docs.codehaus.org/display/SONAR/SCM+Stats+Plugin";

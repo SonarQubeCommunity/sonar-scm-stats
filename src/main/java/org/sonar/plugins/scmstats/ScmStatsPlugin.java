@@ -33,19 +33,11 @@ import org.sonar.api.SonarPlugin;
   description = "This property can be set to false in order to deactivate the SCM Stats plugin.",
   module = true,
   project = true,
-  global = true),
-  @Property(key = ScmStatsPlugin.URL,
-  defaultValue = "",
-  name = "SCM URL",
-  description = "The format is described in <a target=\"_blank\" href=\"http://maven.apache.org/scm/scm-url-format.html\">this page</a>. "
-  + "Example: <i>scm:svn:https://svn.codehaus.org/sonar-plugins/trunk/scm-stats</i>. ",
-  module = true,
-  project = true,
-  global = false)})
+  global = true)
+ })
 public final class ScmStatsPlugin extends SonarPlugin {
 
   public static final String ENABLED = "sonar.scm-stats.enabled";
-  public static final String URL = "sonar.scm-stats.url";
   public static final boolean ENABLED_DEFAULT = true;
 
   public List getExtensions() {
