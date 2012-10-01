@@ -6,30 +6,61 @@
     else
       commitsPerUser = commitsPerUserDistribution.text_value.split(";"); 
     end  
+    sortedCommitsPerUser = Array.new
+    totalCommits = 0 
+    commitsPerUser.each do |a_measure| 
+      split_measure = a_measure.split("=")
+      a_measure = split_measure[1] + "=" + split_measure[0]
+      totalCommits = totalCommits + split_measure[1].to_f 
+      sortedCommitsPerUser.insert(0,a_measure)
+    end ;
+    sortedCommitsPerUser.sort! {|a,b| b.split("=")[0].to_i <=> a.split("=")[0].to_i}
+    the_measure_pie_chart = ""
+    sortedCommitsPerUser.take(10).each do |a_measure| 
+      split_measure = a_measure.split("=")
+      the_percentage=((split_measure[0].to_i/(totalCommits))*100).round(1)
+      the_measure_pie_chart+=split_measure[1]+"="+the_percentage.to_s+";"
+    end ;
+    
+    top10Committers = sortedCommitsPerUser.take(10)
+    sortedCommitsPerUser.shift(10)
+    restCommitsSum = 0
+    sortedCommitsPerUser.each do |a_measure| 
+      split_measure = a_measure.split("=")
+      restCommitsSum = restCommitsSum + split_measure[0].to_i
+    end ;
+    if restCommitsSum > 0 
+      others = message('widget.scm-stats-commits-per-user.others')
+      the_percentage=((restCommitsSum.to_i/(totalCommits))*100).round(1)
+      the_measure_pie_chart+=others+ "="+the_percentage.to_s+";"
+      others_measure = restCommitsSum.to_s + "=" + others
+      top10Committers.insert(10,others_measure)
+    end;
 
 %>  
 <table width="100%">
   <tbody>
     <tr>
-      <td valign="top" width="50%">
+      <td valign="top" width="40%">
           <div class="dashbox">
           <p class="title"><%= message('widget.scm-stats-commits-per-user.title') -%></p>
           <br>
             <table>
-<% commitsPerUser.each do |the_measure|  %>
+<% top10Committers.each do |the_measure|  %>
 <% the_measure =the_measure.split("="); %>
               <tr>
-                <td align="right" width="40px"><p><%= number_with_delimiter(the_measure[1].to_i);-%></p></td>
+                <td align="right" width="40px"><p><%= number_with_delimiter(the_measure[0].to_i);-%></p></td>
                 <td style="width:10px;"></td>
-                <td><p><%= the_measure[0];-%></p></td>
+                <td><p><%= the_measure[1];-%></p></td>
               </tr>
 <% end; %>
             </table>
           </div>
       </td>
-        <td valign="top" width="50%">
+        <td valign="top" width="60%">
           <div class="dashbox">
-          <%= piechart(measure('scm-commits-per-user'), { :size => "400x200"}) -%>
+  <% query="ck=pieChart3D&w=450&h=200&c=33cc33,ffff33,ff9900,ff0033,382CE0,D42CE0,73A30E,13EEE3,A0E3F0,83800A,000000&v=" + u(the_measure_pie_chart) %>
+  <%= chart(query) -%>
         </div>
       </td>
     </tr>
