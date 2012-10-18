@@ -15,7 +15,7 @@
   <url>http://docs.codehaus.org/display/SONAR/SCM+Stats+Plugin</url>
   
   <ciManagement>
-    <system>&gt;Jenkins</system>
+    <system>Jenkins</system>
     <url>https://sonarplugins.ci.cloudbees.com/job/scm-stats/</url>
   </ciManagement>
   <inceptionYear>2012</inceptionYear>
