@@ -21,6 +21,8 @@
 package org.sonar.plugins.scmstats;
 
 import org.apache.maven.scm.manager.NoSuchScmProviderException;
+import org.apache.maven.scm.provider.git.gitexe.GitExeScmProvider;
+import org.apache.maven.scm.provider.hg.HgScmProvider;
 import org.apache.maven.scm.provider.svn.svnexe.SvnExeScmProvider;
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -40,7 +42,16 @@ public class SonarScmManagerTest {
   @Test
   public void testScmManagerGitProvider() {
     try {
-      scmManager.getProviderByType(new SvnExeScmProvider().getScmType());
+      scmManager.getProviderByType(new GitExeScmProvider().getScmType());
+    } catch (NoSuchScmProviderException ex) {
+      fail (ex.getProviderName() + " Provider should be registered" );
+    }
+  }
+
+  @Test
+  public void testScmManagerHgProvider() {
+    try {
+      scmManager.getProviderByType(new HgScmProvider().getScmType());
     } catch (NoSuchScmProviderException ex) {
       fail (ex.getProviderName() + " Provider should be registered" );
     }

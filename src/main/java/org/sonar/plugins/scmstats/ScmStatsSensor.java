@@ -57,7 +57,9 @@ public class ScmStatsSensor implements Sensor {
         List<ChangeSet> changeSets = changeLogScmResult.getChangeLog().getChangeSets();
         ChangeLogHandler holder = new ChangeLogHandler();
         for (ChangeSet changeSet : changeSets) {
-          holder.addChangeLog(changeSet.getAuthor(),changeSet.getDate(),changeSet.getRevision());
+          if (changeSet.getAuthor() != null && changeSet.getDate() != null) {
+            holder.addChangeLog(changeSet.getAuthor(),changeSet.getDate(),changeSet.getRevision());
+          }
         }
         holder.generateMeasures();
         holder.saveMeasures(context);
