@@ -21,25 +21,25 @@ package org.sonar.plugins.scmstats;
 
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
-import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.maven.scm.provider.ScmUrlUtils;
 import org.sonar.api.BatchExtension;
+import org.sonar.api.config.Settings;
 
 public class ScmConfiguration implements BatchExtension {
 
-  private final Configuration configuration;
-  private final MavenScmConfiguration mavenConfonfiguration;
+  private final Settings settings;
+  private final MavenScmConfiguration mavenConfiguration;
   private final Supplier<String> url;
 
-  public ScmConfiguration(Configuration configuration, MavenScmConfiguration mavenConfiguration) {
-    this.configuration = configuration;
-    this.mavenConfonfiguration = mavenConfiguration;
+  public ScmConfiguration(Settings settings, MavenScmConfiguration mavenConfiguration) {
+    this.settings = settings;
+    this.mavenConfiguration = mavenConfiguration;
     url = Suppliers.memoize(new UrlSupplier());
   }
 
-  public ScmConfiguration(Configuration configuration) {
-    this(configuration,null /** not in maven environment*/);
+  public ScmConfiguration(Settings settings) {
+    this(settings,null /** not in maven environment*/);
   }
 
   public String getScmProvider() {
@@ -50,7 +50,7 @@ public class ScmConfiguration implements BatchExtension {
   }
 
   public boolean isEnabled() {
-    return configuration.getBoolean(ScmStatsPlugin.ENABLED, ScmStatsPlugin.ENABLED_DEFAULT);
+    return settings.getBoolean(ScmStatsPlugin.ENABLED);
   }
 
   public String getUrl() {
@@ -65,7 +65,7 @@ public class ScmConfiguration implements BatchExtension {
         return mavenUrl;
       }
 
-      String urlPropertyFromScmActivity = configuration.getString("sonar.scm.url");
+      String urlPropertyFromScmActivity = settings.getString("sonar.scm.url");
       if (!StringUtils.isBlank(urlPropertyFromScmActivity)) {
         return urlPropertyFromScmActivity;
       }
@@ -74,13 +74,13 @@ public class ScmConfiguration implements BatchExtension {
     }
 
     private String getMavenUrl() {
-      if (mavenConfonfiguration == null) {
+      if (mavenConfiguration == null) {
         return null;
       }
 //      if (StringUtils.isNotBlank(mavenConfonfiguration.getDeveloperUrl()) && StringUtils.isNotBlank(getUser())) {
 //        return mavenConfonfiguration.getDeveloperUrl();
 //      }
-      return mavenConfonfiguration.getUrl();
+      return mavenConfiguration.getUrl();
     }
 
   }

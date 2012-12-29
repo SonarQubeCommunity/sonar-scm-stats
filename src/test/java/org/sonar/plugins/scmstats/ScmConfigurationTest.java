@@ -19,26 +19,21 @@
  */
 package org.sonar.plugins.scmstats;
 
-import org.apache.commons.configuration.Configuration;
 import org.apache.maven.model.Scm;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.scm.provider.svn.svnexe.SvnExeScmProvider;
 import org.junit.*;
-import org.sonar.api.resources.Project;
+import org.sonar.api.config.Settings;
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 public class ScmConfigurationTest {
-  private final Project myProject = new Project("myProject");
+  private final Settings settings = new Settings();
   private static final String URL = "scm:svn:http://";
   @Before
   public void setUp() {
-    
-    myProject.setConfiguration(mock(Configuration.class));
-    when(myProject.getConfiguration().getBoolean(ScmStatsPlugin.ENABLED, ScmStatsPlugin.ENABLED_DEFAULT)).thenReturn(true);
+    settings.setProperty(ScmStatsPlugin.ENABLED, true);
   }
 
   @Test
@@ -50,7 +45,7 @@ public class ScmConfigurationTest {
     scm.setDeveloperConnection(URL);
     mvnProject.setScm(scm);
     MavenScmConfiguration mavenConfonfiguration = new MavenScmConfiguration(mvnProject);
-    ScmConfiguration scmConfiguration = new ScmConfiguration(myProject.getConfiguration(), mavenConfonfiguration);
+    ScmConfiguration scmConfiguration = new ScmConfiguration(settings, mavenConfonfiguration);
     
     assertThat ( scmConfiguration.isEnabled() , is(true));
     assertThat ( scmConfiguration.getUrl() , is(URL));
@@ -59,7 +54,7 @@ public class ScmConfigurationTest {
 
   @Test
   public void testNonMavenConfiguration() {
-    ScmConfiguration scmConfiguration = new ScmConfiguration(myProject.getConfiguration());
+    ScmConfiguration scmConfiguration = new ScmConfiguration(settings);
     
     assertThat ( scmConfiguration.isEnabled() , is(true));
     assertNull ( scmConfiguration.getUrl());
@@ -68,9 +63,8 @@ public class ScmConfigurationTest {
 
   @Test
   public void testConfigurationOfSCMActivityPlugin() {
-    when(myProject.getConfiguration().getString("sonar.scm.url")).thenReturn(URL);
-
-    ScmConfiguration scmConfiguration = new ScmConfiguration(myProject.getConfiguration());
+    settings.setProperty("sonar.scm.url", URL);
+    ScmConfiguration scmConfiguration = new ScmConfiguration(settings);
     
     assertThat ( scmConfiguration.isEnabled() , is(true));
     assertThat ( scmConfiguration.getUrl() , is(URL));
