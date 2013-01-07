@@ -19,15 +19,9 @@
  */
 package org.sonar.plugins.scmstats;
 
-import org.apache.commons.configuration.Configuration;
 import org.junit.*;
-import static org.junit.Assert.*;
-import org.sonar.api.batch.SensorContext;
+import org.sonar.api.config.Settings;
 import org.sonar.api.resources.Project;
-import org.sonar.api.resources.Project;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
@@ -35,14 +29,13 @@ public class ScmStatsSensorTest {
 
   private ScmStatsSensor sensor;
   private final Project myProject = new Project("myProject");
-  private static final String URL = "scm:svn:http://";
+  private final Settings settings = new Settings();
 
   @Before
   public void setUp() {
-    myProject.setConfiguration(mock(Configuration.class));
     myProject.setLatestAnalysis(true);
-    when(myProject.getConfiguration().getBoolean(ScmStatsPlugin.ENABLED, ScmStatsPlugin.ENABLED_DEFAULT)).thenReturn(true);
-    ScmConfiguration scmConfiguration = new ScmConfiguration(myProject.getConfiguration());
+    settings.setProperty(ScmStatsPlugin.ENABLED, true);
+    ScmConfiguration scmConfiguration = new ScmConfiguration(settings);
     sensor = new ScmStatsSensor(scmConfiguration, new UrlChecker(), new ScmFacade(null, scmConfiguration));
   }
 
@@ -59,7 +52,7 @@ public class ScmStatsSensorTest {
 
   @Test
   public void testShouldNotExecuteOnProject_WhenPluginIsNotEnabled() {
-    when(myProject.getConfiguration().getBoolean(ScmStatsPlugin.ENABLED, ScmStatsPlugin.ENABLED_DEFAULT)).thenReturn(false);
+    settings.setProperty(ScmStatsPlugin.ENABLED, false);
     assertThat(sensor.shouldExecuteOnProject(myProject), is(false));
   }
 }
