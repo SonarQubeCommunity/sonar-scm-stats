@@ -27,7 +27,7 @@ import org.sonar.api.Property;
 import org.sonar.api.SonarPlugin;
 
 @Properties({
-  @Property(key = ScmStatsPlugin.ENABLED,
+  @Property(key = ScmStatsConstants.ENABLED,
   defaultValue = "" + ScmStatsPlugin.ENABLED_DEFAULT,
   name = "Activation of SCM Stats plugin",
   description = "This property can be set to false in order to deactivate the SCM Stats plugin.",
@@ -37,7 +37,6 @@ import org.sonar.api.SonarPlugin;
  })
 public final class ScmStatsPlugin extends SonarPlugin {
 
-  public static final String ENABLED = "sonar.scm-stats.enabled";
   public static final boolean ENABLED_DEFAULT = true;
 
   public List getExtensions() {

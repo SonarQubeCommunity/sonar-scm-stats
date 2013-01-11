@@ -33,7 +33,7 @@ public class ScmConfigurationTest {
   private static final String URL = "scm:svn:http://";
   @Before
   public void setUp() {
-    settings.setProperty(ScmStatsPlugin.ENABLED, true);
+    settings.setProperty(ScmStatsConstants.ENABLED, true);
   }
 
   @Test

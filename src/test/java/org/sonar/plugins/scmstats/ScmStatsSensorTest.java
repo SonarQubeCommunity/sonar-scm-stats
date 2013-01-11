@@ -34,7 +34,7 @@ public class ScmStatsSensorTest {
   @Before
   public void setUp() {
     myProject.setLatestAnalysis(true);
-    settings.setProperty(ScmStatsPlugin.ENABLED, true);
+    settings.setProperty(ScmStatsConstants.ENABLED, true);
     ScmConfiguration scmConfiguration = new ScmConfiguration(settings);
     sensor = new ScmStatsSensor(scmConfiguration, new UrlChecker(), new ScmFacade(null, scmConfiguration));
   }
@@ -52,7 +52,7 @@ public class ScmStatsSensorTest {
 
   @Test
   public void testShouldNotExecuteOnProject_WhenPluginIsNotEnabled() {
-    settings.setProperty(ScmStatsPlugin.ENABLED, false);
+    settings.setProperty(ScmStatsConstants.ENABLED, false);
     assertThat(sensor.shouldExecuteOnProject(myProject), is(false));
   }
 }

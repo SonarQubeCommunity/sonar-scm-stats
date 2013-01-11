@@ -50,7 +50,15 @@ public class ScmConfiguration implements BatchExtension {
   }
 
   public boolean isEnabled() {
-    return settings.getBoolean(ScmStatsPlugin.ENABLED);
+    return settings.getBoolean(ScmStatsConstants.ENABLED);
+  }
+
+  public String getUser() {
+    return settings.getString(ScmStatsConstants.USER);
+  }
+  
+  public String getPassword() {
+    return settings.getString(ScmStatsConstants.PASSWORD);
   }
 
   public String getUrl() {
@@ -65,7 +73,7 @@ public class ScmConfiguration implements BatchExtension {
         return mavenUrl;
       }
 
-      String urlPropertyFromScmActivity = settings.getString("sonar.scm.url");
+      String urlPropertyFromScmActivity = settings.getString(ScmStatsConstants.URL);
       if (!StringUtils.isBlank(urlPropertyFromScmActivity)) {
         return urlPropertyFromScmActivity;
       }
@@ -77,9 +85,9 @@ public class ScmConfiguration implements BatchExtension {
       if (mavenConfiguration == null) {
         return null;
       }
-//      if (StringUtils.isNotBlank(mavenConfonfiguration.getDeveloperUrl()) && StringUtils.isNotBlank(getUser())) {
-//        return mavenConfonfiguration.getDeveloperUrl();
-//      }
+      if (StringUtils.isNotBlank(mavenConfiguration.getDeveloperUrl()) && StringUtils.isNotBlank(getUser())) {
+        return mavenConfiguration.getDeveloperUrl();
+      }
       return mavenConfiguration.getUrl();
     }
 

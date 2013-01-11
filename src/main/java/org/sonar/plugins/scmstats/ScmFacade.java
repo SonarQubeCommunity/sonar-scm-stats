@@ -21,21 +21,18 @@
 package org.sonar.plugins.scmstats;
 
 import com.google.common.base.Suppliers;
-
 import com.google.common.base.Supplier;
-
 import com.google.common.annotations.VisibleForTesting;
 import org.apache.commons.lang.StringUtils;
 import org.apache.maven.scm.ScmException;
 import org.apache.maven.scm.ScmFileSet;
 import org.apache.maven.scm.command.changelog.ChangeLogScmResult;
-import org.apache.maven.scm.provider.ScmProviderRepository;
 import org.apache.maven.scm.provider.svn.util.SvnUtil;
 import org.apache.maven.scm.repository.ScmRepository;
 import org.apache.maven.scm.repository.ScmRepositoryException;
+import org.apache.maven.scm.provider.ScmProviderRepository;
 import org.sonar.api.BatchExtension;
 import org.sonar.api.utils.SonarException;
-
 import java.io.File;
 
 public class ScmFacade implements BatchExtension {
@@ -63,9 +60,19 @@ public class ScmFacade implements BatchExtension {
       try {
         String connectionUrl = configuration.getUrl();
         String scmProvider = configuration.getScmProvider();
+        String user = configuration.getUser();
+        String password = configuration.getPassword();
         initSvn(scmProvider);
 
-        return scmManager.makeScmRepository(connectionUrl);
+        ScmRepository scmRepository = scmManager.makeScmRepository(connectionUrl);
+
+        if (!StringUtils.isBlank(user)) {
+          ScmProviderRepository providerRepository = scmRepository.getProviderRepository();
+          providerRepository.setUser(user);
+          providerRepository.setPassword(password);
+        }
+
+        return scmRepository;
       } catch (ScmRepositoryException e) {
         throw new SonarException(e.getValidationMessages().toString(), e);
       } catch (ScmException e) {
