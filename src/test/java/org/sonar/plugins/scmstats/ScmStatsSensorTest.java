@@ -22,6 +22,8 @@ package org.sonar.plugins.scmstats;
 import org.junit.*;
 import org.sonar.api.config.Settings;
 import org.sonar.api.resources.Project;
+import static org.mockito.Mockito.*;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
@@ -30,18 +32,29 @@ public class ScmStatsSensorTest {
   private ScmStatsSensor sensor;
   private final Project myProject = new Project("myProject");
   private final Settings settings = new Settings();
+  private UrlChecker checker;
 
   @Before
   public void setUp() {
     myProject.setLatestAnalysis(true);
     settings.setProperty(ScmStatsConstants.ENABLED, true);
+    checker = mock(UrlChecker.class);
+    
+    when(checker.check(null)).thenReturn(Boolean.FALSE);
+    
     ScmConfiguration scmConfiguration = new ScmConfiguration(settings);
-    sensor = new ScmStatsSensor(scmConfiguration, new UrlChecker(), new ScmFacade(null, scmConfiguration));
+    sensor = new ScmStatsSensor(scmConfiguration, checker, new ScmFacade(null, scmConfiguration));
   }
 
   @Test
-  public void testShouldExecuteOnProject_WhenLastAnalysis() {
+  public void testShouldExecuteOnProject_WhenUrlIsValid_andLastAnalysis() {
+    when(checker.check(null)).thenReturn(Boolean.TRUE);
     assertThat(sensor.shouldExecuteOnProject(myProject), is(true));
+  }
+
+  @Test
+  public void testShouldNotExecuteOnProject_WhenUrlIsNotValid() {
+    assertThat(sensor.shouldExecuteOnProject(myProject), is(false));
   }
 
   @Test
