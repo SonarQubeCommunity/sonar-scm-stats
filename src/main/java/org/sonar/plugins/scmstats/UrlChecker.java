@@ -22,25 +22,31 @@ package org.sonar.plugins.scmstats;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.maven.scm.provider.ScmUrlUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonar.api.BatchExtension;
-import org.sonar.api.utils.SonarException;
 
 public class UrlChecker implements BatchExtension {
-  public static final String PARAMETER_MESSAGE = String.format("Please check the parameter SCM URL or the <scm> section of Maven pom.");
+  public static final String PARAMETER_MESSAGE = String.format("SCM Stats Plugin will not run.Please check the parameter SCM URL or the <scm> section of Maven pom.");
   public static final String FAILURE_BLANK = "SCM URL must not be blank";
   public static final String FAILURE_FORMAT = "URL does not respect the SCM URL format described in http://maven.apache.org/scm/scm-url-format.html: [%s]";
   public static final String FAILURE_NOT_SUPPORTED = "Unsupported SCM: [%s]. Check compatibility at http://docs.codehaus.org/display/SONAR/SCM+Stats+Plugin";
+  private static final Logger LOG = LoggerFactory.getLogger(UrlChecker.class);
 
-  public void check(String url) {
+  public boolean check(String url) {
     if (StringUtils.isBlank(url)) {
-      throw failure(FAILURE_BLANK);
+      warn(FAILURE_BLANK);
+      return false;
     }
     if (!ScmUrlUtils.isValid(url)) {
-      throw failure(FAILURE_FORMAT, url);
+      warn(FAILURE_FORMAT,url);
+      return false;
     }
     if (!isSupported(url)) {
-      throw failure(FAILURE_NOT_SUPPORTED, ScmUrlUtils.getProvider(url));
+      warn(FAILURE_NOT_SUPPORTED, ScmUrlUtils.getProvider(url));
+      return false;
     }
+    return true;
   }
 
   private static boolean isSupported(String url) {
@@ -52,7 +58,7 @@ public class UrlChecker implements BatchExtension {
     return false;
   }
 
-  private static SonarException failure(String format, Object... args) {
-    return new SonarException(String.format(format, args) + ". " + PARAMETER_MESSAGE);
+  private static void warn(String format, Object... args) {
+    LOG.warn (String.format(format, args) + ". " + PARAMETER_MESSAGE);
   }
 }

@@ -17,7 +17,6 @@
  * License along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
  */
-
 package org.sonar.plugins.scmstats;
 
 import java.util.List;
@@ -34,7 +33,6 @@ import org.sonar.plugins.scmstats.measures.ChangeLogHandler;
 public class ScmStatsSensor implements Sensor {
 
   private static final Logger LOG = LoggerFactory.getLogger(ScmStatsSensor.class);
-
   private final ScmConfiguration configuration;
   private final UrlChecker urlChecker;
   private final ScmFacade scmFacade;
@@ -46,11 +44,11 @@ public class ScmStatsSensor implements Sensor {
   }
 
   public boolean shouldExecuteOnProject(Project project) {
-    return project.isLatestAnalysis() && configuration.isEnabled();
+    return project.isLatestAnalysis() && configuration.isEnabled()
+            && urlChecker.check(configuration.getUrl());
   }
 
   public void analyse(Project project, SensorContext context) {
-    urlChecker.check(configuration.getUrl());
     try {
       ChangeLogScmResult changeLogScmResult = scmFacade.getChangeLog(project.getFileSystem().getBasedir());
       if (changeLogScmResult.isSuccess()) {
@@ -58,19 +56,18 @@ public class ScmStatsSensor implements Sensor {
         ChangeLogHandler holder = new ChangeLogHandler();
         for (ChangeSet changeSet : changeSets) {
           if (changeSet.getAuthor() != null && changeSet.getDate() != null) {
-            holder.addChangeLog(changeSet.getAuthor(),changeSet.getDate(),changeSet.getRevision());
+            holder.addChangeLog(changeSet.getAuthor(), changeSet.getDate(), changeSet.getRevision());
           }
         }
         holder.generateMeasures();
         holder.saveMeasures(context);
-      }else{
+      } else {
         LOG.warn(String.format("Fail to retrieve SCM info. Reason: %s%n%s",
-                changeLogScmResult.getProviderMessage(), 
+                changeLogScmResult.getProviderMessage(),
                 changeLogScmResult.getCommandOutput()));
       }
     } catch (ScmException e) {
       LOG.warn(String.format("Fail to retrieve SCM info."), e); // See SONARPLUGINS-368. Can occur on generated source
     }
   }
-  
 }
