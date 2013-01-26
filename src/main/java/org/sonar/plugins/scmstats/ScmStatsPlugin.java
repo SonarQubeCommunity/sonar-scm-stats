@@ -19,12 +19,12 @@
  */
 package org.sonar.plugins.scmstats;
 
-import org.sonar.plugins.scmstats.measures.ScmStatsMetrics;
 import com.google.common.collect.ImmutableList;
 import java.util.List;
 import org.sonar.api.Properties;
 import org.sonar.api.Property;
 import org.sonar.api.SonarPlugin;
+import org.sonar.plugins.scmstats.measures.ScmStatsMetrics;
 
 @Properties({
   @Property(key = ScmStatsConstants.ENABLED,

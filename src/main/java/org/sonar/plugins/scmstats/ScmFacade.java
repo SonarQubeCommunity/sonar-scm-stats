@@ -20,20 +20,20 @@
 
 package org.sonar.plugins.scmstats;
 
-import com.google.common.base.Suppliers;
-import com.google.common.base.Supplier;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Supplier;
+import com.google.common.base.Suppliers;
+import java.io.File;
 import org.apache.commons.lang.StringUtils;
 import org.apache.maven.scm.ScmException;
 import org.apache.maven.scm.ScmFileSet;
 import org.apache.maven.scm.command.changelog.ChangeLogScmResult;
+import org.apache.maven.scm.provider.ScmProviderRepository;
 import org.apache.maven.scm.provider.svn.util.SvnUtil;
 import org.apache.maven.scm.repository.ScmRepository;
 import org.apache.maven.scm.repository.ScmRepositoryException;
-import org.apache.maven.scm.provider.ScmProviderRepository;
 import org.sonar.api.BatchExtension;
 import org.sonar.api.utils.SonarException;
-import java.io.File;
 
 public class ScmFacade implements BatchExtension {
   private final SonarScmManager scmManager;
