@@ -29,7 +29,6 @@ public class CommitsPerMonthMeasureTest {
 
   @Test
   public void testInit() {
-    System.out.println("init");
     CommitsPerMonthMeasure measure = 
             new CommitsPerMonthMeasure( new HashMap<String, Integer>(), null);
     measure.init();

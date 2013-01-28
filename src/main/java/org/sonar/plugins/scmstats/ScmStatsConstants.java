@@ -32,4 +32,9 @@ public final class ScmStatsConstants {
   public static final String USER = "sonar.scm.user.secured";
   public static final String PASSWORD = "sonar.scm.password.secured";
   
+  // Constants used in the plugin
+  public static final String ACTIVITY_ADD = "Adding";
+  public static final String ACTIVITY_MODIFY = "Modifying";
+  public static final String ACTIVITY_DELETE = "Deleting";
+  
 }

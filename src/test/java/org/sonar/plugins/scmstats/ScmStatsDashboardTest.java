@@ -38,8 +38,8 @@ public class ScmStatsDashboardTest {
   public void testCreateDashboard() {
     Dashboard result = dashboard.createDashboard();
     assertThat(result.getLayout(),is(DashboardLayout.TWO_COLUMNS));
-    assertThat(result.getWidgets().size(),is(4));
+    assertThat(result.getWidgets().size(),is(5));
     assertThat(result.getWidgetsOfColumn(1).size(),is(2));
-    assertThat(result.getWidgetsOfColumn(2).size(),is(2));
+    assertThat(result.getWidgetsOfColumn(2).size(),is(3));
   }
 }

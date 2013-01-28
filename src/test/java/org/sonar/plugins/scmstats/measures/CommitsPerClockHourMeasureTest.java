@@ -29,7 +29,6 @@ public class CommitsPerClockHourMeasureTest {
 
   @Test
   public void testInit() {
-    System.out.println("init");
     CommitsPerClockHourMeasure measure = 
             new CommitsPerClockHourMeasure( new HashMap<String, Integer>(), null);
     measure.init();

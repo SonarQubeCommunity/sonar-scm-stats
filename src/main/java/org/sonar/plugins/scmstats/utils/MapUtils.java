@@ -18,22 +18,24 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
  */
 
-package org.sonar.plugins.scmstats.measures;
+package org.sonar.plugins.scmstats.utils;
 
 import java.util.HashMap;
-import org.junit.*;
-import static org.junit.Assert.*;
-import static org.hamcrest.Matchers.is;
-public class CommitsPerWeekDayMeasureTest {
-  
+import java.util.Map;
 
-  @Test
-  public void testInit() {
-    CommitsPerWeekDayMeasure measure = 
-            new CommitsPerWeekDayMeasure( new HashMap<String, Integer>(), null);
-    measure.init();
-    assertThat(measure.getDataMap().containsKey("1"), is(true));
-    assertThat(measure.getDataMap().containsKey("7"), is(true));
-    assertThat(measure.getDataMap().size(), is(7));
+public final class MapUtils {
+
+  private MapUtils(){};
+  public static Map<String, Integer> updateMap(final Map<String, Integer> map, final String key) {
+
+    final Map<String, Integer> updatedMap = new HashMap<String, Integer>();
+    updatedMap.putAll(map);
+    if (updatedMap.containsKey(key)) {
+      updatedMap.put(key, updatedMap.get(key) + 1);
+    } else {
+      updatedMap.put(key, 1);
+    }
+
+    return updatedMap;
   }
 }

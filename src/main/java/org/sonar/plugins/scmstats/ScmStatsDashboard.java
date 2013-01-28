@@ -42,10 +42,11 @@ public final class ScmStatsDashboard extends DashboardTemplate {
 
   private void createLeftColumn(final Dashboard dashboard) {
     dashboard.addWidget("scm-stats-commits-per-user", 1);
-    dashboard.addWidget("scm-stats-commits-per-clockhour", 1);
+    dashboard.addWidget("scm-stats-authors-activity", 1);
   }
 
   private void createRightColumn(final Dashboard dashboard) {
+    dashboard.addWidget("scm-stats-commits-per-clockhour", 2);
     dashboard.addWidget("scm-stats-commits-per-weekday", 2);
     dashboard.addWidget("scm-stats-commits-per-month", 2);
   }

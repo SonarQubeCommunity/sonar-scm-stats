@@ -19,53 +19,85 @@
  */
 package org.sonar.plugins.scmstats.measures;
 
+import com.google.common.annotations.VisibleForTesting;
 import java.util.*;
+import org.apache.commons.lang.ObjectUtils;
 import org.joda.time.DateTime;
 import org.sonar.api.batch.SensorContext;
+import org.sonar.plugins.scmstats.ScmStatsConstants;
 import org.sonar.plugins.scmstats.model.ChangeLogInfo;
+import org.sonar.plugins.scmstats.utils.MapUtils;
 
 public class ChangeLogHandler {
 
-  private final Map<String, Integer> commitsPerUser = new HashMap<String, Integer>();
-  private final Map<String, Integer> commitsPerClockHour = new HashMap<String, Integer>();
-  private final Map<String, Integer> commitsPerWeekDay = new HashMap<String, Integer>();
-  private final Map<String, Integer> commitsPerMonth = new HashMap<String, Integer>();
+  private Map<String, List<Integer>> commitsPerUser = new HashMap<String, List<Integer>>();
+  private Map<String, Integer> commitsPerClockHour = new HashMap<String, Integer>();
+  private Map<String, Integer> commitsPerWeekDay = new HashMap<String, Integer>();
+  private Map<String, Integer> commitsPerMonth = new HashMap<String, Integer>();
   private final List<ChangeLogInfo> changeLogs = new ArrayList<ChangeLogInfo>();
 
-  public final void addChangeLog(String authorName, Date commitDate, String revision) {
-    changeLogs.add(new ChangeLogInfo(authorName, commitDate, revision));
+  public final void addChangeLog(String authorName, Date commitDate, Map<String, Integer> fileStatus) {
+    changeLogs.add(new ChangeLogInfo(authorName, commitDate, fileStatus));
   }
 
   public void generateMeasures() {
     for (ChangeLogInfo changeLogInfo : changeLogs) {
-      updateMap(commitsPerUser, changeLogInfo.getAuthor());
+      commitsPerUser = updateAuthorActivity(commitsPerUser, changeLogInfo);
 
       DateTime dt = new DateTime(changeLogInfo.getCommitDate());
 
-      updateMap(commitsPerClockHour, String.format("%2d", dt.getHourOfDay()).replace(' ', '0'));
-      updateMap(commitsPerWeekDay, dt.dayOfWeek().getAsString());
-      updateMap(commitsPerMonth, String.format("%2d", dt.getMonthOfYear()).replace(' ', '0'));
+      commitsPerClockHour = MapUtils.updateMap(commitsPerClockHour, String.format("%2d", dt.getHourOfDay()).replace(' ', '0'));
+      commitsPerWeekDay = MapUtils.updateMap(commitsPerWeekDay, dt.dayOfWeek().getAsString());
+      commitsPerMonth = MapUtils.updateMap(commitsPerMonth, String.format("%2d", dt.getMonthOfYear()).replace(' ', '0'));
     }
-
-
   }
-  
-  public void saveMeasures(SensorContext context){
+
+  public void saveMeasures(SensorContext context) {
     new CommitsPerMonthMeasure(commitsPerMonth, context).save();
     new CommitsPerWeekDayMeasure(commitsPerWeekDay, context).save();
     new CommitsPerClockHourMeasure(commitsPerClockHour, context).save();
     new CommitsPerUserMeasure(commitsPerUser, context).save();
+
+  }
+  @VisibleForTesting
+  Map<String, List<Integer>> updateAuthorActivity(
+          final Map<String, List<Integer>> map, 
+          final ChangeLogInfo changeLogInfo) {
     
+    final String author = changeLogInfo.getAuthor();
+    final Map<String, List<Integer>> authorActivity = new HashMap<String, List<Integer>>();
+    authorActivity.putAll(map);
+    
+    final Map<String, Integer> activity = changeLogInfo.getActivity();
+    final List<Integer> stats = (List<Integer>) 
+            ObjectUtils.defaultIfNull(authorActivity.get(author),
+                                      getInitialActivity(activity));
+    if (authorActivity.containsKey(author)) {
+      final Integer commits = stats.get(0) + 1;
+      stats.set(0, commits);
+      updateActivity( stats, activity, 1, ScmStatsConstants.ACTIVITY_ADD);
+      updateActivity( stats, activity, 2, ScmStatsConstants.ACTIVITY_MODIFY);
+      updateActivity( stats, activity, 3, ScmStatsConstants.ACTIVITY_DELETE);
+    }    
+    authorActivity.put(author, stats);
+    return authorActivity;
   }
 
-  private void updateMap(final Map<String, Integer> map, final String key) {
-    if (map.containsKey(key)) {
-      map.put(key, map.get(key) + 1);
-    } else {
-      map.put(key, 1);
-    }
+  private void updateActivity(final List<Integer> stats, 
+          final Map<String, Integer> activityType, 
+          final int pos,
+          final String action) {
+    final Integer actions = stats.get(pos) + 
+            org.apache.commons.collections.MapUtils.getInteger(activityType, action, 0);
+    stats.set(pos, actions);
   }
 
+  private List<Integer> getInitialActivity(final Map<String,Integer> activity){
+          return Arrays.asList(1,
+            org.apache.commons.collections.MapUtils.getInteger(activity, ScmStatsConstants.ACTIVITY_ADD, 0),
+            org.apache.commons.collections.MapUtils.getInteger(activity, ScmStatsConstants.ACTIVITY_MODIFY, 0),
+            org.apache.commons.collections.MapUtils.getInteger(activity, ScmStatsConstants.ACTIVITY_DELETE, 0));
+                  }
   public Map<String, Integer> getCommitsPerClockHour() {
     return commitsPerClockHour;
   }
@@ -74,7 +106,7 @@ public class ChangeLogHandler {
     return commitsPerMonth;
   }
 
-  public Map<String, Integer> getCommitsPerUser() {
+  public Map<String, List<Integer>> getCommitsPerUser() {
     return commitsPerUser;
   }
 
@@ -82,5 +114,8 @@ public class ChangeLogHandler {
     return commitsPerWeekDay;
   }
   
+  public List<ChangeLogInfo> getChangeLogs(){
+    return changeLogs;
+  }
   
 }

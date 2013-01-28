@@ -34,6 +34,6 @@ public class ScmStatsPluginTest {
 
   @Test
   public void testPluginDefinition() {
-    assertThat(plugin.getExtensions().size(), equalTo(13));
+    assertThat(plugin.getExtensions().size(), equalTo(15));
   }
 }

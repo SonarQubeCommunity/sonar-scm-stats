@@ -1,0 +1,38 @@
+<% 
+  commitsPerUserDistribution = measure("scm-commits-per-user")
+  if commitsPerUserDistribution
+    if !commitsPerUserDistribution.data.blank?
+      commitsPerUser = commitsPerUserDistribution.data.split(";"); 
+    else
+      commitsPerUser = commitsPerUserDistribution.text_value.split(";"); 
+    end  
+    the_measure_stack_chart = ""
+    commitsPerUser.each do |a_measure| 
+      split_measure = a_measure.split("=")
+      activity = split_measure[1].sub('[', '').sub(']', '')
+      activity_metrics = activity.split(",")
+      the_measure_stack_chart+=split_measure[0]+"="+activity_metrics[1]+"."+activity_metrics[2]+"."+activity_metrics[3]+";"
+    end ;
+    height = (commitsPerUser.length * 30) + 40;
+    
+%>  
+<p class="title"><%= message('widget.scm-stats-authors-activity.title') -%></p>
+<table width="100%">
+  <tbody>
+
+    <tr>
+        <td valign="top" width="100%">
+          <div class="dashbox">
+  <% query="ck=stackedBarChart3D&w=500&h=" + height.to_s + "&v=" + u(the_measure_stack_chart) %>
+  <%= chart(query) -%>
+        </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<% else %>
+  <p class="title"><%= message('widget.scm-stats-authors-activity.title') -%></p>
+  <br />
+  <p><%= message('scmstats.noData') -%></p>
+<% end %>

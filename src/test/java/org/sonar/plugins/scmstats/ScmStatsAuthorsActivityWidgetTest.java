@@ -17,23 +17,19 @@
  * License along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
  */
+package org.sonar.plugins.scmstats;
 
-package org.sonar.plugins.scmstats.measures;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.Assert.assertThat;
+import org.junit.Test;
 
-import java.util.HashMap;
-import org.junit.*;
-import static org.junit.Assert.*;
-import static org.hamcrest.Matchers.is;
-public class CommitsPerWeekDayMeasureTest {
-  
+public class ScmStatsAuthorsActivityWidgetTest {
 
   @Test
-  public void testInit() {
-    CommitsPerWeekDayMeasure measure = 
-            new CommitsPerWeekDayMeasure( new HashMap<String, Integer>(), null);
-    measure.init();
-    assertThat(measure.getDataMap().containsKey("1"), is(true));
-    assertThat(measure.getDataMap().containsKey("7"), is(true));
-    assertThat(measure.getDataMap().size(), is(7));
+  public void testWidgetDefinition() {
+    ScmStatsAuthorsActivityWidget widget = new ScmStatsAuthorsActivityWidget();
+    assertThat(widget.getId(), notNullValue());
+    assertThat(widget.getTitle(), notNullValue());
+    assertThat(getClass().getResource(widget.getTemplatePath()), notNullValue());
   }
 }

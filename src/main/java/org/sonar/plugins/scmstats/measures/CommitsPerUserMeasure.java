@@ -1,5 +1,3 @@
-package org.sonar.plugins.scmstats.measures;
-
 /*
  * Sonar SCM Stats Plugin
  * Copyright (C) 2012 Patroklos PAPAPETROU
@@ -19,19 +17,33 @@ package org.sonar.plugins.scmstats.measures;
  * License along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
  */
+package org.sonar.plugins.scmstats.measures;
 
-
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.sonar.api.batch.SensorContext;
+import org.sonar.api.measures.Measure;
+import org.sonar.api.measures.PropertiesBuilder;
 
-public class CommitsPerUserMeasure extends AbstractScmStatsMeasure {
-  
-  public CommitsPerUserMeasure(final Map<String, Integer> map, 
-                                final SensorContext context) {
-    super(ScmStatsMetrics.SCM_COMMITS_PER_USER, map, context);
+public class CommitsPerUserMeasure {
+
+  private Measure measure;
+  private final Map<String, List<Integer>> dataMap = new HashMap<String, List<Integer>>();
+  private final SensorContext context;
+
+  public CommitsPerUserMeasure(final Map<String, List<Integer>> map,
+          final SensorContext context) {
+    this.context = context;
+    dataMap.putAll(map);
+    measure = new PropertiesBuilder<String, List<Integer>>(ScmStatsMetrics.SCM_COMMITS_PER_USER).addAll(dataMap).build();
   }
 
-  @Override
-  protected void init() {
+  public void save() {
+    context.saveMeasure(measure);
+  }
+
+  public Map<String, List<Integer>> getDataMap() {
+    return dataMap;
   }
 }

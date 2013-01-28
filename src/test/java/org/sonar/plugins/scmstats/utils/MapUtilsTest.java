@@ -18,22 +18,32 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
  */
 
-package org.sonar.plugins.scmstats.measures;
+package org.sonar.plugins.scmstats.utils;
 
 import java.util.HashMap;
-import org.junit.*;
-import static org.junit.Assert.*;
+import java.util.Map;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-public class CommitsPerWeekDayMeasureTest {
-  
+import static org.junit.Assert.assertThat;
+import org.junit.Test;
 
+public class MapUtilsTest {
+  
+  /**
+   * Test of updateMap method, of class MapUtils.
+   */
   @Test
-  public void testInit() {
-    CommitsPerWeekDayMeasure measure = 
-            new CommitsPerWeekDayMeasure( new HashMap<String, Integer>(), null);
-    measure.init();
-    assertThat(measure.getDataMap().containsKey("1"), is(true));
-    assertThat(measure.getDataMap().containsKey("7"), is(true));
-    assertThat(measure.getDataMap().size(), is(7));
+  public void testUpdateMap() {
+    
+    Map<String, Integer> map = new HashMap<String, Integer>();
+    map.put("KEY1", 10);
+    Map result = MapUtils.updateMap(map, "KEY1");
+    result = MapUtils.updateMap(result, "KEY2");
+    assertThat(result.size(),is(2));
+    assertThat(result.containsKey("KEY1"),is(true));
+    assertThat(result.containsKey("KEY2"),is(true));
+    assertThat((Integer)result.get("KEY1"),equalTo(11));
+    assertThat((Integer)result.get("KEY2"),is(1));
+    
   }
 }

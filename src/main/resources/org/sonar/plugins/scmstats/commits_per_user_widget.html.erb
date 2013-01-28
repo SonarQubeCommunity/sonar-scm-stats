@@ -8,10 +8,13 @@
     end  
     sortedCommitsPerUser = Array.new
     totalCommits = 0 
+
     commitsPerUser.each do |a_measure| 
       split_measure = a_measure.split("=")
-      a_measure = split_measure[1] + "=" + split_measure[0]
-      totalCommits = totalCommits + split_measure[1].to_f 
+      activity = split_measure[1].sub('[', '').sub(']', '')
+      activity_metrics = activity.split(",")
+      a_measure = activity_metrics[0] + "=" + split_measure[0]
+      totalCommits = totalCommits + activity_metrics[0].to_f 
       sortedCommitsPerUser.insert(0,a_measure)
     end ;
     sortedCommitsPerUser.sort! {|a,b| b.split("=")[0].to_i <=> a.split("=")[0].to_i}
@@ -21,7 +24,7 @@
       the_percentage=((split_measure[0].to_i/(totalCommits))*100).round(1)
       the_measure_pie_chart+=split_measure[1]+"="+the_percentage.to_s+";"
     end ;
-    
+
     top10Committers = sortedCommitsPerUser.take(10)
     sortedCommitsPerUser.shift(10)
     restCommitsSum = 0
@@ -43,7 +46,7 @@
     <tr>
       <td valign="top" width="40%">
           <div class="dashbox">
-          <p class="title"><%= message('widget.scm-stats-commits-per-user.title') -%></p>
+  <p class="title"><%= message('widget.scm-stats-commits-per-user.title') -%></p>
           <br>
             <table>
 <% top10Committers.each do |the_measure|  %>

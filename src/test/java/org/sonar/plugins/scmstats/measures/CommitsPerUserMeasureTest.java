@@ -21,18 +21,17 @@
 package org.sonar.plugins.scmstats.measures;
 
 import java.util.HashMap;
-import org.junit.*;
-import static org.junit.Assert.*;
+import java.util.List;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
+import org.junit.Test;
 public class CommitsPerUserMeasureTest {
   
 
   @Test
   public void testInit() {
-    System.out.println("init");
     CommitsPerUserMeasure measure = 
-            new CommitsPerUserMeasure( new HashMap<String, Integer>(), null);
-    measure.init();
+            new CommitsPerUserMeasure( new HashMap<String, List<Integer>>(), null);
     assertThat(measure.getDataMap().size(), is(0));
   }
 }

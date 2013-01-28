@@ -18,22 +18,30 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
  */
 
-package org.sonar.plugins.scmstats.measures;
+package org.sonar.plugins.scmstats;
 
-import java.util.HashMap;
-import org.junit.*;
-import static org.junit.Assert.*;
-import static org.hamcrest.Matchers.is;
-public class CommitsPerWeekDayMeasureTest {
-  
+import org.sonar.api.web.AbstractRubyTemplate;
+import org.sonar.api.web.Description;
+import org.sonar.api.web.RubyRailsWidget;
+import org.sonar.api.web.UserRole;
+import org.sonar.api.web.WidgetCategory;
 
-  @Test
-  public void testInit() {
-    CommitsPerWeekDayMeasure measure = 
-            new CommitsPerWeekDayMeasure( new HashMap<String, Integer>(), null);
-    measure.init();
-    assertThat(measure.getDataMap().containsKey("1"), is(true));
-    assertThat(measure.getDataMap().containsKey("7"), is(true));
-    assertThat(measure.getDataMap().size(), is(7));
+@UserRole(UserRole.USER)
+@WidgetCategory("SCM")
+@Description("SCM Stats Authors Activity")
+public final class ScmStatsAuthorsActivityWidget extends AbstractRubyTemplate implements RubyRailsWidget {
+
+  public String getId() {
+    return "scm-stats-authors-activity";
   }
+
+  public String getTitle() {
+    return "SCM Stats Authors Activity";
+  }
+
+  @Override
+  protected String getTemplatePath() {
+    return "/org/sonar/plugins/scmstats/authors_activity_widget.html.erb";
+  }
+
 }

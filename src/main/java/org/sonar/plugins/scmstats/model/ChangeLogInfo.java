@@ -21,25 +21,26 @@
 package org.sonar.plugins.scmstats.model;
 
 import java.util.Date;
+import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 
 public class ChangeLogInfo {
   
   private String author;
   private Date commitDate;
-  private String revision;
+  private Map<String,Integer> activity;
 
-  public ChangeLogInfo(String author, Date commitDate, String revision) {
+  public ChangeLogInfo(String author, Date commitDate, Map<String,Integer> activity) {
     this.setAuthor(author);
     this.commitDate = commitDate;
-    this.revision = revision;
+    this.activity = activity;
   }
   
   public String getAuthor() {
     return author;
   }
 
-  public void setAuthor(String author) {
+  public final void setAuthor(String author) {
     this.author = StringUtils.substringBefore(author, "<").trim();
   }
 
@@ -51,12 +52,8 @@ public class ChangeLogInfo {
     this.commitDate = commitDate;
   }
 
-  public String getRevision() {
-    return revision;
-  }
-
-  public void setRevision(String revision) {
-    this.revision = revision;
+  public Map<String, Integer> getActivity() {
+    return activity;
   }
 
 }

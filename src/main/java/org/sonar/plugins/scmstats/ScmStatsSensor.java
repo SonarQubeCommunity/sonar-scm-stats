@@ -19,9 +19,13 @@
  */
 package org.sonar.plugins.scmstats;
 
-import java.util.List;
+import com.google.common.annotations.VisibleForTesting;
+import java.util.HashMap;
+import java.util.Map;
+import org.apache.maven.scm.ChangeFile;
 import org.apache.maven.scm.ChangeSet;
 import org.apache.maven.scm.ScmException;
+import org.apache.maven.scm.ScmFileStatus;
 import org.apache.maven.scm.command.changelog.ChangeLogScmResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +33,7 @@ import org.sonar.api.batch.Sensor;
 import org.sonar.api.batch.SensorContext;
 import org.sonar.api.resources.Project;
 import org.sonar.plugins.scmstats.measures.ChangeLogHandler;
+import org.sonar.plugins.scmstats.utils.MapUtils;
 
 public class ScmStatsSensor implements Sensor {
 
@@ -36,7 +41,7 @@ public class ScmStatsSensor implements Sensor {
   private final ScmConfiguration configuration;
   private final UrlChecker urlChecker;
   private final ScmFacade scmFacade;
-
+  
   public ScmStatsSensor(ScmConfiguration configuration, UrlChecker urlChecker, ScmFacade scmFacade) {
     this.configuration = configuration;
     this.urlChecker = urlChecker;
@@ -52,12 +57,9 @@ public class ScmStatsSensor implements Sensor {
     try {
       ChangeLogScmResult changeLogScmResult = scmFacade.getChangeLog(project.getFileSystem().getBasedir());
       if (changeLogScmResult.isSuccess()) {
-        List<ChangeSet> changeSets = changeLogScmResult.getChangeLog().getChangeSets();
-        ChangeLogHandler holder = new ChangeLogHandler();
-        for (ChangeSet changeSet : changeSets) {
-          if (changeSet.getAuthor() != null && changeSet.getDate() != null) {
-            holder.addChangeLog(changeSet.getAuthor(), changeSet.getDate(), changeSet.getRevision());
-          }
+      ChangeLogHandler holder = new ChangeLogHandler();
+      for (ChangeSet changeSet : changeLogScmResult.getChangeLog().getChangeSets()) {
+          holder = addChangeLogToHolder(changeSet,holder);
         }
         holder.generateMeasures();
         holder.saveMeasures(context);
@@ -69,5 +71,28 @@ public class ScmStatsSensor implements Sensor {
     } catch (ScmException e) {
       LOG.warn(String.format("Fail to retrieve SCM info."), e); // See SONARPLUGINS-368. Can occur on generated source
     }
+  }
+
+  @VisibleForTesting
+  ChangeLogHandler addChangeLogToHolder(ChangeSet changeSet, ChangeLogHandler holder) {
+    if (changeSet.getAuthor() != null && changeSet.getDate() != null) {
+      holder.addChangeLog(changeSet.getAuthor(), changeSet.getDate(), createActivityMap(changeSet));
+    }
+    return holder;
+  }
+
+  @VisibleForTesting
+  Map<String, Integer> createActivityMap(ChangeSet changeSet) {
+    Map<String,Integer> fileStatus = new HashMap<String, Integer>();
+    for (ChangeFile changeFile : changeSet.getFiles()){
+      if (changeFile.getAction()== ScmFileStatus.ADDED){
+        fileStatus = MapUtils.updateMap(fileStatus, ScmStatsConstants.ACTIVITY_ADD);
+      }else if (changeFile.getAction()== ScmFileStatus.MODIFIED){
+        fileStatus = MapUtils.updateMap(fileStatus, ScmStatsConstants.ACTIVITY_MODIFY);
+      }else if (changeFile.getAction()== ScmFileStatus.DELETED){
+        fileStatus = MapUtils.updateMap(fileStatus, ScmStatsConstants.ACTIVITY_DELETE);
+      }
+    }
+    return fileStatus;
   }
 }
