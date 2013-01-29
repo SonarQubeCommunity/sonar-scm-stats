@@ -18,21 +18,19 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
  */
 
-package org.sonar.plugins.scmstats.measures;
+package org.sonar.plugins.scmstats;
 
-import java.util.HashMap;
-import java.util.List;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 import org.junit.Test;
-public class CommitsPerUserMeasureTest {
-  
 
+public class ScmStatsConstantsTest {
   @Test
-  public void testInit() {
-    CommitsPerUserMeasure measure = 
-            new CommitsPerUserMeasure(ScmStatsMetrics.SCM_COMMITS_PER_USER,
-            new HashMap<String, List<Integer>>(), null);
-    assertThat(measure.getDataMap().size(), is(0));
+  public void testConstantsCount() {
+    assertThat(ScmStatsConstants.getAsList().size(),equalTo(10));    
+  }
+  @Test
+  public void testPeriodConstantsCount() {
+    assertThat(ScmStatsConstants.getPeriodsAsList().size(),equalTo(3));    
   }
 }

@@ -23,12 +23,14 @@ package org.sonar.plugins.scmstats.measures;
 
 import java.util.Map;
 import org.sonar.api.batch.SensorContext;
+import org.sonar.api.measures.Metric;
 
 public class CommitsPerClockHourMeasure extends AbstractScmStatsMeasure {
   
-  public CommitsPerClockHourMeasure(final Map<String, Integer> map, 
+  public CommitsPerClockHourMeasure(final Metric metric,
+                                final Map<String, Integer> map, 
                                 final SensorContext context) {
-    super(ScmStatsMetrics.SCM_COMMITS_PER_CLOCKTIME, map, context);
+    super(metric, map, context);
   }
 
   @Override

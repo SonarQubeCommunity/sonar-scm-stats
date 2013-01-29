@@ -54,8 +54,10 @@ public class ScmStatsSensor implements Sensor {
   }
 
   public void analyse(Project project, SensorContext context) {
+    
     try {
-      ChangeLogScmResult changeLogScmResult = scmFacade.getChangeLog(project.getFileSystem().getBasedir());
+      ChangeLogScmResult changeLogScmResult = 
+              scmFacade.getChangeLog(project.getFileSystem().getBasedir(),configuration.getFirstPeriod());
       if (changeLogScmResult.isSuccess()) {
       ChangeLogHandler holder = new ChangeLogHandler();
       for (ChangeSet changeSet : changeLogScmResult.getChangeLog().getChangeSets()) {

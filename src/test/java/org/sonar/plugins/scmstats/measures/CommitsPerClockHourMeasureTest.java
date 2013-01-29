@@ -30,7 +30,8 @@ public class CommitsPerClockHourMeasureTest {
   @Test
   public void testInit() {
     CommitsPerClockHourMeasure measure = 
-            new CommitsPerClockHourMeasure( new HashMap<String, Integer>(), null);
+            new CommitsPerClockHourMeasure(ScmStatsMetrics.SCM_COMMITS_PER_CLOCKTIME,
+            new HashMap<String, Integer>(), null);
     measure.init();
     assertThat(measure.getDataMap().containsKey("00"), is(true));
     assertThat(measure.getDataMap().containsKey("23"), is(true));

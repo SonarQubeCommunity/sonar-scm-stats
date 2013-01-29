@@ -61,6 +61,18 @@ public class ScmConfiguration implements BatchExtension {
     return settings.getString(ScmStatsConstants.PASSWORD);
   }
 
+  public Integer getFirstPeriod() {
+    return settings.getInt(ScmStatsConstants.PERIOD_1);
+  }
+
+  public Integer getSecondPeriod() {
+    return settings.getInt(ScmStatsConstants.PERIOD_2);
+  }
+
+  public Integer getThirdPeriod() {
+    return settings.getInt(ScmStatsConstants.PERIOD_3);
+  }
+
   public String getUrl() {
     return url.get();
   }

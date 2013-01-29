@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import org.sonar.api.batch.SensorContext;
 import org.sonar.api.measures.Measure;
+import org.sonar.api.measures.Metric;
 import org.sonar.api.measures.PropertiesBuilder;
 
 public class CommitsPerUserMeasure {
@@ -32,11 +33,13 @@ public class CommitsPerUserMeasure {
   private final Map<String, List<Integer>> dataMap = new HashMap<String, List<Integer>>();
   private final SensorContext context;
 
-  public CommitsPerUserMeasure(final Map<String, List<Integer>> map,
+  public CommitsPerUserMeasure(
+          final Metric metric,
+          final Map<String, List<Integer>> map,
           final SensorContext context) {
     this.context = context;
     dataMap.putAll(map);
-    measure = new PropertiesBuilder<String, List<Integer>>(ScmStatsMetrics.SCM_COMMITS_PER_USER).addAll(dataMap).build();
+    measure = new PropertiesBuilder<String, List<Integer>>(metric).addAll(dataMap).build();
   }
 
   public void save() {

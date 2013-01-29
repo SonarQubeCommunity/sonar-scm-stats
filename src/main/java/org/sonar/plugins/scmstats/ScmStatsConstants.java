@@ -19,6 +19,9 @@
  */
 package org.sonar.plugins.scmstats;
 
+import com.google.common.collect.ImmutableList;
+import java.util.List;
+
 public final class ScmStatsConstants {
 
   private ScmStatsConstants() {
@@ -26,6 +29,12 @@ public final class ScmStatsConstants {
   
   // Properties provided by this plugin
   public static final String ENABLED = "sonar.scm-stats.enabled";
+  // Properties provided by this plugin
+  public static final String PERIOD_1 = "sonar.scm-stats.period1";
+  // Properties provided by this plugin
+  public static final String PERIOD_2 = "sonar.scm-stats.period2";
+  // Properties provided by this plugin
+  public static final String PERIOD_3 = "sonar.scm-stats.period3";
 
   // Properties provided by the SCM Activity plugin
   public static final String URL = "sonar.scm.url";
@@ -36,5 +45,13 @@ public final class ScmStatsConstants {
   public static final String ACTIVITY_ADD = "Adding";
   public static final String ACTIVITY_MODIFY = "Modifying";
   public static final String ACTIVITY_DELETE = "Deleting";
+  
+  public static List<String> getAsList(){
+    return ImmutableList.of(ENABLED,PERIOD_1,PERIOD_2,PERIOD_3,URL,USER,PASSWORD,
+            ACTIVITY_ADD,ACTIVITY_MODIFY,ACTIVITY_DELETE);
+  }
+  public static List<String> getPeriodsAsList(){
+    return ImmutableList.of(PERIOD_1,PERIOD_2,PERIOD_3);
+  }
   
 }

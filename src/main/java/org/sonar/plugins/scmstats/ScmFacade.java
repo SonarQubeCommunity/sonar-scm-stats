@@ -27,6 +27,7 @@ import java.io.File;
 import org.apache.commons.lang.StringUtils;
 import org.apache.maven.scm.ScmException;
 import org.apache.maven.scm.ScmFileSet;
+import org.apache.maven.scm.command.changelog.ChangeLogScmRequest;
 import org.apache.maven.scm.command.changelog.ChangeLogScmResult;
 import org.apache.maven.scm.provider.ScmProviderRepository;
 import org.apache.maven.scm.provider.svn.util.SvnUtil;
@@ -46,8 +47,14 @@ public class ScmFacade implements BatchExtension {
     repository = Suppliers.memoize(new ScmRepositorySupplier());
   }
 
-  public ChangeLogScmResult getChangeLog(File file) throws ScmException {
-    return scmManager.changeLog(getScmRepository(), new ScmFileSet(file), null , null);
+  public ChangeLogScmResult getChangeLog(File file, int numDays) throws ScmException {
+    
+    ChangeLogScmRequest scmRequest = new ChangeLogScmRequest(getScmRepository(), new ScmFileSet(file));
+    if (numDays > 0){
+      scmRequest.setNumDays(numDays);
+    }
+    
+    return scmManager.changeLog(scmRequest);
   }
 
   @VisibleForTesting

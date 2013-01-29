@@ -33,8 +33,30 @@ import org.sonar.plugins.scmstats.measures.ScmStatsMetrics;
   description = "This property can be set to false in order to deactivate the SCM Stats plugin.",
   module = true,
   project = true,
+  global = true),
+  @Property(key = ScmStatsConstants.PERIOD_1,
+  type = org.sonar.api.PropertyType.INTEGER,
+  defaultValue = "0",
+  name = "Period 1",
+  description = "Period (in number of days before analysis) used to collect SCM Stats.Changing this property only takes effect after subsequent project inspections. Set to 0 to collect all Scm Stats from the beginning of the project",
+  module = true,
+  project = true,
+  global = true),
+  @Property(key = ScmStatsConstants.PERIOD_2,
+  type = org.sonar.api.PropertyType.INTEGER,
+  name = "Period 2",
+  description = "See Period 1. If it's set to a non-positive value, then it's ignored",
+  module = true,
+  project = true,
+  global = true),
+  @Property(key = ScmStatsConstants.PERIOD_3,
+  type = org.sonar.api.PropertyType.INTEGER,
+  name = "Period 3",
+  description = "See Period 1. If it's set to a non-positive value, then it's ignored",
+  module = true,
+  project = true,
   global = true)
- })
+})
 public final class ScmStatsPlugin extends SonarPlugin {
 
   public static final boolean ENABLED_DEFAULT = true;

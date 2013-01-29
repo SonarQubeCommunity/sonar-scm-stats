@@ -20,19 +20,27 @@
 
 package org.sonar.plugins.scmstats.measures;
 
-import java.util.HashMap;
-import java.util.List;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertThat;
+import org.junit.Before;
 import org.junit.Test;
-public class CommitsPerUserMeasureTest {
+import static org.mockito.Mockito.mock;
+import org.sonar.api.batch.SensorContext;
+import org.sonar.plugins.scmstats.ScmStatsConstants;
+public class PeriodMeasuresCreatorFactoryTest {
   
-
+  private final PeriodMeasuresCreatorFactory factory = new PeriodMeasuresCreatorFactory();
+  private SensorContext context;
+  
+  @Before
+  public void mockObjects(){
+    context = mock (SensorContext.class);
+  }
   @Test
-  public void testInit() {
-    CommitsPerUserMeasure measure = 
-            new CommitsPerUserMeasure(ScmStatsMetrics.SCM_COMMITS_PER_USER,
-            new HashMap<String, List<Integer>>(), null);
-    assertThat(measure.getDataMap().size(), is(0));
+  public void shouldReturnFirstPeriodCreator(){
+    
+    assertThat (factory.getPeriodMeasureCreator(context,ScmStatsConstants.PERIOD_1), 
+            instanceOf(FirstPeriodMeasuresCreator.class));
+    
   }
 }

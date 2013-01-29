@@ -20,19 +20,24 @@
 
 package org.sonar.plugins.scmstats.measures;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-import org.junit.Test;
-public class CommitsPerUserMeasureTest {
-  
+import org.sonar.api.batch.SensorContext;
 
-  @Test
-  public void testInit() {
-    CommitsPerUserMeasure measure = 
-            new CommitsPerUserMeasure(ScmStatsMetrics.SCM_COMMITS_PER_USER,
-            new HashMap<String, List<Integer>>(), null);
-    assertThat(measure.getDataMap().size(), is(0));
+
+public class PeriodMeasuresCreatorFactory {
+  public AbstractPeriodMeasuresCreator getPeriodMeasureCreator (
+          final SensorContext context, 
+          final String period){
+    
+    List<AbstractPeriodMeasuresCreator> creators = new ArrayList<AbstractPeriodMeasuresCreator>();
+    creators.add(new FirstPeriodMeasuresCreator(context));
+            
+    for (AbstractPeriodMeasuresCreator creator: creators ){
+      if (creator.isResponsible(period)){
+        return creator;
+      }
+    }
+    return null;
   }
 }

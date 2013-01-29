@@ -30,7 +30,8 @@ public class CommitsPerMonthMeasureTest {
   @Test
   public void testInit() {
     CommitsPerMonthMeasure measure = 
-            new CommitsPerMonthMeasure( new HashMap<String, Integer>(), null);
+            new CommitsPerMonthMeasure(ScmStatsMetrics.SCM_COMMITS_PER_MONTH,
+            new HashMap<String, Integer>(), null);
     measure.init();
     assertThat(measure.getDataMap().containsKey("01"), is(true));
     assertThat(measure.getDataMap().containsKey("12"), is(true));

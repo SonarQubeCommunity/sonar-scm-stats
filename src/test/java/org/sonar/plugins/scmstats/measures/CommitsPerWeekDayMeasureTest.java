@@ -30,7 +30,8 @@ public class CommitsPerWeekDayMeasureTest {
   @Test
   public void testInit() {
     CommitsPerWeekDayMeasure measure = 
-            new CommitsPerWeekDayMeasure( new HashMap<String, Integer>(), null);
+            new CommitsPerWeekDayMeasure(ScmStatsMetrics.SCM_COMMITS_PER_WEEKDAY,
+            new HashMap<String, Integer>(), null);
     measure.init();
     assertThat(measure.getDataMap().containsKey("1"), is(true));
     assertThat(measure.getDataMap().containsKey("7"), is(true));

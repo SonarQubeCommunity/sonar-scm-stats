@@ -22,11 +22,13 @@ package org.sonar.plugins.scmstats;
 import org.apache.maven.model.Scm;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.scm.provider.svn.svnexe.SvnExeScmProvider;
-import org.junit.*;
-import org.sonar.api.config.Settings;
-import static org.junit.Assert.*;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.equalTo;
+import static org.junit.Assert.assertNull;
+import org.junit.Before;
+import org.junit.Test;
+import org.sonar.api.config.Settings;
 
 public class ScmConfigurationTest {
   private final Settings settings = new Settings();
@@ -34,6 +36,9 @@ public class ScmConfigurationTest {
   @Before
   public void setUp() {
     settings.setProperty(ScmStatsConstants.ENABLED, true);
+    settings.setProperty(ScmStatsConstants.PERIOD_1, 0);
+    settings.setProperty(ScmStatsConstants.PERIOD_2, 30);
+    settings.setProperty(ScmStatsConstants.PERIOD_3, 90);
   }
 
   @Test
@@ -70,4 +75,15 @@ public class ScmConfigurationTest {
     assertThat ( scmConfiguration.getUrl() , is(URL));
     assertThat ( scmConfiguration.getScmProvider() , is(new SvnExeScmProvider().getScmType()));
   }
+  
+  @Test
+  public void testPeriodsConfiguration() {
+    ScmConfiguration scmConfiguration = new ScmConfiguration(settings);
+    
+    assertThat ( scmConfiguration.getFirstPeriod() , equalTo(0));
+    assertThat ( scmConfiguration.getSecondPeriod(), equalTo(30));
+    assertThat ( scmConfiguration.getThirdPeriod(), equalTo(90));
+  }
+
+
 }

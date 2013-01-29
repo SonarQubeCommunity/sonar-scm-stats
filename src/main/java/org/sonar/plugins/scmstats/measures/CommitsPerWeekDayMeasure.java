@@ -1,5 +1,3 @@
-package org.sonar.plugins.scmstats.measures;
-
 /*
  * Sonar SCM Stats Plugin
  * Copyright (C) 2012 Patroklos PAPAPETROU
@@ -20,16 +18,20 @@ package org.sonar.plugins.scmstats.measures;
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
  */
 
+package org.sonar.plugins.scmstats.measures;
 
 import java.util.Map;
 import org.joda.time.DateTime;
 import org.sonar.api.batch.SensorContext;
+import org.sonar.api.measures.Metric;
 
 public class CommitsPerWeekDayMeasure extends AbstractScmStatsMeasure {
   
-  public CommitsPerWeekDayMeasure(final Map<String, Integer> map, 
+  public CommitsPerWeekDayMeasure(
+                                final Metric metric,
+                                final Map<String, Integer> map, 
                                 final SensorContext context) {
-    super(ScmStatsMetrics.SCM_COMMITS_PER_WEEKDAY, map, context);
+    super(metric, map, context);
   }
 
   @Override
