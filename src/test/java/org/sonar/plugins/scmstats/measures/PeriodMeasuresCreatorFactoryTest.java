@@ -21,6 +21,7 @@
 package org.sonar.plugins.scmstats.measures;
 
 import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,6 +37,7 @@ public class PeriodMeasuresCreatorFactoryTest {
   public void mockObjects(){
     context = mock (SensorContext.class);
   }
+
   @Test
   public void shouldReturnFirstPeriodCreator(){
     
@@ -43,4 +45,27 @@ public class PeriodMeasuresCreatorFactoryTest {
             instanceOf(FirstPeriodMeasuresCreator.class));
     
   }
+  @Test
+  public void shouldReturnSecondPeriodCreator(){
+    
+    assertThat (factory.getPeriodMeasureCreator(context,ScmStatsConstants.PERIOD_2), 
+            instanceOf(SecondPeriodMeasuresCreator.class));
+    
+  }
+  @Test
+  public void shouldReturnThirdPeriodCreator(){
+    
+    assertThat (factory.getPeriodMeasureCreator(context,ScmStatsConstants.PERIOD_3), 
+            instanceOf(ThirdPeriodMeasuresCreator.class));
+    
+  }
+
+  @Test
+  public void shouldReturnNull(){
+    
+    assertThat (factory.getPeriodMeasureCreator(context,""), 
+            nullValue());
+    
+  }
+
 }

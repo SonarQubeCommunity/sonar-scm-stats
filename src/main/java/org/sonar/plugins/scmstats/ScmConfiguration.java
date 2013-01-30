@@ -104,4 +104,8 @@ public class ScmConfiguration implements BatchExtension {
     }
 
   }
+  
+  public Settings getSettings(){
+    return settings;
+  }
 }

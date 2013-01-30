@@ -33,7 +33,7 @@ public class ScmStatsMetricsTest {
   public void testPluginMetris() {
     List<Metric> metrics = new ScmStatsMetrics().getMetrics();
 
-    assertThat(metrics.size(), equalTo(4));
+    assertThat(metrics.size(), equalTo(12));
     for (Metric metric : metrics) {
       assertThat(metric.getDomain(), is(CoreMetrics.DOMAIN_SCM));
     }

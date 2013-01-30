@@ -20,26 +20,19 @@
 
 package org.sonar.plugins.scmstats.measures;
 
-import java.util.ArrayList;
-import java.util.List;
-import org.sonar.api.batch.SensorContext;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.assertThat;
+import org.junit.Test;
+import org.sonar.plugins.scmstats.ScmStatsConstants;
 
+public class ThirdPeriodMeasuresCreatorTest extends FirstPeriodMeasuresCreatorTest {
 
-public class PeriodMeasuresCreatorFactory {
-  public AbstractPeriodMeasuresCreator getPeriodMeasureCreator (
-          final SensorContext context, 
-          final String period){
-    
-    List<AbstractPeriodMeasuresCreator> creators = new ArrayList<AbstractPeriodMeasuresCreator>();
-    creators.add(new FirstPeriodMeasuresCreator(context));
-    creators.add(new SecondPeriodMeasuresCreator(context));
-    creators.add(new ThirdPeriodMeasuresCreator(context));
-            
-    for (AbstractPeriodMeasuresCreator creator: creators ){
-      if (creator.isResponsible(period)){
-        return creator;
-      }
-    }
-    return null;
+  private final ThirdPeriodMeasuresCreator creator = new ThirdPeriodMeasuresCreator(null);
+  
+  @Test
+  @Override
+  public void shouldGetPeriod(){
+    assertThat ( creator.getPeriod(), is(ScmStatsConstants.PERIOD_3));
   }
+  
 }

@@ -24,34 +24,34 @@ import java.util.Map;
 import org.sonar.api.batch.SensorContext;
 import org.sonar.plugins.scmstats.ScmStatsConstants;
 
-public class FirstPeriodMeasuresCreator extends AbstractPeriodMeasuresCreator{
+public class ThirdPeriodMeasuresCreator extends AbstractPeriodMeasuresCreator{
 
-  public FirstPeriodMeasuresCreator(SensorContext context) {
+  public ThirdPeriodMeasuresCreator(SensorContext context) {
     super(context);
   }
 
   @Override
   public String getPeriod() {
-    return ScmStatsConstants.PERIOD_1;
+    return ScmStatsConstants.PERIOD_3;
   }
 
   @Override
   public CommitsPerUserMeasure getCommitsPerUserMeasure(Map<String, List<Integer>> map) {
-    return new CommitsPerUserMeasure(ScmStatsMetrics.SCM_COMMITS_PER_USER, map, getContext());
+    return new CommitsPerUserMeasure(ScmStatsMetrics.SCM_COMMITS_PER_USER_3, map, getContext());
   }
 
   @Override
   public AbstractScmStatsMeasure getCommitsPerWeekDayMeasure(Map<String, Integer> map) {
-    return new CommitsPerWeekDayMeasure(ScmStatsMetrics.SCM_COMMITS_PER_WEEKDAY, map, getContext());
+    return new CommitsPerWeekDayMeasure(ScmStatsMetrics.SCM_COMMITS_PER_WEEKDAY_3, map, getContext());
   }
 
   @Override
   public AbstractScmStatsMeasure getCommitsPerMonthMeasure(Map<String, Integer> map) {
-    return new CommitsPerMonthMeasure(ScmStatsMetrics.SCM_COMMITS_PER_MONTH, map, getContext());
+    return new CommitsPerMonthMeasure(ScmStatsMetrics.SCM_COMMITS_PER_MONTH_3, map, getContext());
   }
 
   @Override
   public AbstractScmStatsMeasure getCommitsPerClockHourMeasure(Map<String, Integer> map) {
-    return new CommitsPerClockHourMeasure(ScmStatsMetrics.SCM_COMMITS_PER_CLOCKTIME, map, getContext());
+    return new CommitsPerClockHourMeasure(ScmStatsMetrics.SCM_COMMITS_PER_CLOCKTIME_3, map, getContext());
   }
 }

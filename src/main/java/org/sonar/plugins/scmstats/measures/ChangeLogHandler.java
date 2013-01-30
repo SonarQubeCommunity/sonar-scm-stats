@@ -52,10 +52,10 @@ public class ChangeLogHandler {
     }
   }
 
-  public void saveMeasures(SensorContext context) {
+  public void saveMeasures(SensorContext context,String period) {
     PeriodMeasuresCreatorFactory factory = new PeriodMeasuresCreatorFactory();
     AbstractPeriodMeasuresCreator measuresCreator = 
-            factory.getPeriodMeasureCreator(context,ScmStatsConstants.PERIOD_1);
+            factory.getPeriodMeasureCreator(context,period);
     
     measuresCreator.getCommitsPerMonthMeasure(commitsPerMonth).save();
     measuresCreator.getCommitsPerWeekDayMeasure(commitsPerWeekDay).save();
