@@ -1,5 +1,11 @@
 <% 
-  commitsPerUserDistribution = measure("scm-commits-per-user")
+widgetPeriod = widget_properties["Period"]
+if widgetPeriod == 1
+  period_measure = "scm-commits-per-user"
+else 
+  period_measure = "scm-commits-per-user-" + widgetPeriod.to_s
+end
+  commitsPerUserDistribution = measure(period_measure)
   if commitsPerUserDistribution
     if !commitsPerUserDistribution.data.blank?
       commitsPerUser = commitsPerUserDistribution.data.split(";"); 
@@ -46,7 +52,7 @@
     <tr>
       <td valign="top" width="40%">
           <div class="dashbox">
-  <p class="title"><%= message('widget.scm-stats-commits-per-user.title') -%></p>
+          <p class="title"><%= message('widget.scm-stats-commits-per-user.title') + " " + message('scmstats.forPeriod') + " " + widgetPeriod.to_s-%></p>
           <br>
             <table>
 <% top10Committers.each do |the_measure|  %>

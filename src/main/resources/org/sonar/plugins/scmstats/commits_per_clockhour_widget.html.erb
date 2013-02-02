@@ -1,5 +1,12 @@
 <% 
-  commitsPerClockHourDistribution = measure("scm-commits-per-clockhour")
+ 
+widgetPeriod = widget_properties["Period"]
+if widgetPeriod == 1
+  period_measure = "scm-commits-per-clockhour"
+else 
+  period_measure = "scm-commits-per-clockhour-" + widgetPeriod.to_s
+end
+  commitsPerClockHourDistribution = measure(period_measure)
   if commitsPerClockHourDistribution && !commitsPerClockHourDistribution.data.blank?
     
 %>  
@@ -8,7 +15,7 @@
     <tr>
       <td valign="top" width="100%">
           <div class="dashbox">
-          <p class="title"><%= message('widget.scm-stats-commits-per-clockhour.title') -%></p>
+          <p class="title"><%= message('widget.scm-stats-commits-per-clockhour.title') + " " + message('scmstats.forPeriod') + " " + widgetPeriod.to_s-%></p>
           <br />
          <%
            query="ck=distbar&c=2A63B9&w=500&h=250&fs=8&bgc=ffffff&v=" + u(commitsPerClockHourDistribution.data)

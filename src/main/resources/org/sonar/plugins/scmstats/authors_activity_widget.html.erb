@@ -1,5 +1,12 @@
-<% 
-  commitsPerUserDistribution = measure("scm-commits-per-user")
+<%
+ 
+widgetPeriod = widget_properties["Period"]
+if widgetPeriod == 1
+  period_measure = "scm-commits-per-user"
+else 
+  period_measure = "scm-commits-per-user-" + widgetPeriod.to_s
+end
+  commitsPerUserDistribution = measure(period_measure)
   if commitsPerUserDistribution
     if !commitsPerUserDistribution.data.blank?
       commitsPerUser = commitsPerUserDistribution.data.split(";"); 
@@ -16,15 +23,15 @@
     height = (commitsPerUser.length * 30) + 40;
     
 %>  
-<p class="title"><%= message('widget.scm-stats-authors-activity.title') -%></p>
 <table width="100%">
   <tbody>
-
     <tr>
-        <td valign="top" width="100%">
-          <div class="dashbox">
-  <% query="ck=stackedBarChart3D&w=500&h=" + height.to_s + "&v=" + u(the_measure_stack_chart) %>
-  <%= chart(query) -%>
+      <td valign="top" width="100%">
+        <div class="dashbox">
+          <p class="title"><%= message('widget.scm-stats-authors-activity.title') + " " + message('scmstats.forPeriod') + " " + widgetPeriod.to_s-%></p>
+          <br />
+          <% query="ck=stackedBarChart3D&w=500&h=" + height.to_s + "&v=" + u(the_measure_stack_chart) %>
+          <%= chart(query) -%>
         </div>
       </td>
     </tr>
