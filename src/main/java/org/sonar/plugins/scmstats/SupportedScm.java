@@ -23,13 +23,15 @@ package org.sonar.plugins.scmstats;
 import org.apache.maven.scm.provider.ScmProvider;
 import org.apache.maven.scm.provider.git.gitexe.GitExeScmProvider;
 import org.apache.maven.scm.provider.hg.HgScmProvider;
+import org.apache.maven.scm.provider.cvslib.cvsexe.CvsExeScmProvider;
 import org.apache.maven.scm.provider.svn.svnexe.SvnExeScmProvider;
 
 public enum SupportedScm {
   SVN(new SvnExeScmProvider()),
   GIT(new GitExeScmProvider()),
-  HG(new HgScmProvider());
-  
+  HG(new HgScmProvider()),
+  CVS(new CvsExeScmProvider());
+
   private final ScmProvider provider;
 
   private SupportedScm(ScmProvider provider) {
