@@ -75,6 +75,10 @@ public class CommitsPerUserMeasure {
           int res = e1.getValue().compareTo(e2.getValue());
           return res != 0 ? res : 1;
         }
+        @Override
+        public boolean equals(Object obj) {
+          return super.equals(obj);
+        }
       }
     );
     sortedEntries.addAll(map.entrySet());
