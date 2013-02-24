@@ -17,22 +17,36 @@
  * License along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
  */
+package org.sonar.plugins.scmstats.model;
 
-package org.sonar.plugins.scmstats.measures;
+import java.util.ArrayList;
+import java.util.List;
 
-import java.util.HashMap;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-import org.junit.Test;
-import org.sonar.plugins.scmstats.model.CommitsList;
-public class CommitsPerUserMeasureTest {
-  
+public class CommitsList implements Comparable<CommitsList> {
+  private List<Integer> commits = new ArrayList<Integer>();
 
-  @Test
-  public void testInit() {
-    CommitsPerUserMeasure measure = 
-            new CommitsPerUserMeasure(ScmStatsMetrics.SCM_COMMITS_PER_USER,
-            new HashMap<String, CommitsList>(), null);
-    assertThat(measure.getDataMap().size(), is(0));
+  public CommitsList(final List<Integer> commits) {
+    this.commits = commits;
   }
+
+  public List<Integer> getCommits() {
+    return commits;
+  }
+
+  public void setCommits(final List<Integer> commits) {
+    this.commits = commits;
+  }
+
+  public int compareTo(final CommitsList other) {
+      return other.computeSum() - this.computeSum();
+  }
+
+  public int computeSum(){
+    int sum = 0;
+    for (Integer commit : commits){
+        sum += commit;
+    }
+    return sum;
+  }
+
 }

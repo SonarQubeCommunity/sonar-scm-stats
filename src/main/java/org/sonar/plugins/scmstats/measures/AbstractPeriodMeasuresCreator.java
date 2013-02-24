@@ -20,9 +20,9 @@
 
 package org.sonar.plugins.scmstats.measures;
 
-import java.util.List;
 import java.util.Map;
 import org.sonar.api.batch.SensorContext;
+import org.sonar.plugins.scmstats.model.CommitsList;
 
 public abstract class AbstractPeriodMeasuresCreator {
   private final SensorContext context;
@@ -34,7 +34,7 @@ public abstract class AbstractPeriodMeasuresCreator {
     return context;
   }
   public abstract CommitsPerUserMeasure getCommitsPerUserMeasure(
-                                          Map<String, List<Integer>> map);
+                                          Map<String, CommitsList> map);
   public abstract AbstractScmStatsMeasure getCommitsPerWeekDayMeasure(
                                           final Map<String, Integer> map);
   public abstract AbstractScmStatsMeasure getCommitsPerMonthMeasure(

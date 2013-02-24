@@ -19,10 +19,10 @@
  */
 package org.sonar.plugins.scmstats.measures;
 
-import java.util.List;
 import java.util.Map;
 import org.sonar.api.batch.SensorContext;
 import org.sonar.plugins.scmstats.ScmStatsConstants;
+import org.sonar.plugins.scmstats.model.CommitsList;
 
 public class FirstPeriodMeasuresCreator extends AbstractPeriodMeasuresCreator{
 
@@ -36,7 +36,7 @@ public class FirstPeriodMeasuresCreator extends AbstractPeriodMeasuresCreator{
   }
 
   @Override
-  public CommitsPerUserMeasure getCommitsPerUserMeasure(Map<String, List<Integer>> map) {
+  public CommitsPerUserMeasure getCommitsPerUserMeasure(Map<String, CommitsList> map) {
     return new CommitsPerUserMeasure(ScmStatsMetrics.SCM_COMMITS_PER_USER, map, getContext());
   }
 

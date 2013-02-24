@@ -26,11 +26,12 @@ import org.joda.time.DateTime;
 import org.sonar.api.batch.SensorContext;
 import org.sonar.plugins.scmstats.ScmStatsConstants;
 import org.sonar.plugins.scmstats.model.ChangeLogInfo;
+import org.sonar.plugins.scmstats.model.CommitsList;
 import org.sonar.plugins.scmstats.utils.MapUtils;
 
 public class ChangeLogHandler {
 
-  private Map<String, List<Integer>> commitsPerUser = new HashMap<String, List<Integer>>();
+  private Map<String, CommitsList> commitsPerUser = new HashMap<String, CommitsList>();
   private Map<String, Integer> commitsPerClockHour = new HashMap<String, Integer>();
   private Map<String, Integer> commitsPerWeekDay = new HashMap<String, Integer>();
   private Map<String, Integer> commitsPerMonth = new HashMap<String, Integer>();
@@ -64,18 +65,22 @@ public class ChangeLogHandler {
 
   }
   @VisibleForTesting
-  Map<String, List<Integer>> updateAuthorActivity(
-          final Map<String, List<Integer>> map, 
+  protected Map<String, CommitsList> updateAuthorActivity(
+          final Map<String, CommitsList> map,
           final ChangeLogInfo changeLogInfo) {
     
     final String author = changeLogInfo.getAuthor();
-    final Map<String, List<Integer>> authorActivity = new HashMap<String, List<Integer>>();
+    final Map<String, CommitsList> authorActivity = new HashMap<String, CommitsList>();
     authorActivity.putAll(map);
     
     final Map<String, Integer> activity = changeLogInfo.getActivity();
-    final List<Integer> stats = (List<Integer>) 
-            ObjectUtils.defaultIfNull(authorActivity.get(author),
-                                      getInitialActivity(activity));
+    final List<Integer> stats;
+    if (authorActivity.get(author) == null){
+        stats = getInitialActivity(activity);
+    } else {
+        stats = authorActivity.get(author).getCommits();
+    }
+    
     if (authorActivity.containsKey(author)) {
       final Integer commits = stats.get(0) + 1;
       stats.set(0, commits);
@@ -83,7 +88,7 @@ public class ChangeLogHandler {
       updateActivity( stats, activity, 2, ScmStatsConstants.ACTIVITY_MODIFY);
       updateActivity( stats, activity, 3, ScmStatsConstants.ACTIVITY_DELETE);
     }    
-    authorActivity.put(author, stats);
+    authorActivity.put(author, new CommitsList(stats));
     return authorActivity;
   }
 
@@ -110,7 +115,7 @@ public class ChangeLogHandler {
     return commitsPerMonth;
   }
 
-  public Map<String, List<Integer>> getCommitsPerUser() {
+  public Map<String, CommitsList> getCommitsPerUser() {
     return commitsPerUser;
   }
 

@@ -1,5 +1,5 @@
 <%
- 
+
 widgetPeriod = widget_properties["Period"]
 if widgetPeriod == 1
   period_measure = "scm-commits-per-user"
@@ -14,13 +14,16 @@ end
       commitsPerUser = commitsPerUserDistribution.text_value.split(";"); 
     end  
     the_measure_stack_chart = ""
-    commitsPerUser.each do |a_measure| 
+    commitsPerUser.take(10).each do |a_measure|
       split_measure = a_measure.split("=")
       activity = split_measure[1].sub('[', '').sub(']', '')
       activity_metrics = activity.split(",")
-      the_measure_stack_chart+=split_measure[0]+"="+activity_metrics[1]+"."+activity_metrics[2]+"."+activity_metrics[3]+";"
+      author = split_measure[0]
+      length = author.size
+      author = author[4..length]
+      the_measure_stack_chart+=author+"="+activity_metrics[1]+"."+activity_metrics[2]+"."+activity_metrics[3]+";"
     end ;
-    height = (commitsPerUser.length * 30) + 40;
+    height = (commitsPerUser.take(10).length * 30) + 40;
     
 %>  
 <table width="100%">

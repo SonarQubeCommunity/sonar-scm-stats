@@ -22,12 +22,12 @@ package org.sonar.plugins.scmstats.measures;
 
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 import org.junit.Test;
 import org.sonar.plugins.scmstats.ScmStatsConstants;
+import org.sonar.plugins.scmstats.model.CommitsList;
 
 public class FirstPeriodMeasuresCreatorTest {
 
@@ -40,15 +40,17 @@ public class FirstPeriodMeasuresCreatorTest {
   
   @Test
   public void shouldGetCommitsPerUserMeasure(){
-    Map<String,List<Integer>> map = new HashMap<String, List<Integer>>();
-    map.put("key1", Arrays.asList(1,2,3));
-    map.put("key2", Arrays.asList(4,5,6));
+    final Map<String,CommitsList> map = new HashMap<String, CommitsList>();
+    final CommitsList list1 = new CommitsList(Arrays.asList(1,2,3));
+    final CommitsList list2 = new CommitsList(Arrays.asList(4,5,6));
+    map.put("key1", list1);
+    map.put("key2", list2);
     
-    CommitsPerUserMeasure measure = creator.getCommitsPerUserMeasure(map);
+    final CommitsPerUserMeasure measure = creator.getCommitsPerUserMeasure(map);
     assertThat ( measure, instanceOf(CommitsPerUserMeasure.class));
     assertThat ( measure.getDataMap().size(), is(2));
-    assertThat ( measure.getDataMap(), hasEntry("key1", Arrays.asList(1,2,3)));
-    assertThat ( measure.getDataMap(), hasEntry("key2", Arrays.asList(4,5,6)));
+    assertThat ( measure.getDataMap(), hasEntry("key1", list1));
+    assertThat ( measure.getDataMap(), hasEntry("key2", list2));
   }
 
   @Test

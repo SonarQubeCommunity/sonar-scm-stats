@@ -12,29 +12,31 @@ end
     else
       commitsPerUser = commitsPerUserDistribution.text_value.split(";"); 
     end  
-    sortedCommitsPerUser = Array.new
+    fixedCommitsPerUser= Array.new
     totalCommits = 0 
 
     commitsPerUser.each do |a_measure| 
       split_measure = a_measure.split("=")
       activity = split_measure[1].sub('[', '').sub(']', '')
       activity_metrics = activity.split(",")
-      a_measure = activity_metrics[0] + "=" + split_measure[0]
+      author = split_measure[0]
+      length = author.size
+      author = author[4..length]
+      a_measure = activity_metrics[0] + "=" + author
       totalCommits = totalCommits + activity_metrics[0].to_f 
-      sortedCommitsPerUser.insert(0,a_measure)
+      fixedCommitsPerUser.insert(-1,a_measure)
     end ;
-    sortedCommitsPerUser.sort! {|a,b| b.split("=")[0].to_i <=> a.split("=")[0].to_i}
     the_measure_pie_chart = ""
-    sortedCommitsPerUser.take(10).each do |a_measure| 
+    fixedCommitsPerUser.take(10).each do |a_measure|
       split_measure = a_measure.split("=")
       the_percentage=((split_measure[0].to_i/(totalCommits))*100).round(1)
       the_measure_pie_chart+=split_measure[1]+"="+the_percentage.to_s+";"
     end ;
 
-    top10Committers = sortedCommitsPerUser.take(10)
-    sortedCommitsPerUser.shift(10)
+    top10Committers = fixedCommitsPerUser.take(10)
+    fixedCommitsPerUser.shift(10)
     restCommitsSum = 0
-    sortedCommitsPerUser.each do |a_measure| 
+    fixedCommitsPerUser.each do |a_measure|
       split_measure = a_measure.split("=")
       restCommitsSum = restCommitsSum + split_measure[0].to_i
     end ;
@@ -50,25 +52,33 @@ end
 <table width="100%">
   <tbody>
     <tr>
-      <td valign="top" width="40%">
-          <div class="dashbox">
+      <td valign="top" width="100%">
+        <div class="dashbox">
           <p class="title"><%= message('widget.scm-stats-commits-per-user.title') + " " + message('scmstats.forPeriod') + " " + widgetPeriod.to_s-%></p>
-          <br>
-            <table>
+          <br />
+        </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<table width="100%">
+  <tbody>
+    <tr>
+      <td valign="top" width="40%">
+         <table>
 <% top10Committers.each do |the_measure|  %>
 <% the_measure =the_measure.split("="); %>
-              <tr>
-                <td align="right" width="40px"><p><%= number_with_delimiter(the_measure[0].to_i);-%></p></td>
-                <td style="width:10px;"></td>
-                <td><p><%= the_measure[1];-%></p></td>
-              </tr>
+            <tr>
+              <td align="right" width="40px"><p><%= number_with_delimiter(the_measure[0].to_i);-%></p></td>
+              <td style="width:10px;"></td>
+              <td><p><%= the_measure[1];-%></p></td>
+            </tr>
 <% end; %>
-            </table>
-          </div>
-      </td>
+          </table>
+        </td>
         <td valign="top" width="60%">
           <div class="dashbox">
-  <% query="ck=pieChart3D&w=450&h=200&c=33cc33,ffff33,ff9900,ff0033,382CE0,D42CE0,73A30E,13EEE3,A0E3F0,83800A,000000&v=" + u(the_measure_pie_chart) %>
+  <% query="ck=pieChart3D&w=400&h=200&c=33cc33,ffff33,ff9900,ff0033,382CE0,D42CE0,73A30E,13EEE3,A0E3F0,83800A,000000&v=" + u(the_measure_pie_chart) %>
   <%= chart(query) -%>
         </div>
       </td>

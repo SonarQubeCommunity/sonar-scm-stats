@@ -19,34 +19,65 @@
  */
 package org.sonar.plugins.scmstats.measures;
 
+import com.google.common.annotations.VisibleForTesting;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import org.sonar.api.batch.SensorContext;
 import org.sonar.api.measures.Measure;
 import org.sonar.api.measures.Metric;
 import org.sonar.api.measures.PropertiesBuilder;
+import org.sonar.plugins.scmstats.model.CommitsList;
 
 public class CommitsPerUserMeasure {
 
   private Measure measure;
-  private final Map<String, List<Integer>> dataMap = new HashMap<String, List<Integer>>();
+  private final Map<String, CommitsList> dataMap = new HashMap<String, CommitsList>();
   private final SensorContext context;
 
   public CommitsPerUserMeasure(
           final Metric metric,
-          final Map<String, List<Integer>> map,
+          final Map<String, CommitsList> map,
           final SensorContext context) {
     this.context = context;
     dataMap.putAll(map);
-    measure = new PropertiesBuilder<String, List<Integer>>(metric).addAll(dataMap).build();
+    final SortedSet<Entry<String,CommitsList>> sortedSet = entriesSortedByValues(map);
+    final PropertiesBuilder<String, List<Integer>> pBuilder = new
+            PropertiesBuilder<String, List<Integer>>(metric);
+    int counter = 1;
+    for (Entry<String,CommitsList> entry : sortedSet){
+
+      pBuilder.add(String.format ("%03d" , counter) + "." + entry.getKey(), entry.getValue().getCommits());
+      counter++;
+    }
+    measure = pBuilder.build();
   }
 
   public void save() {
     context.saveMeasure(measure);
   }
 
-  public Map<String, List<Integer>> getDataMap() {
+  public Map<String, CommitsList> getDataMap() {
     return dataMap;
+  }
+
+  @VisibleForTesting
+  protected final <K,V extends Comparable<? super V>>
+    SortedSet<Map.Entry<K,V>> entriesSortedByValues(final Map<K,V> map) {
+    final SortedSet<Map.Entry<K,V>> sortedEntries = new TreeSet<Map.Entry<K,V>>(
+      new Comparator<Map.Entry<K,V>>() {
+        @Override
+        public int compare(Map.Entry<K,V> e1, Map.Entry<K,V> e2) {
+          int res = e1.getValue().compareTo(e2.getValue());
+          return res != 0 ? res : 1;
+        }
+      }
+    );
+    sortedEntries.addAll(map.entrySet());
+    return sortedEntries;
   }
 }

@@ -29,6 +29,7 @@ import static org.junit.Assert.assertThat;
 import org.junit.Test;
 import org.sonar.plugins.scmstats.ScmStatsConstants;
 import org.sonar.plugins.scmstats.model.ChangeLogInfo;
+import org.sonar.plugins.scmstats.model.CommitsList;
 
 public class ChangeLogHandlerTest {
   ChangeLogHandler instance = new ChangeLogHandler();
@@ -44,11 +45,11 @@ public class ChangeLogHandlerTest {
     instance.addChangeLog("author", dt.toDate(), activity);
     instance.generateMeasures();
     
-    assertThat (instance.getCommitsPerUser().get("author").size(), is(4));
-    assertThat (instance.getCommitsPerUser().get("author").get(0), is(2));
-    assertThat (instance.getCommitsPerUser().get("author").get(1), is(4));
-    assertThat (instance.getCommitsPerUser().get("author").get(2), is(0));
-    assertThat (instance.getCommitsPerUser().get("author").get(3), is(2));
+    assertThat (instance.getCommitsPerUser().get("author").getCommits().size(), is(4));
+    assertThat (instance.getCommitsPerUser().get("author").getCommits().get(0), is(2));
+    assertThat (instance.getCommitsPerUser().get("author").getCommits().get(1), is(4));
+    assertThat (instance.getCommitsPerUser().get("author").getCommits().get(2), is(0));
+    assertThat (instance.getCommitsPerUser().get("author").getCommits().get(3), is(2));
     assertThat (instance.getCommitsPerClockHour().get("14"), is(2));
     assertThat (instance.getCommitsPerMonth().get("10"), is(2));
     assertThat (instance.getCommitsPerWeekDay().get("1"), is(2));
@@ -56,17 +57,17 @@ public class ChangeLogHandlerTest {
   }
   @Test
   public void shouldUpdateAuthorActivity() {
-    Map<String, List<Integer>> authorsActivity = new HashMap<String, List<Integer>>();
-    authorsActivity.put("author", Arrays.asList(1,1,2,0));
+    Map<String, CommitsList> authorsActivity = new HashMap<String, CommitsList>();
+    authorsActivity.put("author", new CommitsList(Arrays.asList(1,1,2,0)));
     Map<String, Integer> activity = new HashMap<String, Integer>();
     activity.put(ScmStatsConstants.ACTIVITY_ADD, 1);
     activity.put(ScmStatsConstants.ACTIVITY_MODIFY, 2);
     ChangeLogInfo changeLogInfo = new ChangeLogInfo("author", null, activity);
     authorsActivity = instance.updateAuthorActivity(authorsActivity, changeLogInfo);
     
-    assertThat(authorsActivity.get("author").get(0),is(2));
-    assertThat(authorsActivity.get("author").get(1),is(2));
-    assertThat(authorsActivity.get("author").get(2),is(4));
-    assertThat(authorsActivity.get("author").get(3),is(0));
+    assertThat(authorsActivity.get("author").getCommits().get(0),is(2));
+    assertThat(authorsActivity.get("author").getCommits().get(1),is(2));
+    assertThat(authorsActivity.get("author").getCommits().get(2),is(4));
+    assertThat(authorsActivity.get("author").getCommits().get(3),is(0));
   }
 }
