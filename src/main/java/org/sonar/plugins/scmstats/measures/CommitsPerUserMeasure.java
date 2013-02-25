@@ -70,14 +70,9 @@ public class CommitsPerUserMeasure {
     SortedSet<Map.Entry<K,V>> entriesSortedByValues(final Map<K,V> map) {
     final SortedSet<Map.Entry<K,V>> sortedEntries = new TreeSet<Map.Entry<K,V>>(
       new Comparator<Map.Entry<K,V>>() {
-        @Override
         public int compare(Map.Entry<K,V> e1, Map.Entry<K,V> e2) {
           int res = e1.getValue().compareTo(e2.getValue());
           return res != 0 ? res : 1;
-        }
-        @Override
-        public boolean equals(Object obj) {
-          return super.equals(obj);
         }
       }
     );
