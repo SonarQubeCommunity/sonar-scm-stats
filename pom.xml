@@ -9,7 +9,7 @@
   
   <artifactId>sonar-scm-stats-plugin</artifactId>
   <packaging>sonar-plugin</packaging>
-  <version>0.2-SNAPSHOT</version>
+  <version>0.2</version>
   <name>Sonar SCM Stats Plugin</name>
   <description>Feed Sonar with Statistics about SCM system</description>
   <url>http://docs.codehaus.org/display/SONAR/SCM+Stats+Plugin</url>
@@ -40,6 +40,7 @@
     <connection>scm:git:git@github.com:SonarCommunity/sonar-scm-stats</connection>
     <developerConnection>scm:git:git@github.com:SonarCommunity/sonar-scm-stats</developerConnection>
     <url>https://github.com/SonarCommunity/sonar-scm-stats</url>
+    <tag>sonar-scm-stats-plugin-0.2</tag>
   </scm>
   <developers>
     <developer>
