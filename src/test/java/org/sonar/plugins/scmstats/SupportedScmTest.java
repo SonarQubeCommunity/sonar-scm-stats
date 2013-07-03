@@ -29,7 +29,7 @@ public class SupportedScmTest {
   @Test
   public void testValues() {
     SupportedScm[] result = SupportedScm.values();
-    assertThat(result.length, equalTo(4));
+    assertThat(result.length, equalTo(5));
   }
 
 }

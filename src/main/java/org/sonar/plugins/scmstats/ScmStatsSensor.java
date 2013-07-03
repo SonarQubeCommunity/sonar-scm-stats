@@ -49,13 +49,17 @@ public class ScmStatsSensor implements Sensor {
     this.scmFacade = scmFacade;
   }
 
+  @Override
   public boolean shouldExecuteOnProject(Project project) {
-    return project.isLatestAnalysis() && configuration.isEnabled()
-            && urlChecker.check(configuration.getUrl());
+    return configuration.isEnabled() && urlChecker.check(configuration.getUrl());
   }
 
+  @Override
   public void analyse(Project project, SensorContext context) {
-
+    String perfoceClientSpec = configuration.getSettings().getString(ScmStatsConstants.PERFORCE_CLIENTSPEC);
+    if ( perfoceClientSpec!= null ) {
+      System.setProperty("maven.scm.perforce.clientspec.name", perfoceClientSpec);
+    }
     List<String> periods = ScmStatsConstants.getPeriodsAsList();
     for (String period : periods) {
       analyseChangeLog(project, context, period);
@@ -78,7 +82,7 @@ public class ScmStatsSensor implements Sensor {
                   changeLogScmResult.getCommandOutput()));
         }
       } catch (ScmException e) {
-        LOG.warn(String.format("Fail to retrieve SCM info."), e); // See SONARPLUGINS-368. Can occur on generated source
+        LOG.warn(String.format("Fail to retrieve SCM info."), e); 
       }
     }
   }
@@ -93,7 +97,7 @@ public class ScmStatsSensor implements Sensor {
   }
 
   @VisibleForTesting
-  ChangeLogHandler addChangeLogToHolder(ChangeSet changeSet, ChangeLogHandler holder) {
+  protected ChangeLogHandler addChangeLogToHolder(ChangeSet changeSet, ChangeLogHandler holder) {
     if (changeSet.getAuthor() != null && changeSet.getDate() != null) {
       holder.addChangeLog(changeSet.getAuthor(), changeSet.getDate(), createActivityMap(changeSet));
     }
@@ -101,7 +105,7 @@ public class ScmStatsSensor implements Sensor {
   }
 
   @VisibleForTesting
-  Map<String, Integer> createActivityMap(ChangeSet changeSet) {
+  protected Map<String, Integer> createActivityMap(ChangeSet changeSet) {
     Map<String, Integer> fileStatus = new HashMap<String, Integer>();
     for (ChangeFile changeFile : changeSet.getFiles()) {
       if (changeFile.getAction() == ScmFileStatus.ADDED) {

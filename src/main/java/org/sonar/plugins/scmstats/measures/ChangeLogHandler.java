@@ -21,7 +21,6 @@ package org.sonar.plugins.scmstats.measures;
 
 import com.google.common.annotations.VisibleForTesting;
 import java.util.*;
-import org.apache.commons.lang.ObjectUtils;
 import org.joda.time.DateTime;
 import org.sonar.api.batch.SensorContext;
 import org.sonar.plugins.scmstats.ScmStatsConstants;

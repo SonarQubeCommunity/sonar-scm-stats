@@ -45,8 +45,7 @@ public class ScmStatsSensorTest {
 
   @Before
   public void setUp() {
-    myProject.setLatestAnalysis(true);
-    settings.setProperty(ScmStatsConstants.ENABLED, true);
+   settings.setProperty(ScmStatsConstants.ENABLED, true);
     checker = mock(UrlChecker.class);
     
     when(checker.check(null)).thenReturn(Boolean.FALSE);
@@ -60,15 +59,9 @@ public class ScmStatsSensorTest {
     when(checker.check(null)).thenReturn(Boolean.TRUE);
     assertThat(sensor.shouldExecuteOnProject(myProject), is(true));
   }
-
+  
   @Test
   public void testShouldNotExecuteOnProject_WhenUrlIsNotValid() {
-    assertThat(sensor.shouldExecuteOnProject(myProject), is(false));
-  }
-
-  @Test
-  public void testShouldNotExecuteOnProject_WhenNotLastAnalysis() {
-    myProject.setLatestAnalysis(false);
     assertThat(sensor.shouldExecuteOnProject(myProject), is(false));
   }
 
