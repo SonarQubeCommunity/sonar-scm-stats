@@ -11,7 +11,7 @@
   <packaging>sonar-plugin</packaging>
   <version>0.3-SNAPSHOT</version>
   <name>Sonar SCM Stats Plugin</name>
-  <description>Feed Sonar with Statistics about SCM system</description>
+  <description>Feed SonarQube with Statistics about SCM system</description>
   <url>http://docs.codehaus.org/display/SONAR/SCM+Stats+Plugin</url>
   
   <ciManagement>
