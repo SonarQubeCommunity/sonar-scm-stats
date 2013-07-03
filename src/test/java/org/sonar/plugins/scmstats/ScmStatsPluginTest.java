@@ -19,10 +19,9 @@
  */
 package org.sonar.plugins.scmstats;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertThat;
 import org.junit.Before;
 import org.junit.Test;
+import static org.fest.assertions.Assertions.assertThat;
 
 public class ScmStatsPluginTest {
   
@@ -34,6 +33,6 @@ public class ScmStatsPluginTest {
 
   @Test
   public void testPluginDefinition() {
-    assertThat(plugin.getExtensions().size(), equalTo(15));
+    assertThat(plugin.getExtensions()).hasSize(20);
   }
 }

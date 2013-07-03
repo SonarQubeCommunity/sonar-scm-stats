@@ -29,12 +29,10 @@ public final class ScmStatsConstants {
   
   // Properties provided by this plugin
   public static final String ENABLED = "sonar.scm-stats.enabled";
-  // Properties provided by this plugin
   public static final String PERIOD_1 = "sonar.scm-stats.period1";
-  // Properties provided by this plugin
   public static final String PERIOD_2 = "sonar.scm-stats.period2";
-  // Properties provided by this plugin
   public static final String PERIOD_3 = "sonar.scm-stats.period3";
+  public static final String PERFORCE_CLIENTSPEC = "sonar.scm-stats.perforce.clientspec";
 
   // Properties provided by the SCM Activity plugin
   public static final String URL = "sonar.scm.url";
@@ -48,7 +46,7 @@ public final class ScmStatsConstants {
   
   public static List<String> getAsList(){
     return ImmutableList.of(ENABLED,PERIOD_1,PERIOD_2,PERIOD_3,URL,USER,PASSWORD,
-            ACTIVITY_ADD,ACTIVITY_MODIFY,ACTIVITY_DELETE);
+            PERFORCE_CLIENTSPEC,ACTIVITY_ADD,ACTIVITY_MODIFY,ACTIVITY_DELETE);
   }
   public static List<String> getPeriodsAsList(){
     return ImmutableList.of(PERIOD_1,PERIOD_2,PERIOD_3);

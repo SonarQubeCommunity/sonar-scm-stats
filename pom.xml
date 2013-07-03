@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.codehaus.sonar-plugins</groupId>
     <artifactId>parent</artifactId>
-    <version>16</version>
+    <version>17</version>
   </parent>
   
   <artifactId>sonar-scm-stats-plugin</artifactId>
@@ -52,9 +52,9 @@
   </developers>
   
   <properties>
-    <sonar.minversion>3.0</sonar.minversion>
+    <sonar.minversion>3.6</sonar.minversion>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.scm.version>1.8</maven.scm.version>
+    <maven.scm.version>1.8.1</maven.scm.version>
     <sonar.pluginName>Scm Stats</sonar.pluginName>
     <sonar.pluginClass>org.sonar.plugins.scmstats.ScmStatsPlugin</sonar.pluginClass>
   </properties>
@@ -135,6 +135,12 @@
     <dependency>
       <groupId>org.apache.maven.scm</groupId>
       <artifactId>maven-scm-provider-cvsexe</artifactId>
+      <version>${maven.scm.version}</version>
+      <type>jar</type>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.scm</groupId>
+      <artifactId>maven-scm-provider-perforce</artifactId>
       <version>${maven.scm.version}</version>
       <type>jar</type>
     </dependency>

@@ -27,7 +27,7 @@ import org.junit.Test;
 public class ScmStatsConstantsTest {
   @Test
   public void testConstantsCount() {
-    assertThat(ScmStatsConstants.getAsList().size(),equalTo(10));    
+    assertThat(ScmStatsConstants.getAsList().size(),equalTo(11));    
   }
   @Test
   public void testPeriodConstantsCount() {
