@@ -19,6 +19,7 @@
  */
 package org.sonar.plugins.scmstats.scm;
 
+import com.google.common.annotations.VisibleForTesting;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,11 +72,6 @@ public class StatsPerforceDescribeConsumer
    * Current status of the parser
    */
   private int status = GET_REVISION;
-  /**
-   * The current log entry being processed by the parser
-   */
-  @SuppressWarnings("unused")
-  private String currentRevision;
   /**
    * The current log entry being processed by the parser
    */
@@ -223,7 +219,6 @@ public class StatsPerforceDescribeConsumer
       return;
     }
     currentChange = new ChangeSet();
-    currentRevision = revisionRegexp.getParen(1);
     currentChange.setAuthor(revisionRegexp.getParen(2));
     currentChange.setDate(revisionRegexp.getParen(3), userDatePattern);
 
@@ -252,9 +247,16 @@ public class StatsPerforceDescribeConsumer
    * @param line a line of text from the perforce log output
    */
   private void processGetAffectedFiles(String line) {
-    if (!line.equals("Affected files ...")) {
+    if (!"Affected files ...".equals(line)) {
       return;
     }
     status = GET_FILES_BEGIN;
   }
+
+  @VisibleForTesting
+  protected void setStatus(int status) {
+    this.status = status;
+  }
+  
+  
 }

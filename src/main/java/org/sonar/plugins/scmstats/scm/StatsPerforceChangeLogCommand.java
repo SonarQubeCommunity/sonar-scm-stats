@@ -46,7 +46,7 @@ import org.codehaus.plexus.util.cli.Commandline;
  */
 public class StatsPerforceChangeLogCommand extends PerforceChangeLogCommand {
 
-  private final static int SUCCESS_EXIT_CODE = 0;
+  private static final int SUCCESS_EXIT_CODE = 0;
 
   @Override
   protected ChangeLogScmResult executeChangeLogCommand(ScmProviderRepository repo, ScmFileSet fileSet,
@@ -110,7 +110,7 @@ public class StatsPerforceChangeLogCommand extends PerforceChangeLogCommand {
     }
     command.createArg().setValue("changes");
     command.createArg().setValue("-t");
-    
+
     StringBuilder fileSpec = new StringBuilder(repo.getPath());
     fileSpec.append("...");
     fileSpec.append(addDateRange(startDate, endDate));

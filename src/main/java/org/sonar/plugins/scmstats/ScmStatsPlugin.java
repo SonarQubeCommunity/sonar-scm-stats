@@ -49,7 +49,8 @@ public final class ScmStatsPlugin extends SonarPlugin {
             PropertyDefinition.builder(ScmStatsConstants.PERIOD_1).
               defaultValue("0").
               name("Period #1").
-              description("Period (in number of days before analysis) used to collect SCM Stats.Changing this property only takes effect after subsequent project inspections. Set to 0 to collect all Scm Stats from the beginning of the project").
+              description("Period (in number of days before analysis) used to collect SCM Stats."
+              + "Changing this property only takes effect after subsequent project inspections. Set to 0 to collect all Scm Stats from the beginning of the project").
               index(1).
               onQualifiers(Qualifiers.PROJECT, Qualifiers.MODULE).
               category(SCMSTATS_CATEGORY).
@@ -78,7 +79,8 @@ public final class ScmStatsPlugin extends SonarPlugin {
             
             PropertyDefinition.builder(ScmStatsConstants.PERFORCE_CLIENTSPEC).
               name("Client Spec name").
-              description("The Client Spec name which defines your workspace location, the depot files you plan to work with, and where they will be located in your workspace when you invoke Perforce commands").
+              description("The Client Spec name which defines your workspace location, the depot files you plan to work with, "
+                            + "and where they will be located in your workspace when you invoke Perforce commands").
               index(0).
               onQualifiers(Qualifiers.PROJECT).
               category(SCMSTATS_CATEGORY).

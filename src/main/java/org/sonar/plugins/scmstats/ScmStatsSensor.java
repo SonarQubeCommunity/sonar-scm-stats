@@ -65,8 +65,9 @@ public class ScmStatsSensor implements Sensor {
       analyseChangeLog(project, context, period);
     }
   }
-
-  private void analyseChangeLog(Project project, SensorContext context, String period) {
+  
+  @VisibleForTesting
+  protected void analyseChangeLog(Project project, SensorContext context, String period) {
     int numDays = configuration.getSettings().getInt(period);
 
     if (numDays > 0 || period.equals(ScmStatsConstants.PERIOD_1)) {
@@ -86,8 +87,9 @@ public class ScmStatsSensor implements Sensor {
       }
     }
   }
-
-  private void generateAndSaveMeasures(ChangeLogScmResult changeLogScmResult, SensorContext context, String period) {
+  
+  @VisibleForTesting
+  protected void generateAndSaveMeasures(ChangeLogScmResult changeLogScmResult, SensorContext context, String period) {
     ChangeLogHandler holder = new ChangeLogHandler();
     for (ChangeSet changeSet : changeLogScmResult.getChangeLog().getChangeSets()) {
       holder = addChangeLogToHolder(changeSet, holder);
@@ -118,4 +120,9 @@ public class ScmStatsSensor implements Sensor {
     }
     return fileStatus;
   }
+  
+  @Override
+  public String toString() {
+    return getClass().getSimpleName();
+  }  
 }

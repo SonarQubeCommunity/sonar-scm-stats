@@ -35,12 +35,12 @@ import org.apache.maven.scm.provider.perforce.PerforceScmProvider;
  */
 public class StatsPerforceScmProvider extends PerforceScmProvider {
 
-    @Override
-    protected ChangeLogScmResult changelog(ScmProviderRepository repository, ScmFileSet fileSet,
-            CommandParameters parameters)
-            throws ScmException {
-        StatsPerforceChangeLogCommand command = new StatsPerforceChangeLogCommand();
-        command.setLogger(getLogger());
-        return (ChangeLogScmResult) command.execute(repository, fileSet, parameters);
-    }
+  @Override
+  protected ChangeLogScmResult changelog(ScmProviderRepository repository, ScmFileSet fileSet,
+          CommandParameters parameters)
+          throws ScmException {
+    StatsPerforceChangeLogCommand command = new StatsPerforceChangeLogCommand();
+    command.setLogger(getLogger());
+    return (ChangeLogScmResult) command.execute(repository, fileSet, parameters);
+  }
 }

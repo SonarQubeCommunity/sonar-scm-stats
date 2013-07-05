@@ -25,14 +25,19 @@ import static org.junit.Assert.assertThat;
 import org.junit.Test;
 import org.sonar.plugins.scmstats.ScmStatsConstants;
 
-public class ThirdPeriodMeasuresCreatorTest extends FirstPeriodMeasuresCreatorTest {
+public class ThirdPeriodMeasuresCreatorTest extends AbstrasctPeriodMeasuresCreatorTest {
 
   private final ThirdPeriodMeasuresCreator creator = new ThirdPeriodMeasuresCreator(null);
   
+
   @Test
-  @Override
   public void shouldGetPeriod(){
     assertThat ( creator.getPeriod(), is(ScmStatsConstants.PERIOD_3));
+  }
+  
+  @Override
+  protected AbstractPeriodMeasuresCreator getCreator() {
+    return creator;
   }
   
 }

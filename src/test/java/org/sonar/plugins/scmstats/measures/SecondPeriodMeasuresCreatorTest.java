@@ -17,7 +17,6 @@
  * License along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
  */
-
 package org.sonar.plugins.scmstats.measures;
 
 import static org.hamcrest.Matchers.*;
@@ -25,14 +24,17 @@ import static org.junit.Assert.assertThat;
 import org.junit.Test;
 import org.sonar.plugins.scmstats.ScmStatsConstants;
 
-public class SecondPeriodMeasuresCreatorTest extends FirstPeriodMeasuresCreatorTest {
+public class SecondPeriodMeasuresCreatorTest extends AbstrasctPeriodMeasuresCreatorTest {
 
   private final SecondPeriodMeasuresCreator creator = new SecondPeriodMeasuresCreator(null);
-  
+
   @Test
-  @Override
-  public void shouldGetPeriod(){
-    assertThat ( creator.getPeriod(), is(ScmStatsConstants.PERIOD_2));
+  public void shouldGetPeriod() {
+    assertThat(creator.getPeriod(), is(ScmStatsConstants.PERIOD_2));
   }
-  
+
+  @Override
+  protected AbstractPeriodMeasuresCreator getCreator() {
+    return creator;
+  }
 }

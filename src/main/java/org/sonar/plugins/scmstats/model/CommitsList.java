@@ -41,6 +41,28 @@ public class CommitsList implements Comparable<CommitsList> {
       return other.computeSum() - this.computeSum();
   }
 
+  @Override
+  public int hashCode() {
+    int hash = 3;
+    hash = 89 * hash + (this.commits != null ? this.commits.hashCode() : 0);
+    return hash;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    final CommitsList other = (CommitsList) obj;
+    if (this.commits != other.commits && (this.commits == null || !this.commits.equals(other.commits))) {
+      return false;
+    }
+    return true;
+  }
+
   public int computeSum(){
     int sum = 0;
     for (Integer commit : commits){
