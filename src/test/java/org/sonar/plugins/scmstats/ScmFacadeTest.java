@@ -19,10 +19,16 @@
  */
 package org.sonar.plugins.scmstats;
 
+import static org.fest.assertions.Assertions.assertThat;
+import static org.mockito.Mockito.*;
+
 import java.io.File;
 import org.apache.maven.scm.ScmException;
+import org.apache.maven.scm.command.changelog.ChangeLogScmRequest;
+import org.apache.maven.scm.command.changelog.ChangeLogScmResult;
+import org.apache.maven.scm.provider.ScmProviderRepository;
+import org.apache.maven.scm.provider.ScmProviderRepositoryWithHost;
 import org.apache.maven.scm.repository.ScmRepository;
-import static org.fest.assertions.Assertions.assertThat;
 import org.junit.Before;
 import org.junit.Test;
 import org.sonar.api.config.Settings;
@@ -73,19 +79,37 @@ public class ScmFacadeTest {
 
   @Test
   public void shouldGetChangeLog() throws ScmException {
-    initScmRepository("scm:svn:http://svn.codehaus.org/sonar-plugins/trunk/useless-code-tracker");
-    assertThat(scmFacade.getChangeLog(new File(""), 0).getChangeLog()).isNull();
+    ScmConfiguration scmConfiguration = mock(ScmConfiguration.class);
+    ChangeLogScmResult changeLogScmResult = new ChangeLogScmResult("", null);
+    when(scmConfiguration.getSettings()).thenReturn(settings);
+    when(scmConfiguration.getScmProvider()).thenReturn("scm");
+    SonarScmManager scmManager = mock(SonarScmManager.class);
+    ScmRepository scmRepository = mock(ScmRepository.class);
+    when(scmManager.makeScmRepository("scm:url")).thenReturn(scmRepository);
+    when(scmManager.changeLog((ChangeLogScmRequest) any())).thenReturn(changeLogScmResult);
+    scmFacade = new ScmFacade(scmManager, scmConfiguration);
+    ScmFacade spied = spy(scmFacade);
+    when(spied.getScmRepository()).thenReturn(scmRepository);
+    assertThat(spied.getChangeLog(new File(""), 0)).isEqualTo(changeLogScmResult);
   }
 
   @Test
   public void shouldGetChangeLogOfDays() throws ScmException {
-    settings.setProperty(ScmStatsConstants.URL, "scm:svn:http://svn.codehaus.org/sonar-plugins/trunk/useless-code-tracker");
+    settings.setProperty(ScmStatsConstants.URL, "scm:url");
     settings.setProperty(ScmStatsConstants.USER, "user");
     settings.setProperty(ScmStatsConstants.PASSWORD, "password");
-    ScmConfiguration scmConfiguration = new ScmConfiguration(settings);
-    SonarScmManager scmManager = new SonarScmManager();
+    ScmConfiguration scmConfiguration = mock(ScmConfiguration.class);
+    ChangeLogScmResult changeLogScmResult = new ChangeLogScmResult("", null);
+    when(scmConfiguration.getSettings()).thenReturn(settings);
+    when(scmConfiguration.getScmProvider()).thenReturn("scm");
+    SonarScmManager scmManager = mock(SonarScmManager.class);
+    ScmRepository scmRepository = mock(ScmRepository.class);
+    when(scmManager.makeScmRepository("scm:url")).thenReturn(scmRepository);
+    when(scmManager.changeLog((ChangeLogScmRequest) any())).thenReturn(changeLogScmResult);
     scmFacade = new ScmFacade(scmManager, scmConfiguration);
-    assertThat(scmFacade.getChangeLog(new File(""), 10).getChangeLog()).isNull();
+    ScmFacade spied = spy(scmFacade);
+    when(spied.getScmRepository()).thenReturn(scmRepository);
+    assertThat(spied.getChangeLog(new File(""), 0)).isEqualTo(changeLogScmResult);
 
   }
 
