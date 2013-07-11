@@ -17,7 +17,6 @@
  * License along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
  */
-
 package org.sonar.plugins.scmstats;
 
 import org.apache.maven.scm.manager.NoSuchScmProviderException;
@@ -28,24 +27,28 @@ import org.apache.maven.scm.provider.cvslib.cvsexe.CvsExeScmProvider;
 import org.junit.*;
 import static org.junit.Assert.*;
 
+import org.apache.maven.scm.provider.jazz.JazzScmProvider;
+import org.sonar.plugins.scmstats.scm.StatsPerforceScmProvider;
+
 public class SonarScmManagerTest {
+
   private SonarScmManager scmManager = new SonarScmManager();
-  
+
   @Test
   public void testScmManagerSvnProvider() {
     try {
       scmManager.getProviderByType(new SvnExeScmProvider().getScmType());
     } catch (NoSuchScmProviderException ex) {
-      fail (ex.getProviderName() + " Provider should be registered" );
+      failTest(ex);
     }
   }
-  
+
   @Test
   public void testScmManagerGitProvider() {
     try {
       scmManager.getProviderByType(new GitExeScmProvider().getScmType());
     } catch (NoSuchScmProviderException ex) {
-      fail (ex.getProviderName() + " Provider should be registered" );
+      failTest(ex);
     }
   }
 
@@ -54,7 +57,7 @@ public class SonarScmManagerTest {
     try {
       scmManager.getProviderByType(new HgScmProvider().getScmType());
     } catch (NoSuchScmProviderException ex) {
-      fail (ex.getProviderName() + " Provider should be registered" );
+      failTest(ex);
     }
   }
 
@@ -63,7 +66,29 @@ public class SonarScmManagerTest {
     try {
       scmManager.getProviderByType(new CvsExeScmProvider().getScmType());
     } catch (NoSuchScmProviderException ex) {
-      fail (ex.getProviderName() + " Provider should be registered" );
+      failTest(ex);
     }
+  }
+
+  @Test
+  public void testScmManagerJazzProvider() {
+    try {
+      scmManager.getProviderByType(new JazzScmProvider().getScmType());
+    } catch (NoSuchScmProviderException ex) {
+      failTest(ex);
+    }
+  }
+
+  @Test
+  public void testScmManagerPerforceProvider() {
+    try {
+      scmManager.getProviderByType(new StatsPerforceScmProvider().getScmType());
+    } catch (NoSuchScmProviderException ex) {
+      failTest(ex);
+    }
+  }
+
+  private void failTest(NoSuchScmProviderException ex) {
+    fail(ex.getProviderName() + " Provider should be registered");
   }
 }

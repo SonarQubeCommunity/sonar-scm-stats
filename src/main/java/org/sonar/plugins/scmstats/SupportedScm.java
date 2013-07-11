@@ -24,6 +24,7 @@ import org.apache.maven.scm.provider.ScmProvider;
 import org.apache.maven.scm.provider.git.gitexe.GitExeScmProvider;
 import org.apache.maven.scm.provider.hg.HgScmProvider;
 import org.apache.maven.scm.provider.cvslib.cvsexe.CvsExeScmProvider;
+import org.apache.maven.scm.provider.jazz.JazzScmProvider;
 import org.apache.maven.scm.provider.svn.svnexe.SvnExeScmProvider;
 import org.sonar.plugins.scmstats.scm.StatsPerforceScmProvider;
 
@@ -32,6 +33,7 @@ public enum SupportedScm {
   GIT(new GitExeScmProvider()),
   HG(new HgScmProvider()),
   PERFORCE(new StatsPerforceScmProvider()),
+  JAZZ(new JazzScmProvider()),
   CVS(new CvsExeScmProvider());
 
   private final ScmProvider provider;

@@ -26,8 +26,6 @@ import java.io.File;
 import org.apache.maven.scm.ScmException;
 import org.apache.maven.scm.command.changelog.ChangeLogScmRequest;
 import org.apache.maven.scm.command.changelog.ChangeLogScmResult;
-import org.apache.maven.scm.provider.ScmProviderRepository;
-import org.apache.maven.scm.provider.ScmProviderRepositoryWithHost;
 import org.apache.maven.scm.repository.ScmRepository;
 import org.junit.Before;
 import org.junit.Test;
@@ -74,6 +72,11 @@ public class ScmFacadeTest {
   @Test
   public void shouldGetCvsScmRepository() {
     initScmRepository("scm:cvs:pserver:anoncvs:@cvs.apache.org:/cvs/root:module");
+    assertThat(scmFacade.getScmRepository()).isInstanceOf(ScmRepository.class);
+  }
+  @Test
+  public void shouldGetJazzScmRepository() {
+    initScmRepository("scm:jazz:username;password@https://server.name:9443/jazz:workspace");
     assertThat(scmFacade.getScmRepository()).isInstanceOf(ScmRepository.class);
   }
 
