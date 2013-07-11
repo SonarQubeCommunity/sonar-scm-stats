@@ -1,6 +1,8 @@
 <%
 
 widgetPeriod = widget_properties["Period"]
+days = Property.value('sonar.scm-stats.period' + widgetPeriod.to_s, @resource.id)
+
 if widgetPeriod == 1
   period_measure = "scm-commits-per-user"
 else 
@@ -31,7 +33,11 @@ end
     <tr>
       <td valign="top" width="100%">
         <div class="dashbox">
-          <p class="title"><%= message('widget.scm-stats-authors-activity.title') + " " + message('scmstats.forPeriod') + " " + widgetPeriod.to_s-%></p>
+          <% if days.to_i > 0 %>
+            <p class="title"><%= message('widget.scm-stats-authors-activity.title') + " " + message('scmstats.forTheLast', :params => days.to_s) -%></p>
+          <% else %>
+            <p class="title"><%= message('widget.scm-stats-authors-activity.title') + " " + message('scmstats.fromTheBeginning') -%></p>
+          <% end; %> 
           <br />
           <% query="ck=stackedBarChart3D&w=500&h=" + height.to_s + "&v=" + u(the_measure_stack_chart) %>
           <%= chart(query) -%>
@@ -42,7 +48,11 @@ end
 </table>
 
 <% else %>
-  <p class="title"><%= message('widget.scm-stats-authors-activity.title') -%></p>
+    <% if days.to_i > 0 %>
+      <p class="title"><%= message('widget.scm-stats-authors-activity.title') + " " + message('scmstats.forTheLast', :params => days.to_s) -%></p>
+    <% else %>
+      <p class="title"><%= message('widget.scm-stats-authors-activity.title') + " " + message('scmstats.fromTheBeginning') -%></p>
+    <% end; %> 
   <br />
   <p><%= message('scmstats.noData') -%></p>
 <% end %>
