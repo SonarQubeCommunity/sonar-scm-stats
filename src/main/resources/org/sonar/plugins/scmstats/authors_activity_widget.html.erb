@@ -39,7 +39,7 @@ end
             <p class="title"><%= message('widget.scm-stats-authors-activity.title') + " " + message('scmstats.fromTheBeginning') -%></p>
           <% end; %> 
           <br />
-          <% query="ck=stackedBarChart3D&w=500&h=" + height.to_s + "&v=" + u(the_measure_stack_chart) %>
+          <% query="ck=stackedBarChart3D&w=650&h=" + height.to_s + "&v=" + u(the_measure_stack_chart) %>
           <%= chart(query) -%>
         </div>
       </td>

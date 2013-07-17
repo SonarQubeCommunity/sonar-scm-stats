@@ -21,18 +21,23 @@ package org.sonar.plugins.scmstats.measures;
 
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import static org.hamcrest.Matchers.*;
 import org.joda.time.DateTime;
 import static org.junit.Assert.assertThat;
+
+import java.util.ArrayList;
 import org.junit.Test;
+import org.sonar.api.config.Settings;
+import org.sonar.plugins.scmstats.ScmConfiguration;
 import org.sonar.plugins.scmstats.ScmStatsConstants;
 import org.sonar.plugins.scmstats.model.ChangeLogInfo;
 import org.sonar.plugins.scmstats.model.CommitsList;
 
 public class ChangeLogHandlerTest {
-  ChangeLogHandler instance = new ChangeLogHandler();
+  
+  private Settings settings = new Settings();
+  private ChangeLogHandler instance = new ChangeLogHandler(new ArrayList<String>());
   
   @Test
   public void testAddChangeLog() {

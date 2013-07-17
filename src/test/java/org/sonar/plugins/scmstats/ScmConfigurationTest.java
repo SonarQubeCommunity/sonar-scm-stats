@@ -23,9 +23,10 @@ import org.apache.maven.model.Scm;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.scm.provider.svn.svnexe.SvnExeScmProvider;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertNull;
+
+import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.sonar.api.config.Settings;
@@ -33,12 +34,16 @@ import org.sonar.api.config.Settings;
 public class ScmConfigurationTest {
   private final Settings settings = new Settings();
   private static final String URL = "scm:svn:http://";
+  private static final String CLIENT_SPEC = "clientSpec";
+  private static final String IGNORE_AUTHORS_LIST = "author1,author2";
   @Before
   public void setUp() {
     settings.setProperty(ScmStatsConstants.ENABLED, true);
     settings.setProperty(ScmStatsConstants.PERIOD_1, 0);
     settings.setProperty(ScmStatsConstants.PERIOD_2, 30);
     settings.setProperty(ScmStatsConstants.PERIOD_3, 90);
+    settings.setProperty(ScmStatsConstants.PERFORCE_CLIENTSPEC, CLIENT_SPEC);
+    settings.setProperty(ScmStatsConstants.IGNORE_AUTHORS_LIST, IGNORE_AUTHORS_LIST);
   }
 
   @Test
@@ -85,5 +90,18 @@ public class ScmConfigurationTest {
     assertThat ( scmConfiguration.getThirdPeriod(), equalTo(90));
   }
 
+  @Test
+  public void testPerforceConfiguration() {
+    ScmConfiguration scmConfiguration = new ScmConfiguration(settings);
+    assertThat ( scmConfiguration.getPerforceClientSpec() , equalTo(CLIENT_SPEC));
+  }
 
+  @Test
+  public void testIgnoreAuthorsListConfiguration() {
+    ScmConfiguration scmConfiguration = new ScmConfiguration(settings);
+    List<String> ignoreAuthors = scmConfiguration.getIgnoreAuthorsList();
+    
+    assertThat (ignoreAuthors, hasItem("author1"));
+    assertThat (ignoreAuthors, hasItem("author2"));
+  }
 }

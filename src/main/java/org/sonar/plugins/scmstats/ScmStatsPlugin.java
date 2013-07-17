@@ -37,57 +37,61 @@ public final class ScmStatsPlugin extends SonarPlugin {
   public List getExtensions() {
     return ImmutableList.of(
             PropertyDefinition.builder(ScmStatsConstants.ENABLED).
-              defaultValue(ScmStatsPlugin.ENABLED_DEFAULT).
-              name("Activation of SCM Stats plugin").
-              description("This property can be set to false in order to deactivate the SCM Stats plugin.").
-              index(0).
-              onQualifiers(Qualifiers.PROJECT, Qualifiers.MODULE).
-              category(SCMSTATS_CATEGORY).
-              type(PropertyType.BOOLEAN).
-              build(),
-            
+            defaultValue(ScmStatsPlugin.ENABLED_DEFAULT).
+            name("Activation of SCM Stats plugin").
+            description("This property can be set to false in order to deactivate the SCM Stats plugin.").
+            index(0).
+            onQualifiers(Qualifiers.PROJECT, Qualifiers.MODULE).
+            category(SCMSTATS_CATEGORY).
+            type(PropertyType.BOOLEAN).
+            build(),
             PropertyDefinition.builder(ScmStatsConstants.PERIOD_1).
-              defaultValue("0").
-              name("Period #1").
-              description("Period (in number of days before analysis) used to collect SCM Stats."
-              + "Changing this property only takes effect after subsequent project inspections. Set to 0 to collect all Scm Stats from the beginning of the project").
-              index(1).
-              onQualifiers(Qualifiers.PROJECT, Qualifiers.MODULE).
-              category(SCMSTATS_CATEGORY).
-              type(PropertyType.INTEGER).
-              build(),
-
+            defaultValue("0").
+            name("Period #1").
+            description("Period (in number of days before analysis) used to collect SCM Stats."
+            + "Changing this property only takes effect after subsequent project inspections. Set to 0 to collect all Scm Stats from the beginning of the project").
+            index(1).
+            onQualifiers(Qualifiers.PROJECT, Qualifiers.MODULE).
+            category(SCMSTATS_CATEGORY).
+            type(PropertyType.INTEGER).
+            build(),
             PropertyDefinition.builder(ScmStatsConstants.PERIOD_2).
-              defaultValue("0").
-              name("Period #2").
-              description("See description of Period #1 property. If it's set to a non-positive value, then it's ignored").
-              index(2).
-              onQualifiers(Qualifiers.PROJECT, Qualifiers.MODULE).
-              category(SCMSTATS_CATEGORY).
-              type(PropertyType.INTEGER).
-              build(),
-
+            defaultValue("0").
+            name("Period #2").
+            description("See description of Period #1 property. If it's set to a non-positive value, then it's ignored").
+            index(2).
+            onQualifiers(Qualifiers.PROJECT, Qualifiers.MODULE).
+            category(SCMSTATS_CATEGORY).
+            type(PropertyType.INTEGER).
+            build(),
             PropertyDefinition.builder(ScmStatsConstants.PERIOD_3).
-              defaultValue("0").
-              name("Period #2").
-              description("See description of Period #1 property. If it's set to a non-positive value, then it's ignored").
-              index(3).
-              onQualifiers(Qualifiers.PROJECT, Qualifiers.MODULE).
-              category(SCMSTATS_CATEGORY).
-              type(PropertyType.INTEGER).
-              build(),
-            
+            defaultValue("0").
+            name("Period #2").
+            description("See description of Period #1 property. If it's set to a non-positive value, then it's ignored").
+            index(3).
+            onQualifiers(Qualifiers.PROJECT, Qualifiers.MODULE).
+            category(SCMSTATS_CATEGORY).
+            type(PropertyType.INTEGER).
+            build(),
+            PropertyDefinition.builder(ScmStatsConstants.IGNORE_AUTHORS_LIST).
+            name("Ignore author(s) list").
+            description("A list of authors names to be ignored when computing and displaying stats.").
+            index(4).
+            onQualifiers(Qualifiers.PROJECT, Qualifiers.MODULE).
+            category(SCMSTATS_CATEGORY).
+            type(PropertyType.STRING).
+            multiValues(true).
+            build(),
             PropertyDefinition.builder(ScmStatsConstants.PERFORCE_CLIENTSPEC).
-              name("Client Spec name").
-              description("The Client Spec name which defines your workspace location, the depot files you plan to work with, "
-                            + "and where they will be located in your workspace when you invoke Perforce commands").
-              index(0).
-              onQualifiers(Qualifiers.PROJECT).
-              category(SCMSTATS_CATEGORY).
-              subCategory(PERFORCE_SUBCATEGORY).
-              type(PropertyType.STRING).
-              build(),
-            
+            name("Client Spec name").
+            description("The Client Spec name which defines your workspace location, the depot files you plan to work with, "
+            + "and where they will be located in your workspace when you invoke Perforce commands").
+            index(0).
+            onQualifiers(Qualifiers.PROJECT).
+            category(SCMSTATS_CATEGORY).
+            subCategory(PERFORCE_SUBCATEGORY).
+            type(PropertyType.STRING).
+            build(),
             UrlChecker.class,
             SonarScmManager.class,
             ScmFacade.class,
@@ -106,5 +110,4 @@ public final class ScmStatsPlugin extends SonarPlugin {
             StackedBarChart3D.class,
             PieChart3D.class);
   }
-
 }

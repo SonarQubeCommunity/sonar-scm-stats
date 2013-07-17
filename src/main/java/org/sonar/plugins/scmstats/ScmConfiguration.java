@@ -21,6 +21,8 @@ package org.sonar.plugins.scmstats;
 
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
+import java.util.Arrays;
+import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.apache.maven.scm.provider.ScmUrlUtils;
 import org.sonar.api.BatchExtension;
@@ -71,6 +73,14 @@ public class ScmConfiguration implements BatchExtension {
 
   public Integer getThirdPeriod() {
     return settings.getInt(ScmStatsConstants.PERIOD_3);
+  }
+
+  public List<String> getIgnoreAuthorsList() {
+    return Arrays.asList(settings.getStringArray(ScmStatsConstants.IGNORE_AUTHORS_LIST));
+  }
+
+  public String getPerforceClientSpec() {
+    return settings.getString(ScmStatsConstants.PERFORCE_CLIENTSPEC);
   }
 
   public String getUrl() {

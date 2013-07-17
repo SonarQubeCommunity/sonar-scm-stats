@@ -41,7 +41,17 @@ public class ChangeLogInfo {
   }
 
   public final void setAuthor(String author) {
-    this.author = StringUtils.substringBefore(author, "<").trim();
+    if ( author.contains("<")) {
+      this.author = StringUtils.substringAfter(author, "<").trim();
+      if ( ">".equals(this.author) ){
+        this.author = "unknown";
+      } else {
+        this.author = StringUtils.substringBefore(this.author, ">").trim();
+      }
+    } else {
+      this.author = author;
+    }
+    
   }
 
   public Date getCommitDate() {

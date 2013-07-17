@@ -39,6 +39,8 @@ import static org.mockito.Mockito.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+
+import java.util.ArrayList;
 import org.sonar.api.batch.SensorContext;
 import org.sonar.api.resources.ProjectFileSystem;
 import org.sonar.plugins.scmstats.measures.ChangeLogHandler;
@@ -49,21 +51,31 @@ public class ScmStatsSensorTest {
   Project myProject = mock(Project.class);
   private ProjectFileSystem projectFileSystem = mock(ProjectFileSystem.class);
   private ScmFacade scmFacade = mock(ScmFacade.class);
-
   private final Settings settings = new Settings();
   private UrlChecker checker;
   private SensorContext context = mock(SensorContext.class);
-  
+
   @Before
   public void setUp() {
     settings.setProperty(ScmStatsConstants.ENABLED, true);
-    settings.setProperty(ScmStatsConstants.URL,"scm:svn:http://svn.codehaus.org/sonar-plugins/trunk/useless-code-tracker");
+    settings.setProperty(ScmStatsConstants.URL, "scm:svn:http://svn.codehaus.org/sonar-plugins/trunk/useless-code-tracker");
+    when(projectFileSystem.getBasedir()).thenReturn(new File(""));
     checker = mock(UrlChecker.class);
 
     when(checker.check(null)).thenReturn(Boolean.FALSE);
 
     ScmConfiguration scmConfiguration = new ScmConfiguration(settings);
     sensor = new ScmStatsSensor(scmConfiguration, checker, new ScmFacade(new SonarScmManager(), scmConfiguration));
+  }
+
+  @Test
+  public void realTest() {
+    settings.setProperty(ScmStatsConstants.URL, "scm:git:git@github.com:SonarCommunity/sonar-scm-stats");
+    settings.setProperty(ScmStatsConstants.IGNORE_AUTHORS_LIST, "ppapapetrou76@gmail.com");
+    ScmConfiguration scmConfiguration = new ScmConfiguration(settings);
+    when(myProject.getFileSystem()).thenReturn(projectFileSystem);
+    sensor = new ScmStatsSensor(scmConfiguration, checker, new ScmFacade(new SonarScmManager(), scmConfiguration));
+    sensor.analyse(myProject, context);
   }
 
   @Test
@@ -114,7 +126,7 @@ public class ScmStatsSensorTest {
 
   @Test
   public void shouldNotAddChangeLogToHolderIfAuthorIsNull() {
-    ChangeLogHandler holder = new ChangeLogHandler();
+    ChangeLogHandler holder = new ChangeLogHandler(new ArrayList<String>());
     List<ChangeFile> files = createChangeLogFiles();
 
     ChangeSet changeSet = new ChangeSet(null, null, null, files);
@@ -126,7 +138,7 @@ public class ScmStatsSensorTest {
 
   @Test
   public void shouldNotAddChangeLogToHolderIfDateIsNull() {
-    ChangeLogHandler holder = new ChangeLogHandler();
+    ChangeLogHandler holder = new ChangeLogHandler(new ArrayList<String>());
     List<ChangeFile> files = createChangeLogFiles();
 
     ChangeSet changeSet = new ChangeSet(null, null, "author", files);
@@ -138,7 +150,7 @@ public class ScmStatsSensorTest {
 
   @Test
   public void shouldAddChangeLogToHolder() {
-    ChangeLogHandler holder = new ChangeLogHandler();
+    ChangeLogHandler holder = new ChangeLogHandler(new ArrayList<String>());
     List<ChangeFile> files = createChangeLogFiles();
 
     Date someDate = Calendar.getInstance().getTime();
@@ -161,17 +173,17 @@ public class ScmStatsSensorTest {
     when(checker.check("scm:url")).thenReturn(true);
     ChangeLogScmResult scmResult = new ChangeLogScmResult("", null);
     when(scmFacade.getChangeLog(projectFileSystem.getBasedir(), 0)).thenReturn(scmResult);
-    
+
     settings.setProperty(ScmStatsConstants.ENABLED, true);
-    settings.setProperty(ScmStatsConstants.URL,"scm:url");
+    settings.setProperty(ScmStatsConstants.URL, "scm:url");
     ScmConfiguration scmConfiguration = new ScmConfiguration(settings);
     ScmStatsSensor newSensor = new ScmStatsSensor(scmConfiguration, checker, scmFacade);
     ScmStatsSensor spiedSensor = spy(newSensor);
-    doNothing().when(spiedSensor).generateAndSaveMeasures((ChangeLogScmResult)any(),(SensorContext) any(), (String) any());
+    doNothing().when(spiedSensor).generateAndSaveMeasures((ChangeLogScmResult) any(), (SensorContext) any(), (String) any());
 
     spiedSensor.analyse(myProject, context);
-    verify(spiedSensor, times(3)).analyseChangeLog((Project)any(),(SensorContext) any(), (String) any());
-    verify(spiedSensor, times(1)).generateAndSaveMeasures((ChangeLogScmResult)any(),(SensorContext) any(), (String) any());
+    verify(spiedSensor, times(3)).analyseChangeLog((Project) any(), (SensorContext) any(), (String) any());
+    verify(spiedSensor, times(1)).generateAndSaveMeasures((ChangeLogScmResult) any(), (SensorContext) any(), (String) any());
 
   }
 
@@ -184,19 +196,19 @@ public class ScmStatsSensorTest {
     when(scmFacade.getChangeLog(projectFileSystem.getBasedir(), 0)).thenReturn(scmResult);
     when(scmFacade.getChangeLog(projectFileSystem.getBasedir(), 10)).thenReturn(scmResult);
     when(scmFacade.getChangeLog(projectFileSystem.getBasedir(), 20)).thenReturn(scmResult);
-    
+
     settings.setProperty(ScmStatsConstants.ENABLED, true);
     settings.setProperty(ScmStatsConstants.PERIOD_2, 10);
     settings.setProperty(ScmStatsConstants.PERIOD_3, 20);
-    settings.setProperty(ScmStatsConstants.URL,"scm:url");
+    settings.setProperty(ScmStatsConstants.URL, "scm:url");
     ScmConfiguration scmConfiguration = new ScmConfiguration(settings);
     ScmStatsSensor newSensor = new ScmStatsSensor(scmConfiguration, checker, scmFacade);
     ScmStatsSensor spiedSensor = spy(newSensor);
-    doNothing().when(spiedSensor).generateAndSaveMeasures((ChangeLogScmResult)any(),(SensorContext) any(), (String) any());
+    doNothing().when(spiedSensor).generateAndSaveMeasures((ChangeLogScmResult) any(), (SensorContext) any(), (String) any());
 
     spiedSensor.analyse(myProject, context);
-    verify(spiedSensor, times(3)).analyseChangeLog((Project)any(),(SensorContext) any(), (String) any());
-    verify(spiedSensor, times(3)).generateAndSaveMeasures((ChangeLogScmResult)any(),(SensorContext) any(), (String) any());
+    verify(spiedSensor, times(3)).analyseChangeLog((Project) any(), (SensorContext) any(), (String) any());
+    verify(spiedSensor, times(3)).generateAndSaveMeasures((ChangeLogScmResult) any(), (SensorContext) any(), (String) any());
 
   }
 
@@ -207,21 +219,20 @@ public class ScmStatsSensorTest {
     when(checker.check("scm:url")).thenReturn(true);
     ChangeLogScmResult scmResult = new ChangeLogScmResult(null, new ScmResult(null, null, null, false));
     when(scmFacade.getChangeLog(projectFileSystem.getBasedir(), 0)).thenReturn(scmResult);
-    
+
     settings.setProperty(ScmStatsConstants.ENABLED, true);
-    settings.setProperty(ScmStatsConstants.URL,"scm:url");
+    settings.setProperty(ScmStatsConstants.URL, "scm:url");
     ScmConfiguration scmConfiguration = new ScmConfiguration(settings);
     ScmStatsSensor newSensor = new ScmStatsSensor(scmConfiguration, checker, scmFacade);
     ScmStatsSensor spiedSensor = spy(newSensor);
-    doNothing().when(spiedSensor).generateAndSaveMeasures((ChangeLogScmResult)any(),(SensorContext) any(), (String) any());
+    doNothing().when(spiedSensor).generateAndSaveMeasures((ChangeLogScmResult) any(), (SensorContext) any(), (String) any());
 
     spiedSensor.analyse(myProject, context);
-    verify(spiedSensor, times(3)).analyseChangeLog((Project)any(),(SensorContext) any(), (String) any());
-    verify(spiedSensor, times(0)).generateAndSaveMeasures((ChangeLogScmResult)any(),(SensorContext) any(), (String) any());
+    verify(spiedSensor, times(3)).analyseChangeLog((Project) any(), (SensorContext) any(), (String) any());
+    verify(spiedSensor, times(0)).generateAndSaveMeasures((ChangeLogScmResult) any(), (SensorContext) any(), (String) any());
 
   }
-  
-  
+
   @Test
   public void shouldGatherStatsForPerforceScm() throws ScmException {
     when(myProject.getFileSystem()).thenReturn(projectFileSystem);
@@ -231,20 +242,18 @@ public class ScmStatsSensorTest {
     when(scmFacade.getChangeLog(projectFileSystem.getBasedir(), 0)).thenReturn(scmResult);
 
     settings.setProperty(ScmStatsConstants.ENABLED, true);
-    settings.setProperty(ScmStatsConstants.URL,"scm:url");
-    settings.setProperty(ScmStatsConstants.PERFORCE_CLIENTSPEC,"myClient");
+    settings.setProperty(ScmStatsConstants.URL, "scm:url");
+    settings.setProperty(ScmStatsConstants.PERFORCE_CLIENTSPEC, "myClient");
     ScmConfiguration scmConfiguration = new ScmConfiguration(settings);
     ScmStatsSensor newSensor = new ScmStatsSensor(scmConfiguration, checker, scmFacade);
     ScmStatsSensor spiedSensor = spy(newSensor);
-    doNothing().when(spiedSensor).generateAndSaveMeasures((ChangeLogScmResult)any(),(SensorContext) any(), (String) any());
+    doNothing().when(spiedSensor).generateAndSaveMeasures((ChangeLogScmResult) any(), (SensorContext) any(), (String) any());
     spiedSensor.analyse(myProject, context);
-    
+
     assertThat(System.getProperty("maven.scm.perforce.clientspec.name")).isEqualTo("myClient");
 
   }
 
-
-  
   @Test
   public void shouldHaveDebugName() {
     String debugName = sensor.toString();

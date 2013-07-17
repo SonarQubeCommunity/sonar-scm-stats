@@ -20,7 +20,6 @@
 
 package org.sonar.plugins.scmstats.model;
 
-import java.util.Date;
 import org.junit.*;
 import static org.junit.Assert.*;
 import static org.hamcrest.Matchers.is;
@@ -29,10 +28,10 @@ public class ChangeLogInfoTest {
   
   @Test
   public void testSetAuthor() {
-    String author = "ppapapetrou76 < ppapapetrou >";
+    String author = "author <author@mail.com>";
     ChangeLogInfo changeLogInfo = new ChangeLogInfo(author, null, null);
     
-    assertThat (changeLogInfo.getAuthor(),is("ppapapetrou76"));
+    assertThat (changeLogInfo.getAuthor(),is("author@mail.com"));
   }
 
 }

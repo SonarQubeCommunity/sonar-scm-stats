@@ -56,8 +56,8 @@ public class ScmStatsSensor implements Sensor {
 
   @Override
   public void analyse(Project project, SensorContext context) {
-    String perfoceClientSpec = configuration.getSettings().getString(ScmStatsConstants.PERFORCE_CLIENTSPEC);
-    if ( perfoceClientSpec!= null ) {
+    String perfoceClientSpec = configuration.getPerforceClientSpec();
+    if (perfoceClientSpec != null) {
       System.setProperty("maven.scm.perforce.clientspec.name", perfoceClientSpec);
     }
     List<String> periods = ScmStatsConstants.getPeriodsAsList();
@@ -65,7 +65,7 @@ public class ScmStatsSensor implements Sensor {
       analyseChangeLog(project, context, period);
     }
   }
-  
+
   @VisibleForTesting
   protected void analyseChangeLog(Project project, SensorContext context, String period) {
     int numDays = configuration.getSettings().getInt(period);
@@ -83,14 +83,14 @@ public class ScmStatsSensor implements Sensor {
                   changeLogScmResult.getCommandOutput()));
         }
       } catch (ScmException e) {
-        LOG.warn(String.format("Fail to retrieve SCM info."), e); 
+        LOG.warn(String.format("Fail to retrieve SCM info."), e);
       }
     }
   }
-  
+
   @VisibleForTesting
   protected void generateAndSaveMeasures(ChangeLogScmResult changeLogScmResult, SensorContext context, String period) {
-    ChangeLogHandler holder = new ChangeLogHandler();
+    ChangeLogHandler holder = new ChangeLogHandler(configuration.getIgnoreAuthorsList());
     for (ChangeSet changeSet : changeLogScmResult.getChangeLog().getChangeSets()) {
       holder = addChangeLogToHolder(changeSet, holder);
     }
@@ -100,7 +100,8 @@ public class ScmStatsSensor implements Sensor {
 
   @VisibleForTesting
   protected ChangeLogHandler addChangeLogToHolder(ChangeSet changeSet, ChangeLogHandler holder) {
-    if (changeSet.getAuthor() != null && changeSet.getDate() != null) {
+    if (changeSet.getAuthor() != null && changeSet.getDate() != null && 
+            !configuration.getIgnoreAuthorsList().contains(changeSet.getAuthor())) {
       holder.addChangeLog(changeSet.getAuthor(), changeSet.getDate(), createActivityMap(changeSet));
     }
     return holder;
@@ -120,9 +121,9 @@ public class ScmStatsSensor implements Sensor {
     }
     return fileStatus;
   }
-  
+
   @Override
   public String toString() {
     return getClass().getSimpleName();
-  }  
+  }
 }
