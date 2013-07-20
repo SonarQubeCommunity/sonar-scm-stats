@@ -32,6 +32,7 @@ public final class ScmStatsConstants {
   public static final String PERIOD_2 = "sonar.scm-stats.period2";
   public static final String PERIOD_3 = "sonar.scm-stats.period3";
   public static final String IGNORE_AUTHORS_LIST = "sonar.scm-stats.authors.ignore";
+  public static final String CHANGELOG_DATE_PATTERN = "sonar.scm-stats.changelog.datepattern";
   public static final String PERFORCE_CLIENTSPEC = "sonar.scm-stats.perforce.clientspec";
   // Properties provided by the SCM Activity plugin
   public static final String URL = "sonar.scm.url";
@@ -41,6 +42,7 @@ public final class ScmStatsConstants {
   public static final String ACTIVITY_ADD = "Adding";
   public static final String ACTIVITY_MODIFY = "Modifying";
   public static final String ACTIVITY_DELETE = "Deleting";
+  public static final String HG_DEFAULT_CHANGELOG_DATE_PATTERN = "EEE MMM dd HH:mm:ss yyyy Z";
 
   public static List<String> getAsList() {
     return ImmutableList.of(ENABLED, PERIOD_1, PERIOD_2, PERIOD_3, URL, USER, PASSWORD,

@@ -17,7 +17,6 @@
  * License along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
  */
-
 package org.sonar.plugins.scmstats;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -37,9 +36,11 @@ import org.sonar.api.BatchExtension;
 import org.sonar.api.utils.SonarException;
 
 public class ScmFacade implements BatchExtension {
+
   private final SonarScmManager scmManager;
   private final ScmConfiguration configuration;
   private Supplier<ScmRepository> repository;
+  private ChangeLogScmRequest scmRequest;
 
   public ScmFacade(SonarScmManager scmManager, ScmConfiguration configuration) {
     this.scmManager = scmManager;
@@ -48,12 +49,16 @@ public class ScmFacade implements BatchExtension {
   }
 
   public ChangeLogScmResult getChangeLog(File file, int numDays) throws ScmException {
+    scmRequest = new ChangeLogScmRequest(getScmRepository(), new ScmFileSet(file));
+    String datePattern = determineChangeLogDatePattern();
     
-    ChangeLogScmRequest scmRequest = new ChangeLogScmRequest(getScmRepository(), new ScmFileSet(file));
-    if (numDays > 0){
+    if (StringUtils.isNotEmpty(datePattern)) {
+      scmRequest.setDatePattern(datePattern);
+    }
+    if (numDays > 0) {
       scmRequest.setNumDays(numDays);
     }
-    
+
     return scmManager.changeLog(scmRequest);
   }
 
@@ -62,7 +67,21 @@ public class ScmFacade implements BatchExtension {
     return repository.get();
   }
 
+  @VisibleForTesting
+  protected String determineChangeLogDatePattern() {
+    String datePattern = "";
+
+    if (StringUtils.isNotEmpty(configuration.getChangeLogDatePattern())) {
+      datePattern = configuration.getChangeLogDatePattern();
+    } else if ("hg".equals(getScmRepository().getProvider())) {
+      datePattern = "EEE MMM dd HH:mm:ss yyyy Z";
+      
+    }
+    return datePattern;
+  }
+
   private class ScmRepositorySupplier implements Supplier<ScmRepository> {
+
     public ScmRepository get() {
       try {
         String connectionUrl = configuration.getUrl();
@@ -98,4 +117,10 @@ public class ScmFacade implements BatchExtension {
       SvnUtil.getSettings().setTrustServerCert(true);
     }
   }
+
+  public ChangeLogScmRequest getScmRequest() {
+    return scmRequest;
+  }
+  
+  
 }

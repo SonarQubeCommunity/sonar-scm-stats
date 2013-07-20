@@ -83,6 +83,10 @@ public class ScmConfiguration implements BatchExtension {
     return settings.getString(ScmStatsConstants.PERFORCE_CLIENTSPEC);
   }
 
+  public String getChangeLogDatePattern() {
+    return settings.getString(ScmStatsConstants.CHANGELOG_DATE_PATTERN);
+  }
+    
   public String getUrl() {
     return url.get();
   }

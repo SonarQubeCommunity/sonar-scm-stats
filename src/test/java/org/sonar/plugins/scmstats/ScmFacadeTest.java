@@ -26,7 +26,9 @@ import java.io.File;
 import org.apache.maven.scm.ScmException;
 import org.apache.maven.scm.command.changelog.ChangeLogScmRequest;
 import org.apache.maven.scm.command.changelog.ChangeLogScmResult;
+import org.apache.maven.scm.provider.ScmProviderRepository;
 import org.apache.maven.scm.repository.ScmRepository;
+import static org.fest.assertions.Assertions.assertThat;
 import org.junit.Before;
 import org.junit.Test;
 import org.sonar.api.config.Settings;
@@ -74,6 +76,7 @@ public class ScmFacadeTest {
     initScmRepository("scm:cvs:pserver:anoncvs:@cvs.apache.org:/cvs/root:module");
     assertThat(scmFacade.getScmRepository()).isInstanceOf(ScmRepository.class);
   }
+
   @Test
   public void shouldGetJazzScmRepository() {
     initScmRepository("scm:jazz:username;password@https://server.name:9443/jazz:workspace");
@@ -85,15 +88,15 @@ public class ScmFacadeTest {
     ScmConfiguration scmConfiguration = mock(ScmConfiguration.class);
     ChangeLogScmResult changeLogScmResult = new ChangeLogScmResult("", null);
     when(scmConfiguration.getSettings()).thenReturn(settings);
+    when(scmConfiguration.getUrl()).thenReturn("scm:url");
     when(scmConfiguration.getScmProvider()).thenReturn("scm");
     SonarScmManager scmManager = mock(SonarScmManager.class);
-    ScmRepository scmRepository = mock(ScmRepository.class);
+    ScmRepository scmRepository = new ScmRepository("provider", new ScmProviderRepository() {
+    });
     when(scmManager.makeScmRepository("scm:url")).thenReturn(scmRepository);
     when(scmManager.changeLog((ChangeLogScmRequest) any())).thenReturn(changeLogScmResult);
     scmFacade = new ScmFacade(scmManager, scmConfiguration);
-    ScmFacade spied = spy(scmFacade);
-    when(spied.getScmRepository()).thenReturn(scmRepository);
-    assertThat(spied.getChangeLog(new File(""), 0)).isEqualTo(changeLogScmResult);
+    assertThat(scmFacade.getChangeLog(new File(""), 0)).isEqualTo(changeLogScmResult);
   }
 
   @Test
@@ -104,16 +107,55 @@ public class ScmFacadeTest {
     ScmConfiguration scmConfiguration = mock(ScmConfiguration.class);
     ChangeLogScmResult changeLogScmResult = new ChangeLogScmResult("", null);
     when(scmConfiguration.getSettings()).thenReturn(settings);
+    when(scmConfiguration.getUrl()).thenReturn("scm:url");
     when(scmConfiguration.getScmProvider()).thenReturn("scm");
     SonarScmManager scmManager = mock(SonarScmManager.class);
     ScmRepository scmRepository = mock(ScmRepository.class);
     when(scmManager.makeScmRepository("scm:url")).thenReturn(scmRepository);
     when(scmManager.changeLog((ChangeLogScmRequest) any())).thenReturn(changeLogScmResult);
     scmFacade = new ScmFacade(scmManager, scmConfiguration);
-    ScmFacade spied = spy(scmFacade);
-    when(spied.getScmRepository()).thenReturn(scmRepository);
-    assertThat(spied.getChangeLog(new File(""), 0)).isEqualTo(changeLogScmResult);
+    assertThat(scmFacade.getChangeLog(new File(""), 0)).isEqualTo(changeLogScmResult);
 
+  }
+
+  @Test
+  public void shouldGetChangeLogWithDatePAttern() throws ScmException {
+    ScmConfiguration scmConfiguration = mock(ScmConfiguration.class);
+    ChangeLogScmResult changeLogScmResult = new ChangeLogScmResult("", null);
+    when(scmConfiguration.getSettings()).thenReturn(settings);
+    when(scmConfiguration.getUrl()).thenReturn("scm:url");
+    when(scmConfiguration.getChangeLogDatePattern()).thenReturn("dd/MM/yyyy");
+    when(scmConfiguration.getScmProvider()).thenReturn("scm");
+    SonarScmManager scmManager = mock(SonarScmManager.class);
+    ScmRepository scmRepository = new ScmRepository("provider", new ScmProviderRepository() {
+    });
+    when(scmManager.makeScmRepository("scm:url")).thenReturn(scmRepository);
+    when(scmManager.changeLog((ChangeLogScmRequest) any())).thenReturn(changeLogScmResult);
+    scmFacade = new ScmFacade(scmManager, scmConfiguration);
+    assertThat(scmFacade.getChangeLog(new File(""), 0)).isEqualTo(changeLogScmResult);
+    assertThat(scmFacade.getScmRequest().getDatePattern()).isEqualTo("dd/MM/yyyy");
+  }
+
+  @Test
+  public void shouldDetermineDefaultHgDatePattern() {
+    initScmRepository("scm:hg:https://mercurial.scm/hgproject");
+    assertThat(ScmStatsConstants.HG_DEFAULT_CHANGELOG_DATE_PATTERN).
+            isEqualTo(scmFacade.determineChangeLogDatePattern());
+  }
+
+  @Test
+  public void shouldDetermineDefaultDatePattern() {
+    initScmRepository("scm:perforce:perforce:1666://path");
+    assertThat(scmFacade.determineChangeLogDatePattern()).isNullOrEmpty();
+  }
+
+  @Test
+  public void shouldGetUserDatePattern() {
+    String datePattern = "dd/MM/yyyy";
+    settings.setProperty(ScmStatsConstants.CHANGELOG_DATE_PATTERN, datePattern);
+
+    initScmRepository("scm:hg:https://mercurial.scm/hgproject");
+    assertThat(datePattern).isEqualTo(scmFacade.determineChangeLogDatePattern());
   }
 
   private void initScmRepository(String url) {
