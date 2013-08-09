@@ -97,15 +97,17 @@ public class ScmConfiguration implements BatchExtension {
 
   private class UrlSupplier implements Supplier<String> {
 
+    @Override
     public String get() {
-      String mavenUrl = getMavenUrl();
-      if (!StringUtils.isBlank(mavenUrl)) {
-        return mavenUrl;
-      }
 
       String urlPropertyFromScmActivity = settings.getString(ScmStatsConstants.URL);
       if (!StringUtils.isBlank(urlPropertyFromScmActivity)) {
         return urlPropertyFromScmActivity;
+      }
+
+      String mavenUrl = getMavenUrl();
+      if (!StringUtils.isBlank(mavenUrl)) {
+        return mavenUrl;
       }
 
       return null;

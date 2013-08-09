@@ -34,6 +34,7 @@ import org.sonar.api.config.Settings;
 public class ScmConfigurationTest {
   private final Settings settings = new Settings();
   private static final String URL = "scm:svn:http://";
+  private static final String MAVEN_URL = "scm:svn:http://someUrl";
   private static final String CLIENT_SPEC = "clientSpec";
   private static final String IGNORE_AUTHORS_LIST = "author1,author2";
   private static final String MERGE_AUTHORS_LIST = "mergeauthor1:author1;AUTHOR1,mergeauthor2:mergeauthor";
@@ -99,11 +100,35 @@ public class ScmConfigurationTest {
   }
 
   @Test
-  public void testIgnoreAuthorsListConfiguration() {
+  public void testMergedAuthorsListConfiguration() {
     ScmConfiguration scmConfiguration = new ScmConfiguration(settings);
     List<String> mergeAuthors = scmConfiguration.getMergeAuthorsList();
     
     assertThat (mergeAuthors, hasItem("mergeauthor1:author1;AUTHOR1"));
     assertThat (mergeAuthors, hasItem("mergeauthor2:mergeauthor"));
   }
+  
+  @Test
+  public void testIgnotedAuthorsListConfiguration() {
+    ScmConfiguration scmConfiguration = new ScmConfiguration(settings);
+    List<String> ignoredAuthors = scmConfiguration.getIgnoreAuthorsList();
+    
+    assertThat (ignoredAuthors, hasItem("author1"));
+    assertThat (ignoredAuthors, hasItem("author2"));
+  }
+
+  @Test
+  public void shouldIgnoreMavenConfiguration() {
+    settings.setProperty("sonar.scm.url", URL);
+    MavenProject mvnProject = new MavenProject();
+    final Scm scm = new Scm();
+    scm.setConnection(MAVEN_URL);
+    scm.setDeveloperConnection(MAVEN_URL);
+    mvnProject.setScm(scm);
+    MavenScmConfiguration mavenConfonfiguration = new MavenScmConfiguration(mvnProject);
+    ScmConfiguration scmConfiguration = new ScmConfiguration(settings,mavenConfonfiguration);
+    
+    assertThat ( scmConfiguration.getUrl() , is(URL));
+  }
+
 }
