@@ -23,7 +23,6 @@ import com.google.common.annotations.VisibleForTesting;
 import java.util.*;
 import org.joda.time.DateTime;
 import org.sonar.api.batch.SensorContext;
-import org.sonar.plugins.scmstats.ScmConfiguration;
 import org.sonar.plugins.scmstats.ScmStatsConstants;
 import org.sonar.plugins.scmstats.model.ChangeLogInfo;
 import org.sonar.plugins.scmstats.model.CommitsList;
@@ -37,9 +36,11 @@ public class ChangeLogHandler {
   private Map<String, Integer> commitsPerMonth = new HashMap<String, Integer>();
   private final List<ChangeLogInfo> changeLogs = new ArrayList<ChangeLogInfo>();
   private final List<String> ignoredAuthors;
+  private final List<String> mergedAuthors;
 
-  public ChangeLogHandler(List<String> ignoredAuthors) {
+  public ChangeLogHandler(List<String> ignoredAuthors, List<String> mergedAuthors) {
     this.ignoredAuthors = ignoredAuthors;
+    this.mergedAuthors = mergedAuthors;
   }
 
   public final void addChangeLog(String authorName, Date commitDate, Map<String, Integer> fileStatus) {
@@ -48,7 +49,7 @@ public class ChangeLogHandler {
 
   public void generateMeasures() {
     for (ChangeLogInfo changeLogInfo : changeLogs) {
-      
+
       if (!ignoredAuthors.contains(changeLogInfo.getAuthor())) {
         commitsPerUser = updateAuthorActivity(commitsPerUser, changeLogInfo);
 
@@ -78,7 +79,8 @@ public class ChangeLogHandler {
           final Map<String, CommitsList> map,
           final ChangeLogInfo changeLogInfo) {
 
-    final String author = changeLogInfo.getAuthor();
+    final String author = getBasicAuthor(changeLogInfo.getAuthor());
+
     final Map<String, CommitsList> authorActivity = new HashMap<String, CommitsList>();
     authorActivity.putAll(map);
 
@@ -115,6 +117,27 @@ public class ChangeLogHandler {
             org.apache.commons.collections.MapUtils.getInteger(activity, ScmStatsConstants.ACTIVITY_ADD, 0),
             org.apache.commons.collections.MapUtils.getInteger(activity, ScmStatsConstants.ACTIVITY_MODIFY, 0),
             org.apache.commons.collections.MapUtils.getInteger(activity, ScmStatsConstants.ACTIVITY_DELETE, 0));
+  }
+
+  @VisibleForTesting
+  protected String getBasicAuthor(String author) {
+    if (mergedAuthors != null && !mergedAuthors.isEmpty()) {
+      for (String mergeList : mergedAuthors) {
+        String[] mergeConfiguration = mergeList.split("=");
+        if (mergeConfiguration.length == 2) {
+          String basicAuthor = mergeConfiguration[0];
+          if (author.equals(basicAuthor)) {
+            return basicAuthor;
+          }
+          String secondaryAuthorsList = mergeConfiguration[1];
+          List<String> secondaryAuthors = Arrays.asList(secondaryAuthorsList.split(";"));
+          if (secondaryAuthors.contains(author)) {
+            return basicAuthor;
+          }
+        }
+      }
+    }
+    return author;
   }
 
   public Map<String, Integer> getCommitsPerClockHour() {

@@ -32,6 +32,7 @@ public final class ScmStatsConstants {
   public static final String PERIOD_2 = "sonar.scm-stats.period2";
   public static final String PERIOD_3 = "sonar.scm-stats.period3";
   public static final String IGNORE_AUTHORS_LIST = "sonar.scm-stats.authors.ignore";
+  public static final String MERGE_AUTHORS_LIST = "sonar.scm-stats.authors.merge";
   public static final String CHANGELOG_DATE_PATTERN = "sonar.scm-stats.changelog.datepattern";
   public static final String PERFORCE_CLIENTSPEC = "sonar.scm-stats.perforce.clientspec";
   // Properties provided by the SCM Activity plugin

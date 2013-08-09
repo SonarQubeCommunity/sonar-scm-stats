@@ -36,6 +36,7 @@ public class ScmConfigurationTest {
   private static final String URL = "scm:svn:http://";
   private static final String CLIENT_SPEC = "clientSpec";
   private static final String IGNORE_AUTHORS_LIST = "author1,author2";
+  private static final String MERGE_AUTHORS_LIST = "mergeauthor1:author1;AUTHOR1,mergeauthor2:mergeauthor";
   @Before
   public void setUp() {
     settings.setProperty(ScmStatsConstants.ENABLED, true);
@@ -44,6 +45,7 @@ public class ScmConfigurationTest {
     settings.setProperty(ScmStatsConstants.PERIOD_3, 90);
     settings.setProperty(ScmStatsConstants.PERFORCE_CLIENTSPEC, CLIENT_SPEC);
     settings.setProperty(ScmStatsConstants.IGNORE_AUTHORS_LIST, IGNORE_AUTHORS_LIST);
+    settings.setProperty(ScmStatsConstants.MERGE_AUTHORS_LIST, MERGE_AUTHORS_LIST);
   }
 
   @Test
@@ -99,9 +101,9 @@ public class ScmConfigurationTest {
   @Test
   public void testIgnoreAuthorsListConfiguration() {
     ScmConfiguration scmConfiguration = new ScmConfiguration(settings);
-    List<String> ignoreAuthors = scmConfiguration.getIgnoreAuthorsList();
+    List<String> mergeAuthors = scmConfiguration.getMergeAuthorsList();
     
-    assertThat (ignoreAuthors, hasItem("author1"));
-    assertThat (ignoreAuthors, hasItem("author2"));
+    assertThat (mergeAuthors, hasItem("mergeauthor1:author1;AUTHOR1"));
+    assertThat (mergeAuthors, hasItem("mergeauthor2:mergeauthor"));
   }
 }

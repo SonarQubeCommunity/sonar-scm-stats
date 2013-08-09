@@ -27,17 +27,15 @@ import org.joda.time.DateTime;
 import static org.junit.Assert.assertThat;
 
 import java.util.ArrayList;
+import java.util.List;
 import org.junit.Test;
-import org.sonar.api.config.Settings;
-import org.sonar.plugins.scmstats.ScmConfiguration;
 import org.sonar.plugins.scmstats.ScmStatsConstants;
 import org.sonar.plugins.scmstats.model.ChangeLogInfo;
 import org.sonar.plugins.scmstats.model.CommitsList;
 
 public class ChangeLogHandlerTest {
   
-  private Settings settings = new Settings();
-  private ChangeLogHandler instance = new ChangeLogHandler(new ArrayList<String>());
+  private ChangeLogHandler instance = new ChangeLogHandler(new ArrayList<String>(),new ArrayList<String>());
   
   @Test
   public void testAddChangeLog() {
@@ -60,6 +58,7 @@ public class ChangeLogHandlerTest {
     assertThat (instance.getCommitsPerWeekDay().get("1"), is(2));
     
   }
+  
   @Test
   public void shouldUpdateAuthorActivity() {
     Map<String, CommitsList> authorsActivity = new HashMap<String, CommitsList>();
@@ -75,4 +74,37 @@ public class ChangeLogHandlerTest {
     assertThat(authorsActivity.get("author").getCommits().get(2),is(4));
     assertThat(authorsActivity.get("author").getCommits().get(3),is(0));
   }
+
+  @Test
+  public void shouldGetMergedAuthor() {
+    List<String> mergedAuthors = new ArrayList<String>();
+    mergedAuthors.add("author1=author;author11;author111");
+    mergedAuthors.add("author2=author22");
+    ChangeLogHandler changeLogHandler = new ChangeLogHandler(new ArrayList<String>(),mergedAuthors);
+    
+    assertThat(changeLogHandler.getBasicAuthor("author"), equalTo("author1"));
+    assertThat(changeLogHandler.getBasicAuthor("author1"), equalTo("author1"));
+    assertThat(changeLogHandler.getBasicAuthor("author11"), equalTo("author1"));
+    assertThat(changeLogHandler.getBasicAuthor("author111"), equalTo("author1"));
+    assertThat(changeLogHandler.getBasicAuthor("author2"), equalTo("author2"));
+    assertThat(changeLogHandler.getBasicAuthor("author22"), equalTo("author2"));
+  }
+
+  @Test
+  public void shouldGetMergedAuthorWithNoConfiguration() {
+    ChangeLogHandler changeLogHandler = new ChangeLogHandler(new ArrayList<String>(),
+            new ArrayList<String>());
+    
+    assertThat(changeLogHandler.getBasicAuthor("author"), equalTo("author"));
+  }
+
+  @Test
+  public void shouldGetMergedAuthorWithWrongConfiguration() {
+    List<String> mergedAuthors = new ArrayList<String>();
+    mergedAuthors.add("author1:author;author11;author111");
+    ChangeLogHandler changeLogHandler = new ChangeLogHandler(new ArrayList<String>(),mergedAuthors);
+    
+    assertThat(changeLogHandler.getBasicAuthor("author"), equalTo("author"));
+  }
+
 }

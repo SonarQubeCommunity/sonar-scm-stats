@@ -126,7 +126,7 @@ public class ScmStatsSensorTest {
 
   @Test
   public void shouldNotAddChangeLogToHolderIfAuthorIsNull() {
-    ChangeLogHandler holder = new ChangeLogHandler(new ArrayList<String>());
+    ChangeLogHandler holder = new ChangeLogHandler(new ArrayList<String>(),new ArrayList<String>());
     List<ChangeFile> files = createChangeLogFiles();
 
     ChangeSet changeSet = new ChangeSet(null, null, null, files);
@@ -138,7 +138,7 @@ public class ScmStatsSensorTest {
 
   @Test
   public void shouldNotAddChangeLogToHolderIfDateIsNull() {
-    ChangeLogHandler holder = new ChangeLogHandler(new ArrayList<String>());
+    ChangeLogHandler holder = new ChangeLogHandler(new ArrayList<String>(),new ArrayList<String>());
     List<ChangeFile> files = createChangeLogFiles();
 
     ChangeSet changeSet = new ChangeSet(null, null, "author", files);
@@ -150,7 +150,7 @@ public class ScmStatsSensorTest {
 
   @Test
   public void shouldAddChangeLogToHolder() {
-    ChangeLogHandler holder = new ChangeLogHandler(new ArrayList<String>());
+    ChangeLogHandler holder = new ChangeLogHandler(new ArrayList<String>(),new ArrayList<String>());
     List<ChangeFile> files = createChangeLogFiles();
 
     Date someDate = Calendar.getInstance().getTime();

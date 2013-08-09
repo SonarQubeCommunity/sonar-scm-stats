@@ -99,6 +99,17 @@ public final class ScmStatsPlugin extends SonarPlugin {
               type(PropertyType.STRING).
               build(),
             
+            PropertyDefinition.builder(ScmStatsConstants.MERGE_AUTHORS_LIST).
+              name("Merge author(s) list").
+              description("A list of authors names to be merged when computing and displaying stats. Example:"
+              + "author.name=Author.Name;authorName;Author.name;author.NAME").
+              index(4).
+              onQualifiers(Qualifiers.PROJECT, Qualifiers.MODULE).
+              category(SCMSTATS_CATEGORY).
+              type(PropertyType.STRING).
+              multiValues(true).
+              build(),
+            
             PropertyDefinition.builder(ScmStatsConstants.PERFORCE_CLIENTSPEC).
               name("Client Spec name").
               description("The Client Spec name which defines your workspace location, the depot files you plan to work with, "

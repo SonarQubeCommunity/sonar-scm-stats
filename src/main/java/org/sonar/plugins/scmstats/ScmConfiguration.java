@@ -79,6 +79,10 @@ public class ScmConfiguration implements BatchExtension {
     return Arrays.asList(settings.getStringArray(ScmStatsConstants.IGNORE_AUTHORS_LIST));
   }
 
+  public List<String> getMergeAuthorsList() {
+    return Arrays.asList(settings.getStringArray(ScmStatsConstants.MERGE_AUTHORS_LIST));
+  }
+
   public String getPerforceClientSpec() {
     return settings.getString(ScmStatsConstants.PERFORCE_CLIENTSPEC);
   }

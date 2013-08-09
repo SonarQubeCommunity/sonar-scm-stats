@@ -90,7 +90,9 @@ public class ScmStatsSensor implements Sensor {
 
   @VisibleForTesting
   protected void generateAndSaveMeasures(ChangeLogScmResult changeLogScmResult, SensorContext context, String period) {
-    ChangeLogHandler holder = new ChangeLogHandler(configuration.getIgnoreAuthorsList());
+    ChangeLogHandler holder = new ChangeLogHandler(
+            configuration.getIgnoreAuthorsList(),
+            configuration.getMergeAuthorsList());
     for (ChangeSet changeSet : changeLogScmResult.getChangeLog().getChangeSets()) {
       holder = addChangeLogToHolder(changeSet, holder);
     }
