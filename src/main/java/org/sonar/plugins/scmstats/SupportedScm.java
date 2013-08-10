@@ -29,17 +29,23 @@ import org.sonar.plugins.scmstats.scm.StatsHgScmProvider;
 import org.sonar.plugins.scmstats.scm.StatsPerforceScmProvider;
 
 public enum SupportedScm {
-  SVN(new SvnExeScmProvider()),
-  GIT(new GitExeScmProvider()),
-  HG(new StatsHgScmProvider()),
-  PERFORCE(new StatsPerforceScmProvider()),
-  JAZZ(new JazzScmProvider()),
-  CVS(new CvsExeScmProvider());
+  SVN(new SvnExeScmProvider(), "scm:svn:svn://"),
+  GIT(new GitExeScmProvider(), "scm:git:"),
+  HG(new StatsHgScmProvider(),"scm:hg:"),
+  PERFORCE(new StatsPerforceScmProvider(),null),
+  JAZZ(new JazzScmProvider(),null),
+  CVS(new CvsExeScmProvider(),null);
 
   private final ScmProvider provider;
+  private final String guessedUrl;
 
-  private SupportedScm(ScmProvider provider) {
+  private SupportedScm(ScmProvider provider, String guessedUrl) {
     this.provider = provider;
+    this.guessedUrl = guessedUrl;
+  }
+
+  public String getGuessedUrl() {
+    return guessedUrl;
   }
 
   public String getType() {

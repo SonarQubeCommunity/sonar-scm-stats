@@ -19,7 +19,6 @@
  */
 package org.sonar.plugins.scmstats;
 
-import static org.fest.assertions.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 import java.io.File;
@@ -37,10 +36,12 @@ public class ScmFacadeTest {
 
   private final Settings settings = new Settings();
   private ScmFacade scmFacade;
+  private ScmUrlGuess scmUrlGuess = mock(ScmUrlGuess.class);
 
   @Before
   public void setUp() {
     settings.setProperty(ScmStatsConstants.ENABLED, true);
+    when(scmUrlGuess.guess()).thenReturn("scm:svn:http://");
   }
 
   @Test
@@ -160,7 +161,8 @@ public class ScmFacadeTest {
 
   private void initScmRepository(String url) {
     settings.setProperty(ScmStatsConstants.URL, url);
-    ScmConfiguration scmConfiguration = new ScmConfiguration(settings);
+    when(scmUrlGuess.guess()).thenReturn(url);
+    ScmConfiguration scmConfiguration = new ScmConfiguration(settings,scmUrlGuess);
     SonarScmManager scmManager = new SonarScmManager();
     scmFacade = new ScmFacade(scmManager, scmConfiguration);
   }

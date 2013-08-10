@@ -29,7 +29,6 @@ import org.slf4j.LoggerFactory;
 import org.sonar.api.BatchExtension;
 
 public class SonarScmManager extends AbstractScmManager implements BatchExtension {
-  
   public SonarScmManager() {
     registerProviders();
   }

@@ -29,6 +29,8 @@ import static org.junit.Assert.assertNull;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import org.sonar.api.config.Settings;
 
 public class ScmConfigurationTest {
@@ -38,6 +40,8 @@ public class ScmConfigurationTest {
   private static final String CLIENT_SPEC = "clientSpec";
   private static final String IGNORE_AUTHORS_LIST = "author1,author2";
   private static final String MERGE_AUTHORS_LIST = "mergeauthor1:author1;AUTHOR1,mergeauthor2:mergeauthor";
+  private ScmUrlGuess scmUrlGuess = mock(ScmUrlGuess.class);
+  
   @Before
   public void setUp() {
     settings.setProperty(ScmStatsConstants.ENABLED, true);
@@ -47,6 +51,9 @@ public class ScmConfigurationTest {
     settings.setProperty(ScmStatsConstants.PERFORCE_CLIENTSPEC, CLIENT_SPEC);
     settings.setProperty(ScmStatsConstants.IGNORE_AUTHORS_LIST, IGNORE_AUTHORS_LIST);
     settings.setProperty(ScmStatsConstants.MERGE_AUTHORS_LIST, MERGE_AUTHORS_LIST);
+    when(scmUrlGuess.guess()).thenReturn(URL);
+
+    
   }
 
   @Test
@@ -58,7 +65,7 @@ public class ScmConfigurationTest {
     scm.setDeveloperConnection(URL);
     mvnProject.setScm(scm);
     MavenScmConfiguration mavenConfonfiguration = new MavenScmConfiguration(mvnProject);
-    ScmConfiguration scmConfiguration = new ScmConfiguration(settings, mavenConfonfiguration);
+    ScmConfiguration scmConfiguration = new ScmConfiguration(settings, mavenConfonfiguration,scmUrlGuess);
     
     assertThat ( scmConfiguration.isEnabled() , is(true));
     assertThat ( scmConfiguration.getUrl() , is(URL));
@@ -67,17 +74,17 @@ public class ScmConfigurationTest {
 
   @Test
   public void testNonMavenConfiguration() {
-    ScmConfiguration scmConfiguration = new ScmConfiguration(settings);
+    ScmConfiguration scmConfiguration = new ScmConfiguration(settings,scmUrlGuess);
     
     assertThat ( scmConfiguration.isEnabled() , is(true));
-    assertNull ( scmConfiguration.getUrl());
-    assertNull ( scmConfiguration.getScmProvider());
+    assertThat ( scmConfiguration.getUrl(), is(URL));
+    assertThat ( scmConfiguration.getScmProvider(), is("svn"));
   }
 
   @Test
   public void testConfigurationOfSCMActivityPlugin() {
     settings.setProperty("sonar.scm.url", URL);
-    ScmConfiguration scmConfiguration = new ScmConfiguration(settings);
+    ScmConfiguration scmConfiguration = new ScmConfiguration(settings,scmUrlGuess);
     
     assertThat ( scmConfiguration.isEnabled() , is(true));
     assertThat ( scmConfiguration.getUrl() , is(URL));
@@ -86,7 +93,7 @@ public class ScmConfigurationTest {
   
   @Test
   public void testPeriodsConfiguration() {
-    ScmConfiguration scmConfiguration = new ScmConfiguration(settings);
+    ScmConfiguration scmConfiguration = new ScmConfiguration(settings,scmUrlGuess);
     
     assertThat ( scmConfiguration.getFirstPeriod() , equalTo(0));
     assertThat ( scmConfiguration.getSecondPeriod(), equalTo(30));
@@ -95,13 +102,13 @@ public class ScmConfigurationTest {
 
   @Test
   public void testPerforceConfiguration() {
-    ScmConfiguration scmConfiguration = new ScmConfiguration(settings);
+    ScmConfiguration scmConfiguration = new ScmConfiguration(settings,scmUrlGuess);
     assertThat ( scmConfiguration.getPerforceClientSpec() , equalTo(CLIENT_SPEC));
   }
 
   @Test
   public void testMergedAuthorsListConfiguration() {
-    ScmConfiguration scmConfiguration = new ScmConfiguration(settings);
+    ScmConfiguration scmConfiguration = new ScmConfiguration(settings,scmUrlGuess);
     List<String> mergeAuthors = scmConfiguration.getMergeAuthorsList();
     
     assertThat (mergeAuthors, hasItem("mergeauthor1:author1;AUTHOR1"));
@@ -110,7 +117,7 @@ public class ScmConfigurationTest {
   
   @Test
   public void testIgnotedAuthorsListConfiguration() {
-    ScmConfiguration scmConfiguration = new ScmConfiguration(settings);
+    ScmConfiguration scmConfiguration = new ScmConfiguration(settings,scmUrlGuess);
     List<String> ignoredAuthors = scmConfiguration.getIgnoreAuthorsList();
     
     assertThat (ignoredAuthors, hasItem("author1"));
@@ -126,7 +133,7 @@ public class ScmConfigurationTest {
     scm.setDeveloperConnection(MAVEN_URL);
     mvnProject.setScm(scm);
     MavenScmConfiguration mavenConfonfiguration = new MavenScmConfiguration(mvnProject);
-    ScmConfiguration scmConfiguration = new ScmConfiguration(settings,mavenConfonfiguration);
+    ScmConfiguration scmConfiguration = new ScmConfiguration(settings,mavenConfonfiguration,scmUrlGuess);
     
     assertThat ( scmConfiguration.getUrl() , is(URL));
   }

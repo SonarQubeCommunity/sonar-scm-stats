@@ -122,6 +122,7 @@ public final class ScmStatsPlugin extends SonarPlugin {
               build(),
 
             UrlChecker.class,
+            ScmUrlGuess.class,
             SonarScmManager.class,
             ScmFacade.class,
             MavenScmConfiguration.class,

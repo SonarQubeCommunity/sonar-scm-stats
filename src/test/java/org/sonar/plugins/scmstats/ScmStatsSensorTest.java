@@ -54,7 +54,8 @@ public class ScmStatsSensorTest {
   private final Settings settings = new Settings();
   private UrlChecker checker;
   private SensorContext context = mock(SensorContext.class);
-
+  private ScmUrlGuess scmUrlGuess = mock(ScmUrlGuess.class);  
+  
   @Before
   public void setUp() {
     settings.setProperty(ScmStatsConstants.ENABLED, true);
@@ -64,7 +65,7 @@ public class ScmStatsSensorTest {
 
     when(checker.check(null)).thenReturn(Boolean.FALSE);
 
-    ScmConfiguration scmConfiguration = new ScmConfiguration(settings);
+    ScmConfiguration scmConfiguration = new ScmConfiguration(settings,scmUrlGuess);
     sensor = new ScmStatsSensor(scmConfiguration, checker, new ScmFacade(new SonarScmManager(), scmConfiguration));
   }
 
@@ -72,7 +73,7 @@ public class ScmStatsSensorTest {
   public void realTest() {
     settings.setProperty(ScmStatsConstants.URL, "scm:git:git@github.com:SonarCommunity/sonar-scm-stats");
     settings.setProperty(ScmStatsConstants.IGNORE_AUTHORS_LIST, "ppapapetrou76@gmail.com");
-    ScmConfiguration scmConfiguration = new ScmConfiguration(settings);
+    ScmConfiguration scmConfiguration = new ScmConfiguration(settings,scmUrlGuess);
     when(myProject.getFileSystem()).thenReturn(projectFileSystem);
     sensor = new ScmStatsSensor(scmConfiguration, checker, new ScmFacade(new SonarScmManager(), scmConfiguration));
     sensor.analyse(myProject, context);
@@ -176,7 +177,7 @@ public class ScmStatsSensorTest {
 
     settings.setProperty(ScmStatsConstants.ENABLED, true);
     settings.setProperty(ScmStatsConstants.URL, "scm:url");
-    ScmConfiguration scmConfiguration = new ScmConfiguration(settings);
+    ScmConfiguration scmConfiguration = new ScmConfiguration(settings,scmUrlGuess);
     ScmStatsSensor newSensor = new ScmStatsSensor(scmConfiguration, checker, scmFacade);
     ScmStatsSensor spiedSensor = spy(newSensor);
     doNothing().when(spiedSensor).generateAndSaveMeasures((ChangeLogScmResult) any(), (SensorContext) any(), (String) any());
@@ -201,7 +202,7 @@ public class ScmStatsSensorTest {
     settings.setProperty(ScmStatsConstants.PERIOD_2, 10);
     settings.setProperty(ScmStatsConstants.PERIOD_3, 20);
     settings.setProperty(ScmStatsConstants.URL, "scm:url");
-    ScmConfiguration scmConfiguration = new ScmConfiguration(settings);
+    ScmConfiguration scmConfiguration = new ScmConfiguration(settings,scmUrlGuess);
     ScmStatsSensor newSensor = new ScmStatsSensor(scmConfiguration, checker, scmFacade);
     ScmStatsSensor spiedSensor = spy(newSensor);
     doNothing().when(spiedSensor).generateAndSaveMeasures((ChangeLogScmResult) any(), (SensorContext) any(), (String) any());
@@ -222,7 +223,7 @@ public class ScmStatsSensorTest {
 
     settings.setProperty(ScmStatsConstants.ENABLED, true);
     settings.setProperty(ScmStatsConstants.URL, "scm:url");
-    ScmConfiguration scmConfiguration = new ScmConfiguration(settings);
+    ScmConfiguration scmConfiguration = new ScmConfiguration(settings,scmUrlGuess);
     ScmStatsSensor newSensor = new ScmStatsSensor(scmConfiguration, checker, scmFacade);
     ScmStatsSensor spiedSensor = spy(newSensor);
     doNothing().when(spiedSensor).generateAndSaveMeasures((ChangeLogScmResult) any(), (SensorContext) any(), (String) any());
@@ -244,7 +245,7 @@ public class ScmStatsSensorTest {
     settings.setProperty(ScmStatsConstants.ENABLED, true);
     settings.setProperty(ScmStatsConstants.URL, "scm:url");
     settings.setProperty(ScmStatsConstants.PERFORCE_CLIENTSPEC, "myClient");
-    ScmConfiguration scmConfiguration = new ScmConfiguration(settings);
+    ScmConfiguration scmConfiguration = new ScmConfiguration(settings,scmUrlGuess);
     ScmStatsSensor newSensor = new ScmStatsSensor(scmConfiguration, checker, scmFacade);
     ScmStatsSensor spiedSensor = spy(newSensor);
     doNothing().when(spiedSensor).generateAndSaveMeasures((ChangeLogScmResult) any(), (SensorContext) any(), (String) any());
