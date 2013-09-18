@@ -29,7 +29,7 @@ import org.sonar.plugins.scmstats.scm.StatsHgScmProvider;
 import org.sonar.plugins.scmstats.scm.StatsPerforceScmProvider;
 
 public enum SupportedScm {
-  SVN(new SvnExeScmProvider(), "scm:svn:svn://"),
+  SVN(new SvnExeScmProvider(),null),
   GIT(new GitExeScmProvider(), "scm:git:"),
   HG(new StatsHgScmProvider(),"scm:hg:"),
   PERFORCE(new StatsPerforceScmProvider(),null),

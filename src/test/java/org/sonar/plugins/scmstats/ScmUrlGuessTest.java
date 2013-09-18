@@ -83,27 +83,6 @@ public class ScmUrlGuessTest {
   }
 
   @Test
-  public void should_guess_from_svn_project() {
-    when(moduleFileSystem.baseDir()).thenReturn(project(".svn"));
-
-    String url = scmUrlGuess.guess();
-
-    assertThat(url).isEqualTo("scm:svn:svn://");
-    assertThat(ScmUrlUtils.isValid(url)).isTrue();
-  }
-
-  @Test
-  public void should_guess_from_svn_subproject() {
-    File rootDir = project(".svn", "subproject");
-    when(moduleFileSystem.baseDir()).thenReturn(new File(rootDir, "subproject"));
-
-    String url = scmUrlGuess.guess();
-
-    assertThat(url).isEqualTo("scm:svn:svn://");
-    assertThat(ScmUrlUtils.isValid(url)).isTrue();
-  }
-
-  @Test
   public void guess_from_directory_not_file() throws IOException {
     File fileWithMisleadingName = temporaryFolder.newFile(".git");
     when(moduleFileSystem.baseDir()).thenReturn(fileWithMisleadingName.getParentFile());

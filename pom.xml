@@ -9,7 +9,7 @@
   
   <artifactId>sonar-scm-stats-plugin</artifactId>
   <packaging>sonar-plugin</packaging>
-  <version>0.4-SNAPSHOT</version>
+  <version>0.3.1-SNAPSHOT</version>
   <name>Sonar SCM Stats Plugin</name>
   <description>Feed SonarQube with Statistics about SCM system</description>
   <url>http://docs.codehaus.org/display/SONAR/SCM+Stats+Plugin</url>
