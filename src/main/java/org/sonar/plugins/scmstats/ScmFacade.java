@@ -50,17 +50,17 @@ public class ScmFacade implements BatchExtension {
 
   public ChangeLogScmResult getChangeLog(File file, int numDays) throws ScmException {
     scmRequest = new ChangeLogScmRequest(getScmRepository(), new ScmFileSet(file));
-    String datePattern = determineChangeLogDatePattern();
-    
-    if (StringUtils.isNotEmpty(datePattern)) {
-      scmRequest.setDatePattern(datePattern);
-    }
-    if (numDays > 0) {
-      scmRequest.setNumDays(numDays);
-    }
-
-    return scmManager.changeLog(scmRequest);
-  }
+          String datePattern = determineChangeLogDatePattern();
+          
+          if (StringUtils.isNotEmpty(datePattern)) {
+              scmRequest.setDatePattern(datePattern);
+          }
+          if (numDays > 0) {
+              scmRequest.setNumDays(numDays);
+          }
+          
+          return scmManager.changeLog(scmRequest);
+      }
 
   @VisibleForTesting
   ScmRepository getScmRepository() {

@@ -97,7 +97,7 @@ public class ScmFacadeTest {
     when(scmManager.makeScmRepository("scm:url")).thenReturn(scmRepository);
     when(scmManager.changeLog((ChangeLogScmRequest) any())).thenReturn(changeLogScmResult);
     scmFacade = new ScmFacade(scmManager, scmConfiguration);
-    assertThat(scmFacade.getChangeLog(new File(""), 0)).isEqualTo(changeLogScmResult);
+    assertThat(scmFacade.getChangeLog(new File("/"), 0)).isEqualTo(changeLogScmResult);
   }
 
   @Test
@@ -115,7 +115,7 @@ public class ScmFacadeTest {
     when(scmManager.makeScmRepository("scm:url")).thenReturn(scmRepository);
     when(scmManager.changeLog((ChangeLogScmRequest) any())).thenReturn(changeLogScmResult);
     scmFacade = new ScmFacade(scmManager, scmConfiguration);
-    assertThat(scmFacade.getChangeLog(new File(""), 0)).isEqualTo(changeLogScmResult);
+    assertThat(scmFacade.getChangeLog(new File("/"), 0)).isEqualTo(changeLogScmResult);
 
   }
 
@@ -133,7 +133,7 @@ public class ScmFacadeTest {
     when(scmManager.makeScmRepository("scm:url")).thenReturn(scmRepository);
     when(scmManager.changeLog((ChangeLogScmRequest) any())).thenReturn(changeLogScmResult);
     scmFacade = new ScmFacade(scmManager, scmConfiguration);
-    assertThat(scmFacade.getChangeLog(new File(""), 0)).isEqualTo(changeLogScmResult);
+    assertThat(scmFacade.getChangeLog(new File("/"), 0)).isEqualTo(changeLogScmResult);
     assertThat(scmFacade.getScmRequest().getDatePattern()).isEqualTo("dd/MM/yyyy");
   }
 

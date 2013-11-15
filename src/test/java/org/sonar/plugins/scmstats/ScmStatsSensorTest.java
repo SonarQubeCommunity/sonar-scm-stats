@@ -60,7 +60,7 @@ public class ScmStatsSensorTest {
   public void setUp() {
     settings.setProperty(ScmStatsConstants.ENABLED, true);
     settings.setProperty(ScmStatsConstants.URL, "scm:svn:http://svn.codehaus.org/sonar-plugins/trunk/useless-code-tracker");
-    when(projectFileSystem.getBasedir()).thenReturn(new File(""));
+    when(projectFileSystem.getBasedir()).thenReturn(new File("/"));
     checker = mock(UrlChecker.class);
 
     when(checker.check(null)).thenReturn(Boolean.FALSE);
@@ -70,11 +70,17 @@ public class ScmStatsSensorTest {
   }
 
   @Test
+  @Ignore
   public void realTest() {
-    settings.setProperty(ScmStatsConstants.URL, "scm:git:git@github.com:SonarCommunity/sonar-scm-stats");
-    settings.setProperty(ScmStatsConstants.IGNORE_AUTHORS_LIST, "ppapapetrou76@gmail.com");
-    ScmConfiguration scmConfiguration = new ScmConfiguration(settings,scmUrlGuess);
+    settings.setProperty(ScmStatsConstants.URL, "scm:perforce:p4p.grfts:1666://depot/gift");
+    settings.setProperty(ScmStatsConstants.USER, "patroklos.papapetrou");
+    settings.setProperty(ScmStatsConstants.PERFORCE_CLIENTSPEC, "patroklos.papapetrou");
+    settings.setProperty("sonar.inclusions", "fts/gift/common/**/*.java,src/fts/gift/common/**/*.java");
+    
+    //settings.setProperty(ScmStatsConstants.IGNORE_AUTHORS_LIST, "ppapapetrou76@gmail.com");
+    ScmConfiguration scmConfiguration = new ScmConfiguration(settings,scmUrlGuess);   
     when(myProject.getFileSystem()).thenReturn(projectFileSystem);
+    when(projectFileSystem.getBasedir()).thenReturn(new File("C:\\gift\\src"));
     sensor = new ScmStatsSensor(scmConfiguration, checker, new ScmFacade(new SonarScmManager(), scmConfiguration));
     sensor.analyse(myProject, context);
   }
@@ -170,7 +176,7 @@ public class ScmStatsSensorTest {
   @Test
   public void shouldGatherStatsForDefaultPeriod() throws ScmException {
     when(myProject.getFileSystem()).thenReturn(projectFileSystem);
-    when(projectFileSystem.getBasedir()).thenReturn(new File(""));
+    when(projectFileSystem.getBasedir()).thenReturn(new File("/"));
     when(checker.check("scm:url")).thenReturn(true);
     ChangeLogScmResult scmResult = new ChangeLogScmResult("", null);
     when(scmFacade.getChangeLog(projectFileSystem.getBasedir(), 0)).thenReturn(scmResult);
@@ -191,7 +197,7 @@ public class ScmStatsSensorTest {
   @Test
   public void shouldGatherStatsForAllPeriods() throws ScmException {
     when(myProject.getFileSystem()).thenReturn(projectFileSystem);
-    when(projectFileSystem.getBasedir()).thenReturn(new File(""));
+    when(projectFileSystem.getBasedir()).thenReturn(new File("/"));
     when(checker.check("scm:url")).thenReturn(true);
     ChangeLogScmResult scmResult = new ChangeLogScmResult("", null);
     when(scmFacade.getChangeLog(projectFileSystem.getBasedir(), 0)).thenReturn(scmResult);
@@ -216,7 +222,7 @@ public class ScmStatsSensorTest {
   @Test
   public void shouldFailWhenGatheringStats() throws ScmException {
     when(myProject.getFileSystem()).thenReturn(projectFileSystem);
-    when(projectFileSystem.getBasedir()).thenReturn(new File(""));
+    when(projectFileSystem.getBasedir()).thenReturn(new File("/"));
     when(checker.check("scm:url")).thenReturn(true);
     ChangeLogScmResult scmResult = new ChangeLogScmResult(null, new ScmResult(null, null, null, false));
     when(scmFacade.getChangeLog(projectFileSystem.getBasedir(), 0)).thenReturn(scmResult);
@@ -237,7 +243,7 @@ public class ScmStatsSensorTest {
   @Test
   public void shouldGatherStatsForPerforceScm() throws ScmException {
     when(myProject.getFileSystem()).thenReturn(projectFileSystem);
-    when(projectFileSystem.getBasedir()).thenReturn(new File(""));
+    when(projectFileSystem.getBasedir()).thenReturn(new File("/"));
     when(checker.check("scm:url")).thenReturn(true);
     ChangeLogScmResult scmResult = new ChangeLogScmResult("", null);
     when(scmFacade.getChangeLog(projectFileSystem.getBasedir(), 0)).thenReturn(scmResult);

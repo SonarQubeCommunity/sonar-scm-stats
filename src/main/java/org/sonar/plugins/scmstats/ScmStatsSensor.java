@@ -20,6 +20,7 @@
 package org.sonar.plugins.scmstats;
 
 import com.google.common.annotations.VisibleForTesting;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +35,7 @@ import org.sonar.api.batch.Sensor;
 import org.sonar.api.batch.SensorContext;
 import org.sonar.api.resources.Project;
 import org.sonar.plugins.scmstats.measures.ChangeLogHandler;
+import org.sonar.plugins.scmstats.utils.FileUtils;
 import org.sonar.plugins.scmstats.utils.MapUtils;
 
 public class ScmStatsSensor implements Sensor {
@@ -73,9 +75,12 @@ public class ScmStatsSensor implements Sensor {
     if (numDays > 0 || period.equals(ScmStatsConstants.PERIOD_1)) {
       try {
         LOG.info("Collection SCM Change log for the last " + numDays + " days");
-        ChangeLogScmResult changeLogScmResult =
-                scmFacade.getChangeLog(project.getFileSystem().getBasedir(), numDays);
+
+        ChangeLogScmResult changeLogScmResult
+                = scmFacade.getChangeLog(project.getFileSystem().getBasedir(), numDays);
         if (changeLogScmResult.isSuccess()) {
+          List<String> filesToProcess = new FileUtils().getFilesToProcess(project,configuration.getSettings());
+          filterFiles(changeLogScmResult, filesToProcess);
           generateAndSaveMeasures(changeLogScmResult, context, period);
         } else {
           LOG.warn(String.format("Fail to retrieve SCM info. Reason: %s%n%s",
@@ -87,6 +92,28 @@ public class ScmStatsSensor implements Sensor {
       }
     }
   }
+
+  private void filterFiles(ChangeLogScmResult changeLogScmResult, List<String> filesToProcess) {
+    if (changeLogScmResult.getChangeLog() != null && filesToProcess != null) {
+      List<ChangeSet> changeSets = new ArrayList<ChangeSet>(changeLogScmResult.getChangeLog().getChangeSets());
+      for (ChangeSet changeSet : changeSets) {
+        LOG.debug("Processing changeSet:" + changeSet.getDateFormatted() + " by " + changeSet.getAuthor());
+        List<ChangeFile> changeSetFiles = new ArrayList<ChangeFile>(changeSet.getFiles());
+        for (ChangeFile changeFile : changeSetFiles) {
+          if (!filesToProcess.contains(changeFile.getName())) {
+            LOG.debug(changeFile.getName() + " file will be dropped!");
+            changeSet.getFiles().remove(changeFile);
+          }
+        }
+        if (changeSet.getFiles().isEmpty()) {
+          LOG.debug("Removing changeSet:" + changeSet.getDateFormatted() + " by " + changeSet.getAuthor());
+          changeLogScmResult.getChangeLog().getChangeSets().remove(changeSet);
+        }
+        
+      }
+    }
+  }
+ 
 
   @VisibleForTesting
   protected void generateAndSaveMeasures(ChangeLogScmResult changeLogScmResult, SensorContext context, String period) {
@@ -102,8 +129,8 @@ public class ScmStatsSensor implements Sensor {
 
   @VisibleForTesting
   protected ChangeLogHandler addChangeLogToHolder(ChangeSet changeSet, ChangeLogHandler holder) {
-    if (changeSet.getAuthor() != null && changeSet.getDate() != null && 
-            !configuration.getIgnoreAuthorsList().contains(changeSet.getAuthor())) {
+    if (changeSet.getAuthor() != null && changeSet.getDate() != null
+            && !configuration.getIgnoreAuthorsList().contains(changeSet.getAuthor())) {
       holder.addChangeLog(changeSet.getAuthor(), changeSet.getDate(), createActivityMap(changeSet));
     }
     return holder;
