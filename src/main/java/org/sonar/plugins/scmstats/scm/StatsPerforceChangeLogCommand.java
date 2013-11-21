@@ -68,7 +68,7 @@ public class StatsPerforceChangeLogCommand extends PerforceChangeLogCommand {
     long changesCount = changes.size();
     CommandLineUtils.StringStreamConsumer err = new CommandLineUtils.StringStreamConsumer();
 
-    for (int i = 0; i <= changes.size(); i = i + 100) {
+    for (int i = 0; i <= changes.size(); i += 100) {
       int fromChange = i;
       int toChange = (int) Math.min(changesCount - 1, i + 100);
       commandLine = PerforceScmProvider.createP4Command(p4repo, fileSet.getBasedir());

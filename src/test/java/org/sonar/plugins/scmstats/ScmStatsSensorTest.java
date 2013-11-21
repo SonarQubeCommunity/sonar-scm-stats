@@ -41,6 +41,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 import java.util.ArrayList;
+import org.joda.time.DateTime;
+import org.sonar.api.CoreProperties;
 import org.sonar.api.batch.SensorContext;
 import org.sonar.api.resources.ProjectFileSystem;
 import org.sonar.plugins.scmstats.measures.ChangeLogHandler;
@@ -70,12 +72,13 @@ public class ScmStatsSensorTest {
   }
 
   @Test
-  @Ignore
+  //@Ignore
   public void realTest() {
     settings.setProperty(ScmStatsConstants.URL, "scm:perforce:p4p.grfts:1666://depot/gift");
     settings.setProperty(ScmStatsConstants.USER, "patroklos.papapetrou");
     settings.setProperty(ScmStatsConstants.PERFORCE_CLIENTSPEC, "patroklos.papapetrou");
-    settings.setProperty("sonar.inclusions", "fts/gift/common/**/*.java,src/fts/gift/common/**/*.java");
+    settings.setProperty(CoreProperties.PROJECT_DATE_PROPERTY, "2012-12-31");
+    //settings.setProperty("sonar.inclusions", "fts/gift/common/**/*.java,src/fts/gift/common/**/*.java");
     
     //settings.setProperty(ScmStatsConstants.IGNORE_AUTHORS_LIST, "ppapapetrou76@gmail.com");
     ScmConfiguration scmConfiguration = new ScmConfiguration(settings,scmUrlGuess);   
@@ -179,7 +182,7 @@ public class ScmStatsSensorTest {
     when(projectFileSystem.getBasedir()).thenReturn(new File("/"));
     when(checker.check("scm:url")).thenReturn(true);
     ChangeLogScmResult scmResult = new ChangeLogScmResult("", null);
-    when(scmFacade.getChangeLog(projectFileSystem.getBasedir(), 0)).thenReturn(scmResult);
+    when(scmFacade.getChangeLog(projectFileSystem.getBasedir(), 0, null)).thenReturn(scmResult);
 
     settings.setProperty(ScmStatsConstants.ENABLED, true);
     settings.setProperty(ScmStatsConstants.URL, "scm:url");
@@ -200,9 +203,9 @@ public class ScmStatsSensorTest {
     when(projectFileSystem.getBasedir()).thenReturn(new File("/"));
     when(checker.check("scm:url")).thenReturn(true);
     ChangeLogScmResult scmResult = new ChangeLogScmResult("", null);
-    when(scmFacade.getChangeLog(projectFileSystem.getBasedir(), 0)).thenReturn(scmResult);
-    when(scmFacade.getChangeLog(projectFileSystem.getBasedir(), 10)).thenReturn(scmResult);
-    when(scmFacade.getChangeLog(projectFileSystem.getBasedir(), 20)).thenReturn(scmResult);
+    when(scmFacade.getChangeLog(projectFileSystem.getBasedir(), 0, null)).thenReturn(scmResult);
+    when(scmFacade.getChangeLog(projectFileSystem.getBasedir(), 10, null)).thenReturn(scmResult);
+    when(scmFacade.getChangeLog(projectFileSystem.getBasedir(), 20, null)).thenReturn(scmResult);
 
     settings.setProperty(ScmStatsConstants.ENABLED, true);
     settings.setProperty(ScmStatsConstants.PERIOD_2, 10);
@@ -225,7 +228,7 @@ public class ScmStatsSensorTest {
     when(projectFileSystem.getBasedir()).thenReturn(new File("/"));
     when(checker.check("scm:url")).thenReturn(true);
     ChangeLogScmResult scmResult = new ChangeLogScmResult(null, new ScmResult(null, null, null, false));
-    when(scmFacade.getChangeLog(projectFileSystem.getBasedir(), 0)).thenReturn(scmResult);
+    when(scmFacade.getChangeLog(projectFileSystem.getBasedir(), 0, null)).thenReturn(scmResult);
 
     settings.setProperty(ScmStatsConstants.ENABLED, true);
     settings.setProperty(ScmStatsConstants.URL, "scm:url");
@@ -246,7 +249,7 @@ public class ScmStatsSensorTest {
     when(projectFileSystem.getBasedir()).thenReturn(new File("/"));
     when(checker.check("scm:url")).thenReturn(true);
     ChangeLogScmResult scmResult = new ChangeLogScmResult("", null);
-    when(scmFacade.getChangeLog(projectFileSystem.getBasedir(), 0)).thenReturn(scmResult);
+    when(scmFacade.getChangeLog(projectFileSystem.getBasedir(), 0, null)).thenReturn(scmResult);
 
     settings.setProperty(ScmStatsConstants.ENABLED, true);
     settings.setProperty(ScmStatsConstants.URL, "scm:url");
@@ -266,5 +269,16 @@ public class ScmStatsSensorTest {
     String debugName = sensor.toString();
 
     assertThat(debugName).isEqualTo("ScmStatsSensor");
+  }
+  
+  
+  @Test
+  public void shouldGetProjectDateSetting(){
+    settings.setProperty(CoreProperties.PROJECT_DATE_PROPERTY, "2013-01-31");      
+    Date projectDate = this.sensor.getProjectDateProperty();
+    DateTime dateTime = new DateTime(projectDate.getTime());
+    assertThat (dateTime.getYear()).isEqualTo(2013);
+    assertThat (dateTime.getMonthOfYear()).isEqualTo(1);
+    assertThat (dateTime.getDayOfMonth()).isEqualTo(31);
   }
 }

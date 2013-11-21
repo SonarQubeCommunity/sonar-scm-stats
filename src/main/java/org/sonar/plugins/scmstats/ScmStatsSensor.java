@@ -21,6 +21,7 @@ package org.sonar.plugins.scmstats;
 
 import com.google.common.annotations.VisibleForTesting;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,9 +32,11 @@ import org.apache.maven.scm.ScmFileStatus;
 import org.apache.maven.scm.command.changelog.ChangeLogScmResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.sonar.api.CoreProperties;
 import org.sonar.api.batch.Sensor;
 import org.sonar.api.batch.SensorContext;
 import org.sonar.api.resources.Project;
+import org.sonar.api.utils.SonarException;
 import org.sonar.plugins.scmstats.measures.ChangeLogHandler;
 import org.sonar.plugins.scmstats.utils.FileUtils;
 import org.sonar.plugins.scmstats.utils.MapUtils;
@@ -75,12 +78,13 @@ public class ScmStatsSensor implements Sensor {
     if (numDays > 0 || period.equals(ScmStatsConstants.PERIOD_1)) {
       try {
         LOG.info("Collection SCM Change log for the last " + numDays + " days");
-
+        LOG.info("sonar.projectDate setting " + getProjectDateProperty());
+	
         ChangeLogScmResult changeLogScmResult
-                = scmFacade.getChangeLog(project.getFileSystem().getBasedir(), numDays);
+                = scmFacade.getChangeLog(project.getFileSystem().getBasedir(), numDays, getProjectDateProperty());
         if (changeLogScmResult.isSuccess()) {
-          List<String> filesToProcess = new FileUtils().getFilesToProcess(project,configuration.getSettings());
-          filterFiles(changeLogScmResult, filesToProcess);
+          //List<String> filesToProcess = new FileUtils().getFilesToProcess(project,configuration.getSettings());
+          //filterFiles(changeLogScmResult, filesToProcess);
           generateAndSaveMeasures(changeLogScmResult, context, period);
         } else {
           LOG.warn(String.format("Fail to retrieve SCM info. Reason: %s%n%s",
@@ -155,4 +159,16 @@ public class ScmStatsSensor implements Sensor {
   public String toString() {
     return getClass().getSimpleName();
   }
+  
+  Date getProjectDateProperty() {
+    Date date;
+    try {
+      // sonar.projectDate may have been specified as a time
+      date = configuration.getSettings().getDateTime(CoreProperties.PROJECT_DATE_PROPERTY);
+    } catch (SonarException e) {
+      // this is probably just a date
+      date = configuration.getSettings().getDate(CoreProperties.PROJECT_DATE_PROPERTY);
+    }
+    return date;
+  }  
 }
