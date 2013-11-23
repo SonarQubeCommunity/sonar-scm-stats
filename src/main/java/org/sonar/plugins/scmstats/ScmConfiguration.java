@@ -103,7 +103,7 @@ public class ScmConfiguration implements BatchExtension {
 
     @Override
     public String get() {
-      
+
       String guessStr = settings.getString("sonar.scm.hidden.guess"); // Default to true if not set
       if (StringUtils.isEmpty(guessStr) || Boolean.parseBoolean(guessStr)) {
         String guessedUrl = guessUrl();

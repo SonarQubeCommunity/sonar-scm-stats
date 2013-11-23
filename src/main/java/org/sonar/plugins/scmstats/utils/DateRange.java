@@ -17,29 +17,38 @@
  * License along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
  */
+package org.sonar.plugins.scmstats.utils;
 
-package org.sonar.plugins.scmstats;
+import java.util.Date;
+import org.joda.time.DateTime;
 
-import org.apache.maven.model.Scm;
-import org.apache.maven.project.MavenProject;
-import org.sonar.api.BatchExtension;
-import org.sonar.api.batch.SupportedEnvironment;
+public class DateRange {
 
-@SupportedEnvironment("maven")
-public class MavenScmConfiguration implements BatchExtension {
-  private final MavenProject mavenProject;
-  private final Scm scm;
-  
-  public MavenScmConfiguration(MavenProject mvnProject) {
-    mavenProject = mvnProject;
-    scm = mavenProject.getScm();
+  private DateTime from;
+  private DateTime to;
+
+  public DateRange(DateTime from, DateTime to) {
+    this.from = from;
+    this.to = to;
   }
 
-  public String getDeveloperUrl() {
-    return scm == null ? null : scm.getDeveloperConnection();
+  public DateTime getFrom() {
+    return from;
   }
 
-  public String getUrl() {
-    return scm == null ? null : scm.getConnection();
+  public DateTime getTo() {
+    return to;
+  }
+
+  public boolean isDateInRange(DateTime date) {
+    return date.isBefore(to.getMillis()) && date.isAfter(from.getMillis());
+  }
+
+  public static DateRange getDateRange(int numDays, DateTime toDate) {
+    DateTime now = new DateTime();
+    DateTime earliest = new DateTime("1980-01-01");
+    DateTime end = toDate != null ? toDate : now;
+    DateTime start = numDays == 0 ? earliest : end.minusDays(numDays);
+    return new DateRange(start, end);
   }
 }

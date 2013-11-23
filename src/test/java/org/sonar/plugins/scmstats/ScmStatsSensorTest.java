@@ -19,19 +19,10 @@
  */
 package org.sonar.plugins.scmstats;
 
+import org.sonar.plugins.scmstats.utils.UrlChecker;
 import java.io.File;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import org.apache.maven.scm.ChangeFile;
-import org.apache.maven.scm.ChangeSet;
-import org.apache.maven.scm.ScmException;
-import org.apache.maven.scm.ScmFileStatus;
-import org.apache.maven.scm.ScmResult;
-import org.apache.maven.scm.command.changelog.ChangeLogScmResult;
 import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.jodatime.api.Assertions.assertThat;
 import org.junit.*;
 import org.sonar.api.config.Settings;
 import org.sonar.api.resources.Project;
@@ -40,57 +31,58 @@ import static org.mockito.Mockito.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
-import java.util.ArrayList;
 import org.joda.time.DateTime;
 import org.sonar.api.CoreProperties;
 import org.sonar.api.batch.SensorContext;
 import org.sonar.api.resources.ProjectFileSystem;
 import org.sonar.plugins.scmstats.measures.ChangeLogHandler;
+import org.sonar.plugins.scmstats.utils.DateRange;
 
 public class ScmStatsSensorTest {
 
   private ScmStatsSensor sensor;
   Project myProject = mock(Project.class);
   private ProjectFileSystem projectFileSystem = mock(ProjectFileSystem.class);
-  private ScmFacade scmFacade = mock(ScmFacade.class);
+  private ScmAdapterFactory scmAdapterFactory = mock(ScmAdapterFactory.class);
+  private AbstractScmAdapter adapter = mock(AbstractScmAdapter.class);
   private final Settings settings = new Settings();
   private UrlChecker checker;
-  private SensorContext context = mock(SensorContext.class);
-  private ScmUrlGuess scmUrlGuess = mock(ScmUrlGuess.class);  
-  
+  private final SensorContext context = mock(SensorContext.class);
+  private final ScmUrlGuess scmUrlGuess = mock(ScmUrlGuess.class);
+  private final ChangeLogHandler holder = mock(ChangeLogHandler.class);
+  private final static String URL = "someUrl";
+
   @Before
   public void setUp() {
+
     settings.setProperty(ScmStatsConstants.ENABLED, true);
-    settings.setProperty(ScmStatsConstants.URL, "scm:svn:http://svn.codehaus.org/sonar-plugins/trunk/useless-code-tracker");
     when(projectFileSystem.getBasedir()).thenReturn(new File("/"));
+    when(scmAdapterFactory.getScmAdapter()).thenReturn(adapter);
     checker = mock(UrlChecker.class);
 
     when(checker.check(null)).thenReturn(Boolean.FALSE);
+    when(checker.check(URL)).thenReturn(Boolean.TRUE);
 
-    ScmConfiguration scmConfiguration = new ScmConfiguration(settings,scmUrlGuess);
-    sensor = new ScmStatsSensor(scmConfiguration, checker, new ScmFacade(new SonarScmManager(), scmConfiguration));
+    ScmConfiguration scmConfiguration = new ScmConfiguration(settings, scmUrlGuess);
+    sensor = new ScmStatsSensor(scmConfiguration, checker, scmAdapterFactory);
   }
 
   @Test
-  //@Ignore
-  public void realTest() {
-    settings.setProperty(ScmStatsConstants.URL, "scm:perforce:p4p.grfts:1666://depot/gift");
-    settings.setProperty(ScmStatsConstants.USER, "patroklos.papapetrou");
-    settings.setProperty(ScmStatsConstants.PERFORCE_CLIENTSPEC, "patroklos.papapetrou");
-    settings.setProperty(CoreProperties.PROJECT_DATE_PROPERTY, "2012-12-31");
-    //settings.setProperty("sonar.inclusions", "fts/gift/common/**/*.java,src/fts/gift/common/**/*.java");
-    
-    //settings.setProperty(ScmStatsConstants.IGNORE_AUTHORS_LIST, "ppapapetrou76@gmail.com");
-    ScmConfiguration scmConfiguration = new ScmConfiguration(settings,scmUrlGuess);   
-    when(myProject.getFileSystem()).thenReturn(projectFileSystem);
-    when(projectFileSystem.getBasedir()).thenReturn(new File("C:\\gift\\src"));
-    sensor = new ScmStatsSensor(scmConfiguration, checker, new ScmFacade(new SonarScmManager(), scmConfiguration));
+  public void shouldAnalyzeOnlyOnce() {
+    settings.setProperty(ScmStatsConstants.URL, URL);
+    settings.setProperty(ScmStatsConstants.PERIOD_1, 0);
+    settings.setProperty(CoreProperties.PROJECT_DATE_PROPERTY, "2013-10-10");
+    when(adapter.getChangeLog((Project) anyObject(), (DateRange) anyObject())).thenReturn(holder);
+
     sensor.analyse(myProject, context);
+    verify(holder).generateMeasures();
+    verify(holder).saveMeasures(context, ScmStatsConstants.PERIOD_1);
   }
 
   @Test
   public void testShouldExecuteOnProject_WhenUrlIsValid_andLastAnalysis() {
-    when(checker.check("scm:svn:http://svn.codehaus.org/sonar-plugins/trunk/useless-code-tracker")).thenReturn(Boolean.TRUE);
+    settings.setProperty(ScmStatsConstants.URL, URL);
+
     assertThat(sensor.shouldExecuteOnProject(myProject), is(true));
   }
 
@@ -106,179 +98,58 @@ public class ScmStatsSensorTest {
   }
 
   @Test
-  public void shouldCreateActiviyMap() {
-
-    List<ChangeFile> files = createChangeLogFiles();
-    Map<String, Integer> activityMap = sensor.createActivityMap(new ChangeSet(null, null, null, files));
-
-    assertThat(activityMap.containsKey(ScmStatsConstants.ACTIVITY_ADD), is(true));
-    assertThat(activityMap.containsKey(ScmStatsConstants.ACTIVITY_MODIFY), is(true));
-    assertThat(activityMap.containsKey(ScmStatsConstants.ACTIVITY_DELETE), is(true));
-    assertThat(activityMap.get(ScmStatsConstants.ACTIVITY_ADD), is(1));
-    assertThat(activityMap.get(ScmStatsConstants.ACTIVITY_MODIFY), is(2));
-    assertThat(activityMap.get(ScmStatsConstants.ACTIVITY_DELETE), is(1));
-  }
-
-  private List<ChangeFile> createChangeLogFiles() {
-    ChangeFile changeFile1 = new ChangeFile("FileName1");
-    changeFile1.setAction(ScmFileStatus.ADDED);
-    ChangeFile changeFile2 = new ChangeFile("FileName2");
-    changeFile2.setAction(ScmFileStatus.MODIFIED);
-    ChangeFile changeFile3 = new ChangeFile("FileName3");
-    changeFile3.setAction(ScmFileStatus.MODIFIED);
-    ChangeFile changeFile4 = new ChangeFile("FileName4");
-    changeFile4.setAction(ScmFileStatus.DELETED);
-    ChangeFile changeFile5 = new ChangeFile("FileName5");
-    changeFile5.setAction(ScmFileStatus.CONFLICT);
-    List<ChangeFile> files = Arrays.asList(changeFile1, changeFile2, changeFile3, changeFile4, changeFile5);
-    return files;
-  }
-
-  @Test
-  public void shouldNotAddChangeLogToHolderIfAuthorIsNull() {
-    ChangeLogHandler holder = new ChangeLogHandler(new ArrayList<String>(),new ArrayList<String>());
-    List<ChangeFile> files = createChangeLogFiles();
-
-    ChangeSet changeSet = new ChangeSet(null, null, null, files);
-
-    holder = sensor.addChangeLogToHolder(changeSet, holder);
-    assertThat(holder.getChangeLogs().isEmpty(), is(true));
-
-  }
-
-  @Test
-  public void shouldNotAddChangeLogToHolderIfDateIsNull() {
-    ChangeLogHandler holder = new ChangeLogHandler(new ArrayList<String>(),new ArrayList<String>());
-    List<ChangeFile> files = createChangeLogFiles();
-
-    ChangeSet changeSet = new ChangeSet(null, null, "author", files);
-
-    holder = sensor.addChangeLogToHolder(changeSet, holder);
-    assertThat(holder.getChangeLogs().isEmpty(), is(true));
-
-  }
-
-  @Test
-  public void shouldAddChangeLogToHolder() {
-    ChangeLogHandler holder = new ChangeLogHandler(new ArrayList<String>(),new ArrayList<String>());
-    List<ChangeFile> files = createChangeLogFiles();
-
-    Date someDate = Calendar.getInstance().getTime();
-
-    ChangeSet changeSet = new ChangeSet(someDate, null, "author", files);
-
-    holder = sensor.addChangeLogToHolder(changeSet, holder);
-    assertThat(holder.getChangeLogs().isEmpty(), is(false));
-    assertThat(holder.getChangeLogs().size(), is(1));
-    assertThat(holder.getChangeLogs().get(0).getAuthor(), is("author"));
-    assertThat(holder.getChangeLogs().get(0).getCommitDate(), is(someDate));
-    assertThat(holder.getChangeLogs().get(0).getActivity().size(), is(3));
-
-  }
-
-  @Test
-  public void shouldGatherStatsForDefaultPeriod() throws ScmException {
-    when(myProject.getFileSystem()).thenReturn(projectFileSystem);
-    when(projectFileSystem.getBasedir()).thenReturn(new File("/"));
-    when(checker.check("scm:url")).thenReturn(true);
-    ChangeLogScmResult scmResult = new ChangeLogScmResult("", null);
-    when(scmFacade.getChangeLog(projectFileSystem.getBasedir(), 0, null)).thenReturn(scmResult);
-
-    settings.setProperty(ScmStatsConstants.ENABLED, true);
-    settings.setProperty(ScmStatsConstants.URL, "scm:url");
-    ScmConfiguration scmConfiguration = new ScmConfiguration(settings,scmUrlGuess);
-    ScmStatsSensor newSensor = new ScmStatsSensor(scmConfiguration, checker, scmFacade);
-    ScmStatsSensor spiedSensor = spy(newSensor);
-    doNothing().when(spiedSensor).generateAndSaveMeasures((ChangeLogScmResult) any(), (SensorContext) any(), (String) any());
-
-    spiedSensor.analyse(myProject, context);
-    verify(spiedSensor, times(3)).analyseChangeLog((Project) any(), (SensorContext) any(), (String) any());
-    verify(spiedSensor, times(1)).generateAndSaveMeasures((ChangeLogScmResult) any(), (SensorContext) any(), (String) any());
-
-  }
-
-  @Test
-  public void shouldGatherStatsForAllPeriods() throws ScmException {
-    when(myProject.getFileSystem()).thenReturn(projectFileSystem);
-    when(projectFileSystem.getBasedir()).thenReturn(new File("/"));
-    when(checker.check("scm:url")).thenReturn(true);
-    ChangeLogScmResult scmResult = new ChangeLogScmResult("", null);
-    when(scmFacade.getChangeLog(projectFileSystem.getBasedir(), 0, null)).thenReturn(scmResult);
-    when(scmFacade.getChangeLog(projectFileSystem.getBasedir(), 10, null)).thenReturn(scmResult);
-    when(scmFacade.getChangeLog(projectFileSystem.getBasedir(), 20, null)).thenReturn(scmResult);
-
-    settings.setProperty(ScmStatsConstants.ENABLED, true);
-    settings.setProperty(ScmStatsConstants.PERIOD_2, 10);
-    settings.setProperty(ScmStatsConstants.PERIOD_3, 20);
-    settings.setProperty(ScmStatsConstants.URL, "scm:url");
-    ScmConfiguration scmConfiguration = new ScmConfiguration(settings,scmUrlGuess);
-    ScmStatsSensor newSensor = new ScmStatsSensor(scmConfiguration, checker, scmFacade);
-    ScmStatsSensor spiedSensor = spy(newSensor);
-    doNothing().when(spiedSensor).generateAndSaveMeasures((ChangeLogScmResult) any(), (SensorContext) any(), (String) any());
-
-    spiedSensor.analyse(myProject, context);
-    verify(spiedSensor, times(3)).analyseChangeLog((Project) any(), (SensorContext) any(), (String) any());
-    verify(spiedSensor, times(3)).generateAndSaveMeasures((ChangeLogScmResult) any(), (SensorContext) any(), (String) any());
-
-  }
-
-  @Test
-  public void shouldFailWhenGatheringStats() throws ScmException {
-    when(myProject.getFileSystem()).thenReturn(projectFileSystem);
-    when(projectFileSystem.getBasedir()).thenReturn(new File("/"));
-    when(checker.check("scm:url")).thenReturn(true);
-    ChangeLogScmResult scmResult = new ChangeLogScmResult(null, new ScmResult(null, null, null, false));
-    when(scmFacade.getChangeLog(projectFileSystem.getBasedir(), 0, null)).thenReturn(scmResult);
-
-    settings.setProperty(ScmStatsConstants.ENABLED, true);
-    settings.setProperty(ScmStatsConstants.URL, "scm:url");
-    ScmConfiguration scmConfiguration = new ScmConfiguration(settings,scmUrlGuess);
-    ScmStatsSensor newSensor = new ScmStatsSensor(scmConfiguration, checker, scmFacade);
-    ScmStatsSensor spiedSensor = spy(newSensor);
-    doNothing().when(spiedSensor).generateAndSaveMeasures((ChangeLogScmResult) any(), (SensorContext) any(), (String) any());
-
-    spiedSensor.analyse(myProject, context);
-    verify(spiedSensor, times(3)).analyseChangeLog((Project) any(), (SensorContext) any(), (String) any());
-    verify(spiedSensor, times(0)).generateAndSaveMeasures((ChangeLogScmResult) any(), (SensorContext) any(), (String) any());
-
-  }
-
-  @Test
-  public void shouldGatherStatsForPerforceScm() throws ScmException {
-    when(myProject.getFileSystem()).thenReturn(projectFileSystem);
-    when(projectFileSystem.getBasedir()).thenReturn(new File("/"));
-    when(checker.check("scm:url")).thenReturn(true);
-    ChangeLogScmResult scmResult = new ChangeLogScmResult("", null);
-    when(scmFacade.getChangeLog(projectFileSystem.getBasedir(), 0, null)).thenReturn(scmResult);
-
-    settings.setProperty(ScmStatsConstants.ENABLED, true);
-    settings.setProperty(ScmStatsConstants.URL, "scm:url");
-    settings.setProperty(ScmStatsConstants.PERFORCE_CLIENTSPEC, "myClient");
-    ScmConfiguration scmConfiguration = new ScmConfiguration(settings,scmUrlGuess);
-    ScmStatsSensor newSensor = new ScmStatsSensor(scmConfiguration, checker, scmFacade);
-    ScmStatsSensor spiedSensor = spy(newSensor);
-    doNothing().when(spiedSensor).generateAndSaveMeasures((ChangeLogScmResult) any(), (SensorContext) any(), (String) any());
-    spiedSensor.analyse(myProject, context);
-
-    assertThat(System.getProperty("maven.scm.perforce.clientspec.name")).isEqualTo("myClient");
-
-  }
-
-  @Test
   public void shouldHaveDebugName() {
     String debugName = sensor.toString();
-
     assertThat(debugName).isEqualTo("ScmStatsSensor");
   }
-  
-  
+
   @Test
-  public void shouldGetProjectDateSetting(){
-    settings.setProperty(CoreProperties.PROJECT_DATE_PROPERTY, "2013-01-31");      
-    Date projectDate = this.sensor.getProjectDateProperty();
-    DateTime dateTime = new DateTime(projectDate.getTime());
-    assertThat (dateTime.getYear()).isEqualTo(2013);
-    assertThat (dateTime.getMonthOfYear()).isEqualTo(1);
-    assertThat (dateTime.getDayOfMonth()).isEqualTo(31);
+  public void shouldGetProjectDateSetting() {
+    settings.setProperty(CoreProperties.PROJECT_DATE_PROPERTY, "2013-01-31");
+    DateTime projectDate = this.sensor.getProjectDateProperty();
+    assertThat(projectDate).isEqualTo("2013-01-31");
   }
+
+  @Test
+  public void shouldSetPerforceClientSpecName() {
+    settings.setProperty(ScmStatsConstants.URL, URL);
+    settings.setProperty(ScmStatsConstants.PERIOD_1, 0);
+    settings.setProperty(ScmStatsConstants.PERFORCE_CLIENTSPEC, "client");
+    settings.setProperty(CoreProperties.PROJECT_DATE_PROPERTY, "2013-10-10");
+    when(adapter.getChangeLog((Project) anyObject(), (DateRange) anyObject())).thenReturn(holder);
+
+    sensor.analyse(myProject, context);
+    assertThat(System.getProperty("maven.scm.perforce.clientspec.name")).isEqualTo("client");
+  }
+
+  @Test
+  public void should_not_analyze_other_periods_when_days_are_zero() {
+    settings.setProperty(ScmStatsConstants.URL, URL);
+    settings.setProperty(ScmStatsConstants.PERIOD_1, 0);
+    settings.setProperty(ScmStatsConstants.PERIOD_2, 0);
+    settings.setProperty(ScmStatsConstants.PERIOD_3, 0);
+    settings.setProperty(CoreProperties.PROJECT_DATE_PROPERTY, "2013-10-10");
+    when(adapter.getChangeLog((Project) anyObject(), (DateRange) anyObject())).thenReturn(holder);
+
+    sensor.analyse(myProject, context);
+    verify(holder, times(1)).generateMeasures();
+    verify(holder, times(1)).saveMeasures(context, ScmStatsConstants.PERIOD_1);
+    verify(holder, times(0)).saveMeasures(context, ScmStatsConstants.PERIOD_2);
+    verify(holder, times(0)).saveMeasures(context, ScmStatsConstants.PERIOD_3);
+  }
+
+  @Test
+  public void should_analyze_other_periods_where_days_are_great_than_zero() {
+    settings.setProperty(ScmStatsConstants.URL, URL);
+    settings.setProperty(ScmStatsConstants.PERIOD_1, 0);
+    settings.setProperty(ScmStatsConstants.PERIOD_2, 3);
+    settings.setProperty(CoreProperties.PROJECT_DATE_PROPERTY, "2013-10-10");
+    when(adapter.getChangeLog((Project) anyObject(), (DateRange) anyObject())).thenReturn(holder);
+
+    sensor.analyse(myProject, context);
+    verify(holder, times(2)).generateMeasures();
+    verify(holder, times(1)).saveMeasures(context, ScmStatsConstants.PERIOD_1);
+    verify(holder, times(1)).saveMeasures(context, ScmStatsConstants.PERIOD_2);
+  }
+
 }

@@ -20,6 +20,7 @@
 
 package org.sonar.plugins.scmstats;
 
+import org.sonar.plugins.scmstats.utils.SupportedScm;
 import com.google.common.annotations.VisibleForTesting;
 import org.apache.maven.scm.log.ScmLogger;
 import org.apache.maven.scm.manager.AbstractScmManager;
@@ -36,8 +37,9 @@ public class SonarScmManager extends AbstractScmManager implements BatchExtensio
   private void registerProviders() {
     for (SupportedScm supportedScm : SupportedScm.values()) {
       ScmProvider provider = supportedScm.getProvider();
-
-      setScmProvider(provider.getScmType(), supportedScm.getProvider());
+      if ( provider != null){
+        setScmProvider(provider.getScmType(), supportedScm.getProvider());
+      }
     }
   }
 

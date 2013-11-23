@@ -19,6 +19,14 @@
  */
 package org.sonar.plugins.scmstats;
 
+import org.sonar.plugins.scmstats.utils.UrlChecker;
+import org.sonar.plugins.scmstats.charts.PieChart3D;
+import org.sonar.plugins.scmstats.charts.StackedBarChart3D;
+import org.sonar.plugins.scmstats.widget.ScmStatsCommitsPerUserWidget;
+import org.sonar.plugins.scmstats.widget.ScmStatsCommitsPerClockHourWidget;
+import org.sonar.plugins.scmstats.widget.ScmStatsCommitsPerMonthWidget;
+import org.sonar.plugins.scmstats.widget.ScmStatsAuthorsActivityWidget;
+import org.sonar.plugins.scmstats.widget.ScmStatsCommitsPerWeekDayWidget;
 import com.google.common.collect.ImmutableList;
 import java.util.List;
 import org.sonar.api.PropertyType;
@@ -34,6 +42,7 @@ public final class ScmStatsPlugin extends SonarPlugin {
   public static final String COMMON_SUBCATEGORY = "Common";
   public static final String PERFORCE_SUBCATEGORY = "Perforce";
 
+  @Override
   public List getExtensions() {
     return ImmutableList.of(
               PropertyDefinition.builder(ScmStatsConstants.ENABLED).
@@ -130,6 +139,7 @@ public final class ScmStatsPlugin extends SonarPlugin {
             ScmStatsSensor.class,
             ScmStatsMetrics.class,
             ScmStatsDashboard.class,
+            ScmAdapterFactory.class,
             // Widgets
             ScmStatsCommitsPerClockHourWidget.class,
             ScmStatsCommitsPerMonthWidget.class,

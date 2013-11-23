@@ -17,27 +17,38 @@
  * License along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
  */
-
-package org.sonar.plugins.scmstats.model;
+package org.sonar.plugins.scmstats.utils;
 
 import org.junit.*;
-import static org.junit.Assert.*;
-import static org.hamcrest.Matchers.is;
+import static org.fest.assertions.Assertions.assertThat;
+public class UrlCheckerTest {
 
-public class ChangeLogInfoTest {
+  @Test
+  public void CheckForEmptyUrl() {
+    String url = "";
+    UrlChecker instance = new UrlChecker();
+    assertThat( instance.check(url)).isFalse();
+    
+  }
+
+  @Test
+  public void CheckForInvalidUrl() {
+    String url = "An invlid url";
+    UrlChecker instance = new UrlChecker();
+    assertThat( instance.check(url)).isFalse();
+  }
+  @Test
+  public void CheckvalidUrl() {
+    String url = "scm:svn:svn:\\";
+    UrlChecker instance = new UrlChecker();
+    assertThat( instance.check(url)).isTrue();
+  }
+  @Test
+  public void CheckForUnSupportedUrl() {
+    String url = "scm:starteam:hostname:23456/project/view/folder";
+    UrlChecker instance = new UrlChecker();
+    assertThat( instance.check(url)).isFalse();
+  }
   
-  @Test
-  public void testSetAuthor() {
-    String author = "author <author@mail.com>";
-    ChangeLogInfo changeLogInfo = new ChangeLogInfo(author, null, null);
-    
-    assertThat (changeLogInfo.getAuthor(),is("author@mail.com"));
-  }
-  @Test
-  public void testSetUnknownAuthor() {
-    String author = "author <>";
-    ChangeLogInfo changeLogInfo = new ChangeLogInfo(author, null, null);
-    
-    assertThat (changeLogInfo.getAuthor(),is("unknown"));
-  }
+  
 }

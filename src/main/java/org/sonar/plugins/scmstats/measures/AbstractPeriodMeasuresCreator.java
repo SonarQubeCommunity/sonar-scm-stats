@@ -44,5 +44,5 @@ public abstract class AbstractPeriodMeasuresCreator {
   public abstract String getPeriod();
   public boolean isResponsible(String period){
     return getPeriod().equals(period);
-  };  
+  }
 }
