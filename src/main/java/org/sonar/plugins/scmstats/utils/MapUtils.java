@@ -25,8 +25,7 @@ import java.util.Map;
 
 public final class MapUtils {
 
-  private MapUtils() {
-  }
+  private MapUtils(){};
   public static Map<String, Integer> updateMap(final Map<String, Integer> map, final String key) {
 
     final Map<String, Integer> updatedMap = new HashMap<String, Integer>();

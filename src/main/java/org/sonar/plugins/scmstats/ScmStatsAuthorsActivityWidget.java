@@ -18,20 +18,31 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
  */
 
-package org.sonar.plugins.scmstats.model;
+package org.sonar.plugins.scmstats;
 
-import org.junit.*;
-import static org.junit.Assert.*;
-import static org.hamcrest.Matchers.is;
+import org.sonar.api.web.*;
 
-public class ChangeLogInfoTest {
-  
-  @Test
-  public void testSetAuthor() {
-    String author = "author <author@mail.com>";
-    ChangeLogInfo changeLogInfo = new ChangeLogInfo(author, null, null);
-    
-    assertThat (changeLogInfo.getAuthor(),is("author@mail.com"));
+@UserRole(UserRole.USER)
+@WidgetCategory("SCM")
+@Description("SCM Stats Authors Activity")
+@WidgetProperties(
+{
+  @WidgetProperty(key = "Period", type = WidgetPropertyType.INTEGER, defaultValue = "1",optional=false)
+})
+
+public final class ScmStatsAuthorsActivityWidget extends AbstractRubyTemplate implements RubyRailsWidget {
+
+  public String getId() {
+    return "scm-stats-authors-activity";
+  }
+
+  public String getTitle() {
+    return "SCM Stats Authors Activity";
+  }
+
+  @Override
+  protected String getTemplatePath() {
+    return "/org/sonar/plugins/scmstats/authors_activity_widget.html.erb";
   }
 
 }

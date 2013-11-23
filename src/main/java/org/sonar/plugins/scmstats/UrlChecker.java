@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
  */
 
-package org.sonar.plugins.scmstats.utils;
+package org.sonar.plugins.scmstats;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.maven.scm.provider.ScmUrlUtils;
@@ -51,7 +51,7 @@ public class UrlChecker implements BatchExtension {
 
   private static boolean isSupported(String url) {
     for (SupportedScm scm : SupportedScm.values()) {
-      if (ScmUrlUtils.getProvider(url).equals(scm.getType())) {
+      if (scm.getType().equals(ScmUrlUtils.getProvider(url))) {
         return true;
       }
     }

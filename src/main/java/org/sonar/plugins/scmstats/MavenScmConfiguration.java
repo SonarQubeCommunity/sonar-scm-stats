@@ -36,10 +36,10 @@ public class MavenScmConfiguration implements BatchExtension {
   }
 
   public String getDeveloperUrl() {
-    return scm == null ? null : scm.getDeveloperConnection();
+    return (scm == null ? null : scm.getDeveloperConnection());
   }
 
   public String getUrl() {
-    return scm == null ? null : scm.getConnection();
+    return (scm == null ? null : scm.getConnection());
   }
 }

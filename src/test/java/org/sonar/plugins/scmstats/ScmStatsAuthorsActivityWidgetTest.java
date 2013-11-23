@@ -17,21 +17,19 @@
  * License along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
  */
+package org.sonar.plugins.scmstats;
 
-package org.sonar.plugins.scmstats.model;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.Assert.assertThat;
+import org.junit.Test;
 
-import org.junit.*;
-import static org.junit.Assert.*;
-import static org.hamcrest.Matchers.is;
+public class ScmStatsAuthorsActivityWidgetTest {
 
-public class ChangeLogInfoTest {
-  
   @Test
-  public void testSetAuthor() {
-    String author = "author <author@mail.com>";
-    ChangeLogInfo changeLogInfo = new ChangeLogInfo(author, null, null);
-    
-    assertThat (changeLogInfo.getAuthor(),is("author@mail.com"));
+  public void testWidgetDefinition() {
+    ScmStatsAuthorsActivityWidget widget = new ScmStatsAuthorsActivityWidget();
+    assertThat(widget.getId(), notNullValue());
+    assertThat(widget.getTitle(), notNullValue());
+    assertThat(getClass().getResource(widget.getTemplatePath()), notNullValue());
   }
-
 }

@@ -33,82 +33,97 @@ import org.apache.maven.scm.provider.ScmProviderRepository;
 import org.apache.maven.scm.provider.svn.util.SvnUtil;
 import org.apache.maven.scm.repository.ScmRepository;
 import org.apache.maven.scm.repository.ScmRepositoryException;
+import org.joda.time.DateTime;
 import org.sonar.api.BatchExtension;
 import org.sonar.api.utils.SonarException;
 
 public class ScmFacade implements BatchExtension {
 
-  private final SonarScmManager scmManager;
-  private final ScmConfiguration configuration;
-  private Supplier<ScmRepository> repository;
+    private final SonarScmManager scmManager;
+    private final ScmConfiguration configuration;
+    private Supplier<ScmRepository> repository;
+    private ChangeLogScmRequest scmRequest;
 
-  public ScmFacade(SonarScmManager scmManager, ScmConfiguration configuration) {
-    this.scmManager = scmManager;
-    this.configuration = configuration;
-    repository = Suppliers.memoize(new ScmRepositorySupplier());
-  }
-
-  public ChangeLogScmResult getChangeLog(File file, Date fromDate, Date toDate) throws ScmException {
-    ChangeLogScmRequest scmRequest = new ChangeLogScmRequest(getScmRepository(), new ScmFileSet(file));
-    String datePattern = determineChangeLogDatePattern();
-
-    if (StringUtils.isNotEmpty(datePattern)) {
-      scmRequest.setDatePattern(datePattern);
+    public ScmFacade(SonarScmManager scmManager, ScmConfiguration configuration) {
+	this.scmManager = scmManager;
+	this.configuration = configuration;
+	repository = Suppliers.memoize(new ScmRepositorySupplier());
     }
-    scmRequest.setDateRange(fromDate, toDate);
 
-    return scmManager.changeLog(scmRequest);
-  }
+    public ChangeLogScmResult getChangeLog(File file, int numDays, Date projectDate) throws ScmException {
+	scmRequest = new ChangeLogScmRequest(getScmRepository(), new ScmFileSet(file));
+	String datePattern = determineChangeLogDatePattern();
 
-  public ScmRepository getScmRepository() {
-    return repository.get();
-  }
-
-  String determineChangeLogDatePattern() {
-    String datePattern = "";
-
-    if (StringUtils.isNotEmpty(configuration.getChangeLogDatePattern())) {
-      datePattern = configuration.getChangeLogDatePattern();
+	if (StringUtils.isNotEmpty(datePattern)){
+	    scmRequest.setDatePattern(datePattern);
+	}
+	
+	if (projectDate == null){
+	    if (numDays > 0){
+		scmRequest.setNumDays(numDays);
+	    }
+	} else {
+	    scmRequest.setDateRange(new DateTime(1980, 1, 1, 0, 0).toDate(), projectDate);
+	}
+	  
+	return scmManager.changeLog(scmRequest);
     }
-    return datePattern;
-  }
 
-  private class ScmRepositorySupplier implements Supplier<ScmRepository> {
-
-    @Override
-    public ScmRepository get() {
-      try {
-        String connectionUrl = configuration.getUrl();
-        String scmProvider = configuration.getScmProvider();
-        String user = configuration.getUser();
-        String password = configuration.getPassword();
-        initSvn(scmProvider);
-
-        ScmRepository scmRepository = scmManager.makeScmRepository(connectionUrl);
-
-        if (!StringUtils.isBlank(user)) {
-          ScmProviderRepository providerRepository = scmRepository.getProviderRepository();
-          providerRepository.setUser(user);
-          providerRepository.setPassword(password);
-        }
-
-        return scmRepository;
-      } catch (ScmRepositoryException e) {
-        throw new SonarException(e.getValidationMessages().toString(), e);
-      } catch (ScmException e) {
-        throw new SonarException(e);
-      }
+    @VisibleForTesting
+    ScmRepository getScmRepository() {
+	return repository.get();
     }
-  }
 
-  /*
-   * http://jira.codehaus.org/browse/SONARPLUGINS-1082
-   * The goal is to always trust SSL certificates. It's partially implemented with the SVN property --trust-server-cert.
-   * However it bypasses ONLY the "CA is unknown" check. It doesn't bypass hostname and expiry checks
-   */
-  private void initSvn(String scmProvider) {
-    if (StringUtils.equals(scmProvider, "svn")) {
-      SvnUtil.getSettings().setTrustServerCert(true);
+    @VisibleForTesting
+    protected String determineChangeLogDatePattern() {
+	String datePattern = "";
+
+	if (StringUtils.isNotEmpty(configuration.getChangeLogDatePattern())){
+	    datePattern = configuration.getChangeLogDatePattern();
+	}else if ("hg".equals(getScmRepository().getProvider())){
+	    datePattern = "EEE MMM dd HH:mm:ss yyyy Z";
+	}
+	return datePattern;
     }
-  }
+
+    private class ScmRepositorySupplier implements Supplier<ScmRepository> {
+
+	public ScmRepository get() {
+	    try {
+		String connectionUrl = configuration.getUrl();
+		String scmProvider = configuration.getScmProvider();
+		String user = configuration.getUser();
+		String password = configuration.getPassword();
+		initSvn(scmProvider);
+
+		ScmRepository scmRepository = scmManager.makeScmRepository(connectionUrl);
+
+		if (!StringUtils.isBlank(user)) {
+		    ScmProviderRepository providerRepository = scmRepository.getProviderRepository();
+		    providerRepository.setUser(user);
+		    providerRepository.setPassword(password);
+		}
+
+		return scmRepository;
+	    } catch (ScmRepositoryException e) {
+		throw new SonarException(e.getValidationMessages().toString(), e);
+	    } catch (ScmException e) {
+		throw new SonarException(e);
+	    }
+	}
+    }
+
+    /*
+     * http://jira.codehaus.org/browse/SONARPLUGINS-1082
+     * The goal is to always trust SSL certificates. It's partially implemented with the SVN property --trust-server-cert.
+     * However it bypasses ONLY the "CA is unknown" check. It doesn't bypass hostname and expiry checks
+     */
+    private void initSvn(String scmProvider) {
+	if (StringUtils.equals(scmProvider, "svn"))
+	    SvnUtil.getSettings().setTrustServerCert(true);
+    }
+
+    public ChangeLogScmRequest getScmRequest() {
+	return scmRequest;
+    }
 }

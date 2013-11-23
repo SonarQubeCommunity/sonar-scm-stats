@@ -18,7 +18,7 @@
     <system>Jenkins</system>
     <url>https://sonarplugins.ci.cloudbees.com/job/scm-stats/</url>
   </ciManagement>
-  <issueManagement>
+    <issueManagement>
     <system>JIRA</system>
     <url>http://jira.codehaus.org/browse/SONARPLUGINS/component/15608</url>
   </issueManagement>
@@ -128,6 +128,12 @@
     </dependency>
     <dependency>
       <groupId>org.apache.maven.scm</groupId>
+      <artifactId>maven-scm-provider-hg</artifactId>
+      <version>${maven.scm.version}</version>
+      <type>jar</type>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.scm</groupId>
       <artifactId>maven-scm-provider-cvsexe</artifactId>
       <version>${maven.scm.version}</version>
       <type>jar</type>
@@ -156,17 +162,6 @@
       <type>jar</type>
       <version>2.0.5</version>
     </dependency>
-    <dependency>
-      <groupId>org.tmatesoft.hg4j</groupId>
-      <artifactId>hg4j</artifactId>
-      <version>1.1.0-RELEASE</version>
-    </dependency>
-    <dependency>
-      <groupId>org.assertj</groupId>
-      <artifactId>assertj-joda-time</artifactId>
-      <version>1.1.0</version>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
 
   <build>
@@ -180,12 +175,5 @@
       </plugin>
     </plugins>
   </build>
-  
-  <repositories>
-    <repository>
-      <id>tmetesoft_releases</id>
-      <url>http://maven.tmatesoft.com/content/repositories/releases/</url>
-    </repository>
-  </repositories>
 
 </project>

@@ -19,11 +19,17 @@
  */
 package org.sonar.plugins.scmstats;
 
-import org.sonar.plugins.scmstats.utils.UrlChecker;
 import com.google.common.annotations.VisibleForTesting;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
-import org.joda.time.DateTime;
+import java.util.Map;
+import org.apache.maven.scm.ChangeFile;
+import org.apache.maven.scm.ChangeSet;
+import org.apache.maven.scm.ScmException;
+import org.apache.maven.scm.ScmFileStatus;
+import org.apache.maven.scm.command.changelog.ChangeLogScmResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonar.api.CoreProperties;
@@ -32,21 +38,20 @@ import org.sonar.api.batch.SensorContext;
 import org.sonar.api.resources.Project;
 import org.sonar.api.utils.SonarException;
 import org.sonar.plugins.scmstats.measures.ChangeLogHandler;
-import org.sonar.plugins.scmstats.utils.DateRange;
+import org.sonar.plugins.scmstats.utils.FileUtils;
+import org.sonar.plugins.scmstats.utils.MapUtils;
 
 public class ScmStatsSensor implements Sensor {
 
   private static final Logger LOG = LoggerFactory.getLogger(ScmStatsSensor.class);
   private final ScmConfiguration configuration;
   private final UrlChecker urlChecker;
-  private final ScmAdapterFactory scmAdapterFactory;
+  private final ScmFacade scmFacade;
 
-  public ScmStatsSensor(ScmConfiguration configuration, 
-          UrlChecker urlChecker,
-          ScmAdapterFactory scmAdapterFactory) {
+  public ScmStatsSensor(ScmConfiguration configuration, UrlChecker urlChecker, ScmFacade scmFacade) {
     this.configuration = configuration;
     this.urlChecker = urlChecker;
-    this.scmAdapterFactory = scmAdapterFactory;
+    this.scmFacade = scmFacade;
   }
 
   @Override
@@ -71,24 +76,99 @@ public class ScmStatsSensor implements Sensor {
     int numDays = configuration.getSettings().getInt(period);
 
     if (numDays > 0 || period.equals(ScmStatsConstants.PERIOD_1)) {
-      LOG.info("Collection SCM Change log for the last " + numDays + " days");
-      LOG.info("sonar.projectDate setting " + getProjectDateProperty());
-      ChangeLogHandler holder = scmAdapterFactory.getScmAdapter().
-              getChangeLog(project, DateRange.getDateRange(
-                                numDays, getProjectDateProperty()));
-      
-      holder.generateMeasures();
-      holder.saveMeasures(context, period);
+      try {
+        LOG.info("Collection SCM Change log for the last " + numDays + " days");
+        LOG.info("sonar.projectDate setting " + getProjectDateProperty());
+	
+        ChangeLogScmResult changeLogScmResult
+                = scmFacade.getChangeLog(project.getFileSystem().getBasedir(), numDays, getProjectDateProperty());
+        if (changeLogScmResult.isSuccess()) {
+          //List<String> filesToProcess = new FileUtils().getFilesToProcess(project,configuration.getSettings());
+          //filterFiles(changeLogScmResult, filesToProcess);
+          generateAndSaveMeasures(changeLogScmResult, context, period);
+        } else {
+          LOG.warn(String.format("Fail to retrieve SCM info. Reason: %s%n%s",
+                  changeLogScmResult.getProviderMessage(),
+                  changeLogScmResult.getCommandOutput()));
+        }
+      } catch (ScmException e) {
+        LOG.warn(String.format("Fail to retrieve SCM info."), e);
+      }
     }
+  }
+
+  private void filterFiles(ChangeLogScmResult changeLogScmResult, List<String> filesToProcess) {
+    if (changeLogScmResult.getChangeLog() != null && filesToProcess != null) {
+      List<ChangeSet> changeSets = new ArrayList<ChangeSet>(changeLogScmResult.getChangeLog().getChangeSets());
+      for (ChangeSet changeSet : changeSets) {
+        LOG.debug("Processing changeSet:" + changeSet.getDateFormatted() + " by " + changeSet.getAuthor());
+        List<ChangeFile> changeSetFiles = new ArrayList<ChangeFile>(changeSet.getFiles());
+        for (ChangeFile changeFile : changeSetFiles) {
+          if (!filesToProcess.contains(changeFile.getName())) {
+            LOG.debug(changeFile.getName() + " file will be dropped!");
+            changeSet.getFiles().remove(changeFile);
+          }
+        }
+        if (changeSet.getFiles().isEmpty()) {
+          LOG.debug("Removing changeSet:" + changeSet.getDateFormatted() + " by " + changeSet.getAuthor());
+          changeLogScmResult.getChangeLog().getChangeSets().remove(changeSet);
+        }
+        
+      }
+    }
+  }
+ 
+
+  @VisibleForTesting
+  protected void generateAndSaveMeasures(ChangeLogScmResult changeLogScmResult, SensorContext context, String period) {
+    ChangeLogHandler holder = new ChangeLogHandler(
+            configuration.getIgnoreAuthorsList(),
+            configuration.getMergeAuthorsList());
+    for (ChangeSet changeSet : changeLogScmResult.getChangeLog().getChangeSets()) {
+      holder = addChangeLogToHolder(changeSet, holder);
+    }
+    holder.generateMeasures();
+    holder.saveMeasures(context, period);
+  }
+
+  @VisibleForTesting
+  protected ChangeLogHandler addChangeLogToHolder(ChangeSet changeSet, ChangeLogHandler holder) {
+    if (changeSet.getAuthor() != null && changeSet.getDate() != null
+            && !configuration.getIgnoreAuthorsList().contains(changeSet.getAuthor())) {
+      holder.addChangeLog(changeSet.getAuthor(), changeSet.getDate(), createActivityMap(changeSet));
+    }
+    return holder;
+  }
+
+  @VisibleForTesting
+  protected Map<String, Integer> createActivityMap(ChangeSet changeSet) {
+    Map<String, Integer> fileStatus = new HashMap<String, Integer>();
+    for (ChangeFile changeFile : changeSet.getFiles()) {
+      if (changeFile.getAction() == ScmFileStatus.ADDED) {
+        fileStatus = MapUtils.updateMap(fileStatus, ScmStatsConstants.ACTIVITY_ADD);
+      } else if (changeFile.getAction() == ScmFileStatus.MODIFIED) {
+        fileStatus = MapUtils.updateMap(fileStatus, ScmStatsConstants.ACTIVITY_MODIFY);
+      } else if (changeFile.getAction() == ScmFileStatus.DELETED) {
+        fileStatus = MapUtils.updateMap(fileStatus, ScmStatsConstants.ACTIVITY_DELETE);
+      }
+    }
+    return fileStatus;
   }
 
   @Override
   public String toString() {
     return getClass().getSimpleName();
   }
-
-  DateTime getProjectDateProperty() {
-    Date date = configuration.getSettings().getDate(CoreProperties.PROJECT_DATE_PROPERTY);
-    return new DateTime(date.getTime());
-  }
+  
+  Date getProjectDateProperty() {
+    Date date;
+    try {
+      // sonar.projectDate may have been specified as a time
+      date = configuration.getSettings().getDateTime(CoreProperties.PROJECT_DATE_PROPERTY);
+    } catch (SonarException e) {
+      // this is probably just a date
+      date = configuration.getSettings().getDate(CoreProperties.PROJECT_DATE_PROPERTY);
+    }
+    return date;
+  }  
 }

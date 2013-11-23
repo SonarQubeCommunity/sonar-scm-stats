@@ -17,21 +17,19 @@
  * License along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
  */
-
-package org.sonar.plugins.scmstats.model;
+package org.sonar.plugins.scmstats;
 
 import org.junit.*;
 import static org.junit.Assert.*;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.equalTo;
 
-public class ChangeLogInfoTest {
+public class SupportedScmTest {
   
+
   @Test
-  public void testSetAuthor() {
-    String author = "author <author@mail.com>";
-    ChangeLogInfo changeLogInfo = new ChangeLogInfo(author, null, null);
-    
-    assertThat (changeLogInfo.getAuthor(),is("author@mail.com"));
+  public void testValues() {
+    SupportedScm[] result = SupportedScm.values();
+    assertThat(result.length, equalTo(6));
   }
 
 }
