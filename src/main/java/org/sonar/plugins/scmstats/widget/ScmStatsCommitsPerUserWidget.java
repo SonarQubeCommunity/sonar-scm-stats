@@ -18,28 +18,31 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
  */
 
-package org.sonar.plugins.scmstats;
+package org.sonar.plugins.scmstats.widget;
 
-import org.apache.maven.model.Scm;
-import org.apache.maven.project.MavenProject;
-import org.sonar.api.BatchExtension;
-import org.sonar.api.batch.SupportedEnvironment;
+import org.sonar.api.web.*;
 
-@SupportedEnvironment("maven")
-public class MavenScmConfiguration implements BatchExtension {
-  private final MavenProject mavenProject;
-  private final Scm scm;
-  
-  public MavenScmConfiguration(MavenProject mvnProject) {
-    mavenProject = mvnProject;
-    scm = mavenProject.getScm();
+@UserRole(UserRole.USER)
+@WidgetCategory("SCM")
+@Description("SCM Stats Commits per user")
+@WidgetProperties(
+{
+  @WidgetProperty(key = "Period", type = WidgetPropertyType.INTEGER, defaultValue = "1",optional=false)
+})
+
+public final class ScmStatsCommitsPerUserWidget extends AbstractRubyTemplate implements RubyRailsWidget {
+
+  public String getId() {
+    return "scm-stats-commits-per-user";
   }
 
-  public String getDeveloperUrl() {
-    return scm == null ? null : scm.getDeveloperConnection();
+  public String getTitle() {
+    return "SCM Stats Commits per User";
   }
 
-  public String getUrl() {
-    return scm == null ? null : scm.getConnection();
+  @Override
+  protected String getTemplatePath() {
+    return "/org/sonar/plugins/scmstats/commits_per_user_widget.html.erb";
   }
+
 }

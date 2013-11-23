@@ -19,28 +19,26 @@
  */
 package org.sonar.plugins.scmstats.scm;
 
-import org.apache.maven.scm.CommandParameters;
-import org.apache.maven.scm.ScmException;
-import org.apache.maven.scm.ScmFileSet;
-import org.apache.maven.scm.command.changelog.ChangeLogScmResult;
+import org.apache.maven.scm.provider.AbstractScmProvider;
 import org.apache.maven.scm.provider.ScmProviderRepository;
-import org.apache.maven.scm.provider.hg.HgScmProvider;
+import org.apache.maven.scm.repository.ScmRepositoryException;
 
-/**
- * Overriding the default perforce provider in order to use the
- * StatsHgChangeLogCommand to retrieve the changelog information and the
- * StatsHgDescribeConsumer to get action information on changed files.
- *
- * @since 0.3
- */
-public class StatsHgScmProvider extends HgScmProvider {
+public class HgScmProvider extends AbstractScmProvider {
 
   @Override
-  public ChangeLogScmResult changelog(ScmProviderRepository repository, ScmFileSet fileSet,
-          CommandParameters parameters)
-          throws ScmException {
-    StatsHgChangeLogCommand command = new StatsHgChangeLogCommand();
-    command.setLogger(getLogger());
-    return (ChangeLogScmResult) command.execute(repository, fileSet, parameters);
+  public String getScmType() {
+    return "hg";
   }
+
+  @Override
+  public ScmProviderRepository makeProviderScmRepository(String string, char c) throws ScmRepositoryException {
+    return new ScmProviderRepository() {
+    };
+  }
+
+  @Override
+  public String getScmSpecificFilename() {
+    return ".hg";
+  }
+
 }

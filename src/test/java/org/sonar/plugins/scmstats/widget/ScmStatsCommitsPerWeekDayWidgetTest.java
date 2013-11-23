@@ -17,29 +17,20 @@
  * License along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
  */
+package org.sonar.plugins.scmstats.widget;
 
-package org.sonar.plugins.scmstats;
+import org.sonar.plugins.scmstats.widget.ScmStatsCommitsPerWeekDayWidget;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.Assert.assertThat;
+import org.junit.Test;
 
-import org.apache.maven.model.Scm;
-import org.apache.maven.project.MavenProject;
-import org.sonar.api.BatchExtension;
-import org.sonar.api.batch.SupportedEnvironment;
+public class ScmStatsCommitsPerWeekDayWidgetTest {
 
-@SupportedEnvironment("maven")
-public class MavenScmConfiguration implements BatchExtension {
-  private final MavenProject mavenProject;
-  private final Scm scm;
-  
-  public MavenScmConfiguration(MavenProject mvnProject) {
-    mavenProject = mvnProject;
-    scm = mavenProject.getScm();
-  }
-
-  public String getDeveloperUrl() {
-    return scm == null ? null : scm.getDeveloperConnection();
-  }
-
-  public String getUrl() {
-    return scm == null ? null : scm.getConnection();
+  @Test
+  public void testWidgetDefinition() {
+    ScmStatsCommitsPerWeekDayWidget widget = new ScmStatsCommitsPerWeekDayWidget();
+    assertThat(widget.getId(), notNullValue());
+    assertThat(widget.getTitle(), notNullValue());
+    assertThat(getClass().getResource(widget.getTemplatePath()), notNullValue());
   }
 }

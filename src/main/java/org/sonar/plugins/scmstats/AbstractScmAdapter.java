@@ -17,29 +17,31 @@
  * License along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
  */
-
 package org.sonar.plugins.scmstats;
 
-import org.apache.maven.model.Scm;
-import org.apache.maven.project.MavenProject;
+import org.sonar.plugins.scmstats.utils.DateRange;
 import org.sonar.api.BatchExtension;
-import org.sonar.api.batch.SupportedEnvironment;
+import org.sonar.api.resources.Project;
+import org.sonar.plugins.scmstats.measures.ChangeLogHandler;
 
-@SupportedEnvironment("maven")
-public class MavenScmConfiguration implements BatchExtension {
-  private final MavenProject mavenProject;
-  private final Scm scm;
+public abstract class AbstractScmAdapter implements BatchExtension {
+
+  private final ScmConfiguration configuration;
+
+  public AbstractScmAdapter(ScmConfiguration configuration) {
+    this.configuration = configuration;
+  }
+
+  protected ScmConfiguration getConfiguration() {
+    return configuration;
+  }
+
+  public abstract ChangeLogHandler getChangeLog(Project project, DateRange dateRange);
+  public abstract boolean isResponsible(String scmType);
   
-  public MavenScmConfiguration(MavenProject mvnProject) {
-    mavenProject = mvnProject;
-    scm = mavenProject.getScm();
-  }
-
-  public String getDeveloperUrl() {
-    return scm == null ? null : scm.getDeveloperConnection();
-  }
-
-  public String getUrl() {
-    return scm == null ? null : scm.getConnection();
+  protected ChangeLogHandler createChangeLogHolder() {
+    return new ChangeLogHandler(
+            getConfiguration().getIgnoreAuthorsList(),
+            getConfiguration().getMergeAuthorsList());
   }
 }

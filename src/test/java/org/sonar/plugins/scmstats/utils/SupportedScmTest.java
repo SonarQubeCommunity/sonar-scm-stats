@@ -17,29 +17,20 @@
  * License along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
  */
+package org.sonar.plugins.scmstats.utils;
 
-package org.sonar.plugins.scmstats;
+import org.sonar.plugins.scmstats.utils.SupportedScm;
+import org.junit.*;
+import static org.junit.Assert.*;
+import static org.hamcrest.Matchers.equalTo;
 
-import org.apache.maven.model.Scm;
-import org.apache.maven.project.MavenProject;
-import org.sonar.api.BatchExtension;
-import org.sonar.api.batch.SupportedEnvironment;
-
-@SupportedEnvironment("maven")
-public class MavenScmConfiguration implements BatchExtension {
-  private final MavenProject mavenProject;
-  private final Scm scm;
+public class SupportedScmTest {
   
-  public MavenScmConfiguration(MavenProject mvnProject) {
-    mavenProject = mvnProject;
-    scm = mavenProject.getScm();
+
+  @Test
+  public void testValues() {
+    SupportedScm[] result = SupportedScm.values();
+    assertThat(result.length, equalTo(6));
   }
 
-  public String getDeveloperUrl() {
-    return scm == null ? null : scm.getDeveloperConnection();
-  }
-
-  public String getUrl() {
-    return scm == null ? null : scm.getConnection();
-  }
 }

@@ -21,7 +21,6 @@ package org.sonar.plugins.scmstats;
 
 import org.apache.maven.scm.manager.NoSuchScmProviderException;
 import org.apache.maven.scm.provider.git.gitexe.GitExeScmProvider;
-import org.apache.maven.scm.provider.hg.HgScmProvider;
 import org.apache.maven.scm.provider.svn.svnexe.SvnExeScmProvider;
 import org.apache.maven.scm.provider.cvslib.cvsexe.CvsExeScmProvider;
 import org.junit.*;
@@ -52,14 +51,6 @@ public class SonarScmManagerTest {
     }
   }
 
-  @Test
-  public void testScmManagerHgProvider() {
-    try {
-      scmManager.getProviderByType(new HgScmProvider().getScmType());
-    } catch (NoSuchScmProviderException ex) {
-      failTest(ex);
-    }
-  }
 
   @Test
   public void testScmManagerCvsProvider() {

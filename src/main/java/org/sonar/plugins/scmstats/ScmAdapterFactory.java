@@ -17,29 +17,36 @@
  * License along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
  */
-
 package org.sonar.plugins.scmstats;
 
-import org.apache.maven.model.Scm;
-import org.apache.maven.project.MavenProject;
+import java.util.ArrayList;
+import java.util.List;
 import org.sonar.api.BatchExtension;
-import org.sonar.api.batch.SupportedEnvironment;
+import org.tmatesoft.hg.core.HgRepoFacade;
 
-@SupportedEnvironment("maven")
-public class MavenScmConfiguration implements BatchExtension {
-  private final MavenProject mavenProject;
-  private final Scm scm;
-  
-  public MavenScmConfiguration(MavenProject mvnProject) {
-    mavenProject = mvnProject;
-    scm = mavenProject.getScm();
+public class ScmAdapterFactory implements BatchExtension {
+
+  private final ScmConfiguration config;
+  private final ScmFacade scmFacade;
+
+  public ScmAdapterFactory(ScmConfiguration config, ScmFacade scmFacade) {
+    this.config = config;
+    this.scmFacade = scmFacade;
   }
 
-  public String getDeveloperUrl() {
-    return scm == null ? null : scm.getDeveloperConnection();
+  public AbstractScmAdapter getScmAdapter() {
+    List<AbstractScmAdapter> availableAdapters = new ArrayList();
+    AbstractScmAdapter genericAdapter = new GenericScmAdapter(scmFacade, config);
+    availableAdapters.add(new HgScmAdapter(new HgRepoFacade(), config));
+    availableAdapters.add(genericAdapter);
+
+    for (AbstractScmAdapter adapter : availableAdapters) {
+      if (adapter.isResponsible(scmFacade.getScmRepository().getProvider())) {
+        return adapter;
+      }
+    }
+    return genericAdapter;
+
   }
 
-  public String getUrl() {
-    return scm == null ? null : scm.getConnection();
-  }
 }
