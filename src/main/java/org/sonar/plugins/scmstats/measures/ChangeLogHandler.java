@@ -44,7 +44,12 @@ public class ChangeLogHandler {
   }
 
   public final void addChangeLog(String authorName, Date commitDate, Map<String, Integer> fileStatus) {
-    changeLogs.add(new ChangeLogInfo(authorName, commitDate, fileStatus));
+    if (org.apache.commons.collections.MapUtils.getIntValue(fileStatus, ScmStatsConstants.ACTIVITY_ADD) > 0
+            || org.apache.commons.collections.MapUtils.getIntValue(fileStatus, ScmStatsConstants.ACTIVITY_MODIFY) > 0
+            || org.apache.commons.collections.MapUtils.getIntValue(fileStatus, ScmStatsConstants.ACTIVITY_DELETE) > 0) {
+
+      changeLogs.add(new ChangeLogInfo(authorName, commitDate, fileStatus));
+    }
   }
 
   public void generateMeasures() {
@@ -64,8 +69,8 @@ public class ChangeLogHandler {
 
   public void saveMeasures(SensorContext context, String period) {
     PeriodMeasuresCreatorFactory factory = new PeriodMeasuresCreatorFactory();
-    AbstractPeriodMeasuresCreator measuresCreator =
-            factory.getPeriodMeasureCreator(context, period);
+    AbstractPeriodMeasuresCreator measuresCreator
+            = factory.getPeriodMeasureCreator(context, period);
 
     measuresCreator.getCommitsPerMonthMeasure(commitsPerMonth).save();
     measuresCreator.getCommitsPerWeekDayMeasure(commitsPerWeekDay).save();
@@ -85,12 +90,7 @@ public class ChangeLogHandler {
     authorActivity.putAll(map);
 
     final Map<String, Integer> activity = changeLogInfo.getActivity();
-    final List<Integer> stats;
-    if (authorActivity.get(author) == null) {
-      stats = getInitialActivity(activity);
-    } else {
-      stats = authorActivity.get(author).getCommits();
-    }
+    List<Integer> stats = (authorActivity.get(author) == null ? getInitialActivity(activity) : authorActivity.get(author).getCommits());
 
     if (authorActivity.containsKey(author)) {
       final Integer commits = stats.get(0) + 1;

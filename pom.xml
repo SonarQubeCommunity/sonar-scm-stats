@@ -55,6 +55,7 @@
     <sonar.minversion>3.6</sonar.minversion>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.scm.version>1.8.1</maven.scm.version>
+    <powermock.version>1.4.12</powermock.version>
     <sonar.pluginName>Scm Stats</sonar.pluginName>
     <sonar.pluginClass>org.sonar.plugins.scmstats.ScmStatsPlugin</sonar.pluginClass>
   </properties>
@@ -143,6 +144,12 @@
       <artifactId>maven-scm-provider-jazz</artifactId>
       <version>${maven.scm.version}</version>
       <type>jar</type>
+      <exclusions>
+        <exclusion>
+          <artifactId>mockito-core</artifactId>
+          <groupId>org.mockito</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>joda-time</groupId>
@@ -167,6 +174,19 @@
       <version>1.1.0</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.powermock</groupId>
+      <artifactId>powermock-module-junit4</artifactId>
+      <version>${powermock.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.powermock</groupId>
+      <artifactId>powermock-api-mockito</artifactId>
+      <version>${powermock.version}</version>
+      <scope>test</scope>
+    </dependency>   
+    
   </dependencies>
 
   <build>

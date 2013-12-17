@@ -40,17 +40,19 @@ import org.sonar.api.resources.Project;
 import org.sonar.api.resources.ProjectFileSystem;
 import org.sonar.plugins.scmstats.measures.ChangeLogHandler;
 import static org.mockito.Mockito.*;
+import org.sonar.api.scan.filesystem.FileExclusions;
+import org.sonar.api.scan.filesystem.ModuleFileSystem;
 import org.sonar.plugins.scmstats.model.ChangeLogInfo;
 
 public class GenericScmAdapterTest {
 
   private final File projectBaseDir = new File(".");
-  private final Project myProject = mock(Project.class);
   private final Settings settings = new Settings();
   private final ScmUrlGuess scmUrlGuess = mock(ScmUrlGuess.class);
+  private final FileExclusions fileExclusions = mock(FileExclusions.class);
   private final ScmConfiguration config = new ScmConfiguration(settings, scmUrlGuess);
   private final ScmFacade scmFacade = mock(ScmFacade.class);
-  private final ProjectFileSystem projectFileSystem = mock(ProjectFileSystem.class);
+  private final ModuleFileSystem moduleFileSystem = mock(ModuleFileSystem.class);
   private final ChangeLogScmResult changeLog = mock(ChangeLogScmResult.class);
   private final ChangeLogSet changeLogSet = mock(ChangeLogSet.class);
   private final List<ChangeSet> changeSets = new ArrayList();
@@ -59,22 +61,24 @@ public class GenericScmAdapterTest {
 
   @Before
   public void init() throws ScmException {
-    when(projectFileSystem.getBasedir()).thenReturn(projectBaseDir);
-    when(myProject.getFileSystem()).thenReturn(projectFileSystem);
+    when(moduleFileSystem.baseDir()).thenReturn(projectBaseDir);
     when(changeLog.getChangeLog()).thenReturn(changeLogSet);
     when(changeLogSet.getChangeSets()).thenReturn(changeSets);
     when(scmFacade.getChangeLog(projectBaseDir, datefrom.toDate(), dateTo.toDate())).thenReturn(changeLog);
+    when(fileExclusions.sourceExclusions()).thenReturn(new String[0]);
+    when(fileExclusions.sourceInclusions()).thenReturn(new String[0]);
+    
   }
 
   @Test
   public void shouldBeResponsible() {
-    GenericScmAdapter genericScmAdapter = new GenericScmAdapter(scmFacade, config);
+    GenericScmAdapter genericScmAdapter = new GenericScmAdapter(scmFacade, config, fileExclusions, moduleFileSystem);
     assertThat(genericScmAdapter.isResponsible("git")).isTrue();
   }
 
   @Test
   public void shouldNotBeResponsible() {
-    GenericScmAdapter genericScmAdapter = new GenericScmAdapter(scmFacade, config);
+    GenericScmAdapter genericScmAdapter = new GenericScmAdapter(scmFacade, config, fileExclusions, moduleFileSystem);
     assertThat(genericScmAdapter.isResponsible("hg")).isFalse();
   }
 
@@ -83,8 +87,8 @@ public class GenericScmAdapterTest {
     DateRange dateRange = new DateRange(datefrom, dateTo);
 
     when(changeLog.isSuccess()).thenReturn(Boolean.FALSE);
-    GenericScmAdapter genericScmAdapter = new GenericScmAdapter(scmFacade, config);
-    ChangeLogHandler changeLogHandler = genericScmAdapter.getChangeLog(myProject, dateRange);
+    GenericScmAdapter genericScmAdapter = new GenericScmAdapter(scmFacade, config, fileExclusions, moduleFileSystem);
+    ChangeLogHandler changeLogHandler = genericScmAdapter.getChangeLog(dateRange);
     assertThat(changeLogHandler.getChangeLogs()).isEmpty();
 
   }
@@ -92,8 +96,8 @@ public class GenericScmAdapterTest {
   public void shouldGetEmptyHolderWhenExceptionIsThrown() throws ScmException {
     DateRange dateRange = new DateRange(datefrom, dateTo);
     when(scmFacade.getChangeLog(projectBaseDir, datefrom.toDate(), dateTo.toDate())).thenThrow(ScmException.class);
-    GenericScmAdapter genericScmAdapter = new GenericScmAdapter(scmFacade, config);
-    ChangeLogHandler changeLogHandler = genericScmAdapter.getChangeLog(myProject, dateRange);
+    GenericScmAdapter genericScmAdapter = new GenericScmAdapter(scmFacade, config, fileExclusions, moduleFileSystem);
+    ChangeLogHandler changeLogHandler = genericScmAdapter.getChangeLog(dateRange);
     assertThat(changeLogHandler.getChangeLogs()).isEmpty();
 
   }
@@ -108,12 +112,12 @@ public class GenericScmAdapterTest {
     when(changeLog.isSuccess()).thenReturn(Boolean.TRUE);
     DateRange dateRange = new DateRange(datefrom, dateTo);
 
-    GenericScmAdapter genericScmAdapter = new GenericScmAdapter(scmFacade, config);
+    GenericScmAdapter genericScmAdapter = new GenericScmAdapter(scmFacade, config, fileExclusions, moduleFileSystem);
     Map<String, Integer> activity = createActivityMap();
     ChangeLogInfo changeLogInfo1 = new ChangeLogInfo("user1", date1.toDate(), activity);
     ChangeLogInfo changeLogInfo2 = new ChangeLogInfo("user2", date2.toDate(), activity);
 
-    ChangeLogHandler result = genericScmAdapter.getChangeLog(myProject, dateRange);
+    ChangeLogHandler result = genericScmAdapter.getChangeLog(dateRange);
 
     assertThat(result.getChangeLogs().get(0).getAuthor()).isEqualTo(changeLogInfo2.getAuthor());
     assertThat(result.getChangeLogs().get(0).getCommitDate()).isEqualTo(changeLogInfo2.getCommitDate());

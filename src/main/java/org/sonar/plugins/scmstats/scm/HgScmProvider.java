@@ -31,7 +31,7 @@ public class HgScmProvider extends AbstractScmProvider {
   }
 
   @Override
-  public ScmProviderRepository makeProviderScmRepository(String string, char c) throws ScmRepositoryException {
+  public ScmProviderRepository makeProviderScmRepository(String string, char chr) throws ScmRepositoryException {
     return new ScmProviderRepository() {
     };
   }

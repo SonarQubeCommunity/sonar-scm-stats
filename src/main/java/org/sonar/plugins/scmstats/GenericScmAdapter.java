@@ -19,6 +19,7 @@
  */
 package org.sonar.plugins.scmstats;
 
+import java.io.File;
 import org.sonar.plugins.scmstats.utils.DateRange;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,34 +30,34 @@ import org.apache.maven.scm.ScmFileStatus;
 import org.apache.maven.scm.command.changelog.ChangeLogScmResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonar.api.resources.Project;
-import org.sonar.plugins.scmstats.ScmConfiguration;
-import org.sonar.plugins.scmstats.ScmFacade;
-import org.sonar.plugins.scmstats.ScmStatsConstants;
+import org.sonar.api.scan.filesystem.FileExclusions;
+import org.sonar.api.scan.filesystem.ModuleFileSystem;
 import org.sonar.plugins.scmstats.measures.ChangeLogHandler;
-import org.sonar.plugins.scmstats.utils.MapUtils;
 
 public class GenericScmAdapter extends AbstractScmAdapter {
 
-  private static final Logger LOG = LoggerFactory.getLogger(HgScmAdapter.class);
+  private static final Logger LOG = LoggerFactory.getLogger(GenericScmAdapter.class);
   private final ScmFacade scmFacade;
 
-  public GenericScmAdapter(ScmFacade scmFacade, ScmConfiguration configuration) {
-    super(configuration);
+  public GenericScmAdapter(ScmFacade scmFacade, ScmConfiguration configuration, 
+          FileExclusions fileExclusions, ModuleFileSystem moduleFileSystem) {
+    super(configuration, fileExclusions, moduleFileSystem);
     this.scmFacade = scmFacade;
   }
   @Override
   public boolean isResponsible(String scmType) {
     return !"hg".equals(scmType);
   }
+  
   @Override
-  public ChangeLogHandler getChangeLog(Project project, DateRange dateRange) {
-    LOG.info("Getting change log information for %s\n",
-            project.getFileSystem().getBasedir().getAbsolutePath());
+  public ChangeLogHandler getChangeLog(DateRange dateRange) {
+    
+    File baseDir = getModuleFileSystem().baseDir();
+    
+    LOG.info("Getting change log information for %s\n", baseDir.getAbsolutePath());
     ChangeLogHandler holder = createChangeLogHolder();
     try {
-      ChangeLogScmResult changeLogScmResult = scmFacade.getChangeLog(
-                    project.getFileSystem().getBasedir(), 
+      ChangeLogScmResult changeLogScmResult = scmFacade.getChangeLog( baseDir, 
                     dateRange.getFrom().toDate(), 
                     dateRange.getTo().toDate());
       
@@ -80,6 +81,7 @@ public class GenericScmAdapter extends AbstractScmAdapter {
     if (changeSet.getAuthor() != null && changeSet.getDate() != null
             && !getConfiguration().getIgnoreAuthorsList().contains(changeSet.getAuthor())) {
       holder.addChangeLog(changeSet.getAuthor(), changeSet.getDate(), createActivityMap(changeSet));
+      
     }
     return holder;
   }
@@ -88,11 +90,11 @@ public class GenericScmAdapter extends AbstractScmAdapter {
     Map<String, Integer> fileStatus = new HashMap<String, Integer>();
     for (ChangeFile changeFile : changeSet.getFiles()) {
       if (changeFile.getAction() == ScmFileStatus.ADDED) {
-        fileStatus = MapUtils.updateMap(fileStatus, ScmStatsConstants.ACTIVITY_ADD);
+        fileStatus = updateActivity(changeFile.getName(), fileStatus, ScmStatsConstants.ACTIVITY_ADD);
       } else if (changeFile.getAction() == ScmFileStatus.MODIFIED) {
-        fileStatus = MapUtils.updateMap(fileStatus, ScmStatsConstants.ACTIVITY_MODIFY);
+        fileStatus = updateActivity(changeFile.getName(), fileStatus, ScmStatsConstants.ACTIVITY_MODIFY);
       } else if (changeFile.getAction() == ScmFileStatus.DELETED) {
-        fileStatus = MapUtils.updateMap(fileStatus, ScmStatsConstants.ACTIVITY_DELETE);
+        fileStatus = updateActivity(changeFile.getName(), fileStatus, ScmStatsConstants.ACTIVITY_DELETE);
       }
     }
     return fileStatus;

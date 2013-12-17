@@ -21,6 +21,8 @@ package org.sonar.plugins.scmstats;
 
 import org.sonar.plugins.scmstats.utils.UrlChecker;
 import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import static org.fest.assertions.Assertions.assertThat;
 import static org.assertj.jodatime.api.Assertions.assertThat;
 import org.junit.*;
@@ -34,7 +36,9 @@ import static org.hamcrest.Matchers.*;
 import org.joda.time.DateTime;
 import org.sonar.api.CoreProperties;
 import org.sonar.api.batch.SensorContext;
-import org.sonar.api.resources.ProjectFileSystem;
+import org.sonar.api.scan.filesystem.FileExclusions;
+import org.sonar.api.scan.filesystem.ModuleFileSystem;
+import org.sonar.api.test.SimpleProjectFileSystem;
 import org.sonar.plugins.scmstats.measures.ChangeLogHandler;
 import org.sonar.plugins.scmstats.utils.DateRange;
 
@@ -42,21 +46,23 @@ public class ScmStatsSensorTest {
 
   private ScmStatsSensor sensor;
   Project myProject = mock(Project.class);
-  private ProjectFileSystem projectFileSystem = mock(ProjectFileSystem.class);
+  private ModuleFileSystem moduleFileSystem = mock(ModuleFileSystem.class);
   private ScmAdapterFactory scmAdapterFactory = mock(ScmAdapterFactory.class);
   private AbstractScmAdapter adapter = mock(AbstractScmAdapter.class);
+
   private final Settings settings = new Settings();
   private UrlChecker checker;
   private final SensorContext context = mock(SensorContext.class);
   private final ScmUrlGuess scmUrlGuess = mock(ScmUrlGuess.class);
   private final ChangeLogHandler holder = mock(ChangeLogHandler.class);
   private final static String URL = "someUrl";
+  private FileExclusions fileExclusions = new FileExclusions(settings);
 
   @Before
   public void setUp() {
 
     settings.setProperty(ScmStatsConstants.ENABLED, true);
-    when(projectFileSystem.getBasedir()).thenReturn(new File("/"));
+    when(moduleFileSystem.baseDir()).thenReturn(new File("/"));
     when(scmAdapterFactory.getScmAdapter()).thenReturn(adapter);
     checker = mock(UrlChecker.class);
 
@@ -68,11 +74,40 @@ public class ScmStatsSensorTest {
   }
 
   @Test
+  @Ignore
+  public void realHgTest() {
+    settings.setProperty(ScmStatsConstants.PERIOD_1, 0);
+    settings.setProperty(ScmStatsConstants.URL, "scm:hg:https://hg.keepitcloud.com/weather.marine.travel");
+    settings.setProperty(CoreProperties.PROJECT_DATE_PROPERTY, "2013-12-12");
+    settings.setProperty(CoreProperties.PROJECT_EXCLUSIONS_PROPERTY, "**/wredis/**/Get*.java,**/*.xml");
+    Project project = new Project("KEY");
+    project.setFileSystem(new SimpleProjectFileSystem(new File("C:/dev/kic/weather.marine.travel")));
+    ScmConfiguration scmConfiguration = new ScmConfiguration(settings, scmUrlGuess);
+    sensor = new ScmStatsSensor(scmConfiguration, checker, new ScmAdapterFactory(scmConfiguration, new ScmFacade(new SonarScmManager(), scmConfiguration), fileExclusions, moduleFileSystem));
+
+    sensor.analyse(project, context);
+  }
+
+  @Test
+  public void realGitTest() {
+    settings.setProperty(ScmStatsConstants.PERIOD_1, 0);
+    settings.setProperty(ScmStatsConstants.URL, "scm:git:https://github.com/SonarCommunity/sonar-scm-stats");
+    settings.setProperty(CoreProperties.PROJECT_DATE_PROPERTY, "2013-12-31");
+    settings.setProperty(CoreProperties.PROJECT_EXCLUSIONS_PROPERTY, "**/org/**/*.java");
+    Project project = new Project("KEY");
+    project.setFileSystem(new SimpleProjectFileSystem(new File("C:/dev/sonar/plugins/sonar-scm-stats")));
+    ScmConfiguration scmConfiguration = new ScmConfiguration(settings, scmUrlGuess);
+    sensor = new ScmStatsSensor(scmConfiguration, checker, new ScmAdapterFactory(scmConfiguration, new ScmFacade(new SonarScmManager(), scmConfiguration), fileExclusions, moduleFileSystem));
+
+    sensor.analyse(project, context);
+  }
+
+  @Test
   public void shouldAnalyzeOnlyOnce() {
     settings.setProperty(ScmStatsConstants.URL, URL);
     settings.setProperty(ScmStatsConstants.PERIOD_1, 0);
     settings.setProperty(CoreProperties.PROJECT_DATE_PROPERTY, "2013-10-10");
-    when(adapter.getChangeLog((Project) anyObject(), (DateRange) anyObject())).thenReturn(holder);
+    when(adapter.getChangeLog((DateRange) anyObject())).thenReturn(holder);
 
     sensor.analyse(myProject, context);
     verify(holder).generateMeasures();
@@ -104,6 +139,13 @@ public class ScmStatsSensorTest {
   }
 
   @Test
+  public void shouldGetProjectDateTimeSetting() {
+     settings.setProperty(CoreProperties.PROJECT_DATE_PROPERTY, "2013-01-31T10:10:10-0800");
+    DateTime projectDate = this.sensor.getProjectDateProperty();
+    assertThat(projectDate).isEqualTo("2013-01-31T20:10:10.000+02:00");
+  }
+
+  @Test
   public void shouldGetProjectDateSetting() {
     settings.setProperty(CoreProperties.PROJECT_DATE_PROPERTY, "2013-01-31");
     DateTime projectDate = this.sensor.getProjectDateProperty();
@@ -116,7 +158,7 @@ public class ScmStatsSensorTest {
     settings.setProperty(ScmStatsConstants.PERIOD_1, 0);
     settings.setProperty(ScmStatsConstants.PERFORCE_CLIENTSPEC, "client");
     settings.setProperty(CoreProperties.PROJECT_DATE_PROPERTY, "2013-10-10");
-    when(adapter.getChangeLog((Project) anyObject(), (DateRange) anyObject())).thenReturn(holder);
+    when(adapter.getChangeLog((DateRange) anyObject())).thenReturn(holder);
 
     sensor.analyse(myProject, context);
     assertThat(System.getProperty("maven.scm.perforce.clientspec.name")).isEqualTo("client");
@@ -129,7 +171,7 @@ public class ScmStatsSensorTest {
     settings.setProperty(ScmStatsConstants.PERIOD_2, 0);
     settings.setProperty(ScmStatsConstants.PERIOD_3, 0);
     settings.setProperty(CoreProperties.PROJECT_DATE_PROPERTY, "2013-10-10");
-    when(adapter.getChangeLog((Project) anyObject(), (DateRange) anyObject())).thenReturn(holder);
+    when(adapter.getChangeLog((DateRange) anyObject())).thenReturn(holder);
 
     sensor.analyse(myProject, context);
     verify(holder, times(1)).generateMeasures();
@@ -144,7 +186,7 @@ public class ScmStatsSensorTest {
     settings.setProperty(ScmStatsConstants.PERIOD_1, 0);
     settings.setProperty(ScmStatsConstants.PERIOD_2, 3);
     settings.setProperty(CoreProperties.PROJECT_DATE_PROPERTY, "2013-10-10");
-    when(adapter.getChangeLog((Project) anyObject(), (DateRange) anyObject())).thenReturn(holder);
+    when(adapter.getChangeLog((DateRange) anyObject())).thenReturn(holder);
 
     sensor.analyse(myProject, context);
     verify(holder, times(2)).generateMeasures();

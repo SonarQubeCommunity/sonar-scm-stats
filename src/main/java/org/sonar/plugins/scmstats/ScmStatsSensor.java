@@ -43,7 +43,8 @@ public class ScmStatsSensor implements Sensor {
 
   public ScmStatsSensor(ScmConfiguration configuration, 
           UrlChecker urlChecker,
-          ScmAdapterFactory scmAdapterFactory) {
+          ScmAdapterFactory scmAdapterFactory
+  ) {
     this.configuration = configuration;
     this.urlChecker = urlChecker;
     this.scmAdapterFactory = scmAdapterFactory;
@@ -69,14 +70,12 @@ public class ScmStatsSensor implements Sensor {
   @VisibleForTesting
   protected void analyseChangeLog(Project project, SensorContext context, String period) {
     int numDays = configuration.getSettings().getInt(period);
-
     if (numDays > 0 || period.equals(ScmStatsConstants.PERIOD_1)) {
       LOG.info("Collection SCM Change log for the last " + numDays + " days");
       LOG.info("sonar.projectDate setting " + getProjectDateProperty());
       ChangeLogHandler holder = scmAdapterFactory.getScmAdapter().
-              getChangeLog(project, DateRange.getDateRange(
+              getChangeLog(DateRange.getDateRange(
                                 numDays, getProjectDateProperty()));
-      
       holder.generateMeasures();
       holder.saveMeasures(context, period);
     }
@@ -88,7 +87,14 @@ public class ScmStatsSensor implements Sensor {
   }
 
   DateTime getProjectDateProperty() {
-    Date date = configuration.getSettings().getDate(CoreProperties.PROJECT_DATE_PROPERTY);
+    Date date;
+    try {
+      // try to read sonar.projectDate as a datetime
+      date = configuration.getSettings().getDateTime(CoreProperties.PROJECT_DATE_PROPERTY);
+    } catch (SonarException e) {
+      // this is probably just a date
+      date = configuration.getSettings().getDate(CoreProperties.PROJECT_DATE_PROPERTY);
+    }
     return new DateTime(date.getTime());
   }
 }

@@ -22,9 +22,8 @@ package org.sonar.plugins.scmstats.measures;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import static org.hamcrest.Matchers.*;
 import org.joda.time.DateTime;
-import static org.junit.Assert.assertThat;
+import static org.fest.assertions.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +34,7 @@ import org.sonar.plugins.scmstats.model.CommitsList;
 
 public class ChangeLogHandlerTest {
   
-  private ChangeLogHandler instance = new ChangeLogHandler(new ArrayList<String>(),new ArrayList<String>());
+  private final ChangeLogHandler instance = new ChangeLogHandler(new ArrayList<String>(),new ArrayList<String>());
   
   @Test
   public void testAddChangeLog() {
@@ -48,14 +47,14 @@ public class ChangeLogHandlerTest {
     instance.addChangeLog("author", dt.toDate(), activity);
     instance.generateMeasures();
     
-    assertThat (instance.getCommitsPerUser().get("author").getCommits().size(), is(4));
-    assertThat (instance.getCommitsPerUser().get("author").getCommits().get(0), is(2));
-    assertThat (instance.getCommitsPerUser().get("author").getCommits().get(1), is(4));
-    assertThat (instance.getCommitsPerUser().get("author").getCommits().get(2), is(0));
-    assertThat (instance.getCommitsPerUser().get("author").getCommits().get(3), is(2));
-    assertThat (instance.getCommitsPerClockHour().get("14"), is(2));
-    assertThat (instance.getCommitsPerMonth().get("10"), is(2));
-    assertThat (instance.getCommitsPerWeekDay().get("1"), is(2));
+    assertThat (instance.getCommitsPerUser().get("author").getCommits()).hasSize(4);
+    assertThat (instance.getCommitsPerUser().get("author").getCommits().get(0)).isEqualTo(2);
+    assertThat (instance.getCommitsPerUser().get("author").getCommits().get(1)).isEqualTo(4);
+    assertThat (instance.getCommitsPerUser().get("author").getCommits().get(2)).isEqualTo(0);
+    assertThat (instance.getCommitsPerUser().get("author").getCommits().get(3)).isEqualTo(2);
+    assertThat (instance.getCommitsPerClockHour().get("14")).isEqualTo(2);
+    assertThat (instance.getCommitsPerMonth().get("10")).isEqualTo(2);
+    assertThat (instance.getCommitsPerWeekDay().get("1")).isEqualTo(2);
     
   }
   
@@ -69,10 +68,22 @@ public class ChangeLogHandlerTest {
     ChangeLogInfo changeLogInfo = new ChangeLogInfo("author", null, activity);
     authorsActivity = instance.updateAuthorActivity(authorsActivity, changeLogInfo);
     
-    assertThat(authorsActivity.get("author").getCommits().get(0),is(2));
-    assertThat(authorsActivity.get("author").getCommits().get(1),is(2));
-    assertThat(authorsActivity.get("author").getCommits().get(2),is(4));
-    assertThat(authorsActivity.get("author").getCommits().get(3),is(0));
+    assertThat(authorsActivity.get("author").getCommits().get(0)).isEqualTo(2);
+    assertThat(authorsActivity.get("author").getCommits().get(1)).isEqualTo(2);
+    assertThat(authorsActivity.get("author").getCommits().get(2)).isEqualTo(4);
+    assertThat(authorsActivity.get("author").getCommits().get(3)).isEqualTo(0);
+  }
+
+  @Test
+  public void shouldNotAddChangeLogWhenNoFilesAreAffected() {
+    Map<String, CommitsList> authorsActivity = new HashMap<String, CommitsList>();
+    Map<String, Integer> activity = new HashMap<String, Integer>();
+    activity.put(ScmStatsConstants.ACTIVITY_ADD, 0);
+    activity.put(ScmStatsConstants.ACTIVITY_MODIFY, 0);
+    activity.put(ScmStatsConstants.ACTIVITY_DELETE, 0);
+    instance.addChangeLog("author", null, activity);
+    
+    assertThat(authorsActivity).hasSize(0);
   }
 
   @Test
@@ -82,12 +93,12 @@ public class ChangeLogHandlerTest {
     mergedAuthors.add("author2=author22");
     ChangeLogHandler changeLogHandler = new ChangeLogHandler(new ArrayList<String>(),mergedAuthors);
     
-    assertThat(changeLogHandler.getBasicAuthor("author"), equalTo("author1"));
-    assertThat(changeLogHandler.getBasicAuthor("author1"), equalTo("author1"));
-    assertThat(changeLogHandler.getBasicAuthor("author11"), equalTo("author1"));
-    assertThat(changeLogHandler.getBasicAuthor("author111"), equalTo("author1"));
-    assertThat(changeLogHandler.getBasicAuthor("author2"), equalTo("author2"));
-    assertThat(changeLogHandler.getBasicAuthor("author22"), equalTo("author2"));
+    assertThat(changeLogHandler.getBasicAuthor("author")).isEqualTo("author1");
+    assertThat(changeLogHandler.getBasicAuthor("author1")).isEqualTo("author1");
+    assertThat(changeLogHandler.getBasicAuthor("author11")).isEqualTo("author1");
+    assertThat(changeLogHandler.getBasicAuthor("author111")).isEqualTo("author1");
+    assertThat(changeLogHandler.getBasicAuthor("author2")).isEqualTo("author2");
+    assertThat(changeLogHandler.getBasicAuthor("author22")).isEqualTo("author2");
   }
 
   @Test
@@ -95,7 +106,7 @@ public class ChangeLogHandlerTest {
     ChangeLogHandler changeLogHandler = new ChangeLogHandler(new ArrayList<String>(),
             new ArrayList<String>());
     
-    assertThat(changeLogHandler.getBasicAuthor("author"), equalTo("author"));
+    assertThat(changeLogHandler.getBasicAuthor("author")).isEqualTo("author");
   }
 
   @Test
@@ -104,7 +115,7 @@ public class ChangeLogHandlerTest {
     mergedAuthors.add("author1:author;author11;author111");
     ChangeLogHandler changeLogHandler = new ChangeLogHandler(new ArrayList<String>(),mergedAuthors);
     
-    assertThat(changeLogHandler.getBasicAuthor("author"), equalTo("author"));
+    assertThat(changeLogHandler.getBasicAuthor("author")).isEqualTo("author");
   }
 
 }

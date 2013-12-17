@@ -19,6 +19,7 @@
  */
 package org.sonar.plugins.scmstats;
 
+import java.io.File;
 import java.util.Collections;
 import org.sonar.plugins.scmstats.utils.DateRange;
 import java.util.Date;
@@ -28,58 +29,64 @@ import java.util.Map;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonar.api.resources.Project;
-import org.sonar.plugins.scmstats.ScmConfiguration;
-import org.sonar.plugins.scmstats.ScmStatsConstants;
+import org.sonar.api.scan.filesystem.FileExclusions;
+import org.sonar.api.scan.filesystem.ModuleFileSystem;
 import org.sonar.plugins.scmstats.measures.ChangeLogHandler;
-import org.sonar.plugins.scmstats.utils.MapUtils;
 import org.tmatesoft.hg.core.HgChangeset;
 import org.tmatesoft.hg.core.HgDate;
 import org.tmatesoft.hg.core.HgException;
+import org.tmatesoft.hg.core.HgFileRevision;
 import org.tmatesoft.hg.core.HgLogCommand;
 import org.tmatesoft.hg.core.HgRepoFacade;
 import org.tmatesoft.hg.core.HgRepositoryNotFoundException;
+import org.tmatesoft.hg.util.Path;
 
 public class HgScmAdapter extends AbstractScmAdapter {
-  
+
   private static final Logger LOG = LoggerFactory.getLogger(HgScmAdapter.class);
   private final HgRepoFacade hgRepo;
-  
-  public HgScmAdapter(HgRepoFacade hgRepoFacade, ScmConfiguration configuration) {
-    super(configuration);
+
+  public HgScmAdapter(HgRepoFacade hgRepoFacade, ScmConfiguration configuration, 
+          FileExclusions fileExclusions, ModuleFileSystem moduleFileSystem) {
+    super(configuration, fileExclusions, moduleFileSystem);
     hgRepo = hgRepoFacade;
   }
+
   @Override
   public boolean isResponsible(String scmType) {
     return "hg".equals(scmType);
   }
+
   @Override
-  public ChangeLogHandler getChangeLog(Project project, DateRange dateRange) {
-    List<HgChangeset> hgChangeSets = getHgChangeLog(project);
-    if ( hgChangeSets.isEmpty()) {
+  public ChangeLogHandler getChangeLog(DateRange dateRange) {
+    List<HgChangeset> hgChangeSets = getHgChangeLog();
+    if (hgChangeSets.isEmpty()) {
       return null;
     }
     ChangeLogHandler holder = createChangeLogHolder();
+
     for (HgChangeset hgChangeSet : hgChangeSets) {
       String author = hgChangeSet.getUser();
       HgDate changeSetDate = hgChangeSet.getDate();
-      if (author != null && hgChangeSet.getDate() != null && 
-          dateRange.isDateInRange(new DateTime(changeSetDate.getRawTime())) && 
-          !getConfiguration().getIgnoreAuthorsList().contains(author)) {
+
+      if (author != null && hgChangeSet.getDate() != null
+              && dateRange.isDateInRange(new DateTime(changeSetDate.getRawTime()))
+              && !getConfiguration().getIgnoreAuthorsList().contains(author)) {
         holder.addChangeLog(author, new Date(changeSetDate.getRawTime()), createActivityMap(hgChangeSet));
       }
     }
     return holder;
   }
 
-  private List<HgChangeset> getHgChangeLog(Project project) {
+  private List<HgChangeset> getHgChangeLog() {
+    
+    File baseDir = getModuleFileSystem().baseDir();
+    
     try {
-      LOG.info("Getting change log information for %s\n", 
-              project.getFileSystem().getBasedir().getAbsolutePath());
-      if (!hgRepo.initFrom(project.getFileSystem().getBasedir())) {
+      LOG.info("Getting change log information for %s\n", baseDir.getAbsolutePath());
+      if (!hgRepo.initFrom(baseDir)) {
         throw new HgRepositoryNotFoundException(
-                String.format("Can't find repository in: %s\n", 
-                        project.getFileSystem().getBasedir().getAbsolutePath()));
+                String.format("Can't find repository in: %s\n",baseDir.getAbsolutePath()));
       }
       HgLogCommand cmd = hgRepo.createLogCommand();
       return cmd.execute();
@@ -90,20 +97,20 @@ public class HgScmAdapter extends AbstractScmAdapter {
     return Collections.EMPTY_LIST;
   }
 
-  private Map<String, Integer> createActivityMap(HgChangeset changeSet) {
+  Map<String, Integer> createActivityMap(HgChangeset changeSet) {
     Map<String, Integer> fileStatus = new HashMap<String, Integer>();
-    for (int i = 0; i < changeSet.getAddedFiles().size(); i++) {
-      fileStatus = MapUtils.updateMap(fileStatus, ScmStatsConstants.ACTIVITY_ADD);
+
+    for (HgFileRevision hgFileRevision : changeSet.getAddedFiles()) {
+      fileStatus = updateActivity(hgFileRevision.getPath().toString(), fileStatus, ScmStatsConstants.ACTIVITY_ADD);
     }
 
-    for (int i = 0; i < changeSet.getModifiedFiles().size(); i++) {
-      fileStatus = MapUtils.updateMap(fileStatus, ScmStatsConstants.ACTIVITY_MODIFY);
+    for (HgFileRevision hgFileRevision : changeSet.getModifiedFiles()) {
+      fileStatus = updateActivity(hgFileRevision.getPath().toString(), fileStatus, ScmStatsConstants.ACTIVITY_MODIFY);
     }
 
-    for (int i = 0; i < changeSet.getRemovedFiles().size(); i++) {
-      fileStatus = MapUtils.updateMap(fileStatus, ScmStatsConstants.ACTIVITY_DELETE);
+    for (Path path : changeSet.getRemovedFiles()) {
+      fileStatus = updateActivity(path.toString(), fileStatus, ScmStatsConstants.ACTIVITY_DELETE);
     }
-
     return fileStatus;
   }
 

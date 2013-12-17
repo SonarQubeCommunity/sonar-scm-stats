@@ -143,4 +143,13 @@ public class ScmConfiguration implements BatchExtension {
   public Settings getSettings() {
     return settings;
   }
+  
+  public String getSourceDir(){
+    return mavenConfiguration == null ? "" : mavenConfiguration.getSourceDir();
+  }
+
+  public String getTestSourceDir(){
+    return mavenConfiguration == null ? "" : mavenConfiguration.getTestDir();
+  }
+  
 }

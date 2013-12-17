@@ -20,6 +20,7 @@
 
 package org.sonar.plugins.scmstats;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.maven.model.Scm;
 import org.apache.maven.project.MavenProject;
 import org.sonar.api.BatchExtension;
@@ -41,5 +42,18 @@ public class MavenScmConfiguration implements BatchExtension {
 
   public String getUrl() {
     return scm == null ? null : scm.getConnection();
+  }
+  
+  public String getSourceDir(){
+    return getDir(mavenProject.getBuild().getSourceDirectory());
+  }
+
+  private String getDir(String dir) {
+    String baseDir = mavenProject.getBasedir().getAbsolutePath();
+    return StringUtils.remove(dir,baseDir + "\\").replace("\\", "/");
+  }
+
+  public String getTestDir(){
+    return getDir(mavenProject.getBuild().getTestSourceDirectory());
   }
 }

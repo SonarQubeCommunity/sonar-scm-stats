@@ -26,20 +26,26 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.sonar.api.config.Settings;
 import static org.fest.assertions.Assertions.assertThat;
+import org.sonar.api.scan.filesystem.FileExclusions;
+import org.sonar.api.scan.filesystem.ModuleFileSystem;
 
 public class ScmAdapterFactoryTest {
 
   private final Settings settings = new Settings();
 
-  private ScmUrlGuess scmUrlGuess = mock(ScmUrlGuess.class);
+  private final ScmUrlGuess scmUrlGuess = mock(ScmUrlGuess.class);
   private final ScmConfiguration scmConfiguration = new ScmConfiguration(settings, scmUrlGuess);
   private final ScmFacade scmFacade = mock(ScmFacade.class);
   private final ScmRepository repo = mock(ScmRepository.class);
-  private final ScmAdapterFactory adapterFactory = new ScmAdapterFactory(scmConfiguration, scmFacade);
+  private final FileExclusions fileExclusions = mock(FileExclusions.class);
+  private final ModuleFileSystem moduleFileSystem = mock(ModuleFileSystem.class);
+  private final ScmAdapterFactory adapterFactory = new ScmAdapterFactory(scmConfiguration, scmFacade, fileExclusions, moduleFileSystem);
 
   @Before
   public void setUp(){
     when(scmFacade.getScmRepository()).thenReturn(repo);
+    when(fileExclusions.sourceExclusions()).thenReturn(new String[0]);
+    when(fileExclusions.sourceInclusions()).thenReturn(new String[0]);
   }
 
   @Test

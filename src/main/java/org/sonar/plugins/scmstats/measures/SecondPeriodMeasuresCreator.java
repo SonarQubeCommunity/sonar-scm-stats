@@ -19,7 +19,6 @@
  */
 package org.sonar.plugins.scmstats.measures;
 
-import java.util.List;
 import java.util.Map;
 import org.sonar.api.batch.SensorContext;
 import org.sonar.plugins.scmstats.ScmStatsConstants;

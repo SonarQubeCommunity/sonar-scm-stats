@@ -19,11 +19,16 @@
  */
 package org.sonar.plugins.scmstats;
 
+import java.io.File;
+import org.apache.maven.model.Build;
 import org.junit.*;
-import static org.junit.Assert.*;
-
 import org.apache.maven.model.Scm;
 import org.apache.maven.project.MavenProject;
+
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
+import static org.fest.assertions.Assertions.assertThat;
+
 public class MavenScmConfigurationTest {
 
   private final MavenProject mvnProject = new MavenProject();
@@ -59,6 +64,35 @@ public class MavenScmConfigurationTest {
   @Test
   public void GetUrl_should_return_null_if_scm_is_null() {
     assertNull(mvnConfNullScm.getUrl());
+  }
+
+  @Test
+  public void should_get_sourceDir() {
+    Build build = mock(Build.class);
+    when(build.getSourceDirectory()).thenReturn("C:\\dev\\sonar\\plugins\\sonar-scm-stats\\src\\main\\java");
+    MavenProject mavenProject = mock(MavenProject.class);
+    when(mavenProject.getBuild()).thenReturn(build);
+    when(mavenProject.getBasedir()).thenReturn(new File("C:\\dev\\sonar\\plugins\\sonar-scm-stats"));
+    MavenScmConfiguration mavenConfig = new MavenScmConfiguration(mavenProject);
+
+    
+    String expectedDir = "src/main/java";
+    String sourceDir = mavenConfig.getSourceDir();
+    assertThat (expectedDir).isEqualTo(sourceDir);
+  }
+
+  @Test
+  public void should_get_testDir() {
+    Build build = mock(Build.class);
+    when(build.getTestSourceDirectory()).thenReturn("C:\\dev\\sonar\\plugins\\sonar-scm-stats\\src\\test\\java");
+    MavenProject mavenProject = mock(MavenProject.class);
+    when(mavenProject.getBuild()).thenReturn(build);
+    when(mavenProject.getBasedir()).thenReturn(new File("C:\\dev\\sonar\\plugins\\sonar-scm-stats"));
+    MavenScmConfiguration mavenConfig = new MavenScmConfiguration(mavenProject);
+
+    String expectedDir = "src/test/java";
+    String sourceDir = mavenConfig.getTestDir();
+    assertThat (expectedDir).isEqualTo(sourceDir);
   }
 
 }

@@ -24,7 +24,7 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.scm.provider.svn.svnexe.SvnExeScmProvider;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertNull;
+import static org.fest.assertions.Assertions.assertThat;
 
 import java.util.List;
 import org.junit.Before;
@@ -138,4 +138,45 @@ public class ScmConfigurationTest {
     assertThat ( scmConfiguration.getUrl() , is(URL));
   }
 
+  @Test
+  public void shouldGetSourceDirWithMavenProject() {
+    
+    String expectedDir = "ExpectedDir";
+    Settings mockedSettings = mock(Settings.class);
+    MavenScmConfiguration mavenConfonfiguration = mock(MavenScmConfiguration.class);
+    when(mavenConfonfiguration.getSourceDir()).thenReturn(expectedDir);
+    ScmConfiguration scmConfiguration = new ScmConfiguration(mockedSettings,mavenConfonfiguration,scmUrlGuess);
+    String sourceDir = scmConfiguration.getSourceDir();
+    assertThat ( sourceDir).isEqualTo(expectedDir);
+  }
+
+  @Test
+  public void shouldGetTestSourceDirWithMavenProject() {
+    
+    String expectedDir = "ExpectedDir";
+    Settings mockedSettings = mock(Settings.class);
+    MavenScmConfiguration mavenConfonfiguration = mock(MavenScmConfiguration.class);
+    when(mavenConfonfiguration.getTestDir()).thenReturn(expectedDir);
+    ScmConfiguration scmConfiguration = new ScmConfiguration(mockedSettings,mavenConfonfiguration,scmUrlGuess);
+    String sourceDir = scmConfiguration.getTestSourceDir();
+    assertThat ( sourceDir).isEqualTo(expectedDir);
+  }
+
+  @Test
+  public void shouldGetSourceDir() {
+    
+    Settings mockedSettings = mock(Settings.class);
+    ScmConfiguration scmConfiguration = new ScmConfiguration(mockedSettings,null,scmUrlGuess);
+    String sourceDir = scmConfiguration.getSourceDir();
+    assertThat (sourceDir).isEmpty();
+  }
+
+  @Test
+  public void shouldGetTestSourceDir() {
+    
+    Settings mockedSettings = mock(Settings.class);
+    ScmConfiguration scmConfiguration = new ScmConfiguration(mockedSettings,null,scmUrlGuess);
+    String sourceDir = scmConfiguration.getTestSourceDir();
+    assertThat (sourceDir).isEmpty();
+  }
 }

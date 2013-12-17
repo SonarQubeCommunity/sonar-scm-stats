@@ -22,22 +22,29 @@ package org.sonar.plugins.scmstats;
 import java.util.ArrayList;
 import java.util.List;
 import org.sonar.api.BatchExtension;
+import org.sonar.api.scan.filesystem.FileExclusions;
+import org.sonar.api.scan.filesystem.ModuleFileSystem;
 import org.tmatesoft.hg.core.HgRepoFacade;
 
 public class ScmAdapterFactory implements BatchExtension {
 
   private final ScmConfiguration config;
   private final ScmFacade scmFacade;
+  private final FileExclusions fileExclusions;
+  private final ModuleFileSystem moduleFileSystem;
 
-  public ScmAdapterFactory(ScmConfiguration config, ScmFacade scmFacade) {
+  public ScmAdapterFactory(ScmConfiguration config, ScmFacade scmFacade, 
+          FileExclusions fileExclusions, ModuleFileSystem moduleFileSystem) {
     this.config = config;
     this.scmFacade = scmFacade;
+    this.fileExclusions = fileExclusions;
+    this.moduleFileSystem = moduleFileSystem;
   }
 
   public AbstractScmAdapter getScmAdapter() {
     List<AbstractScmAdapter> availableAdapters = new ArrayList();
-    AbstractScmAdapter genericAdapter = new GenericScmAdapter(scmFacade, config);
-    availableAdapters.add(new HgScmAdapter(new HgRepoFacade(), config));
+    AbstractScmAdapter genericAdapter = new GenericScmAdapter(scmFacade, config, fileExclusions, moduleFileSystem);
+    availableAdapters.add(new HgScmAdapter(new HgRepoFacade(), config, fileExclusions, moduleFileSystem));
     availableAdapters.add(genericAdapter);
 
     for (AbstractScmAdapter adapter : availableAdapters) {
