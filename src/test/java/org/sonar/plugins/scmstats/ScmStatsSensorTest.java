@@ -21,8 +21,6 @@ package org.sonar.plugins.scmstats;
 
 import org.sonar.plugins.scmstats.utils.UrlChecker;
 import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import static org.fest.assertions.Assertions.assertThat;
 import static org.assertj.jodatime.api.Assertions.assertThat;
 import org.junit.*;
@@ -73,34 +71,6 @@ public class ScmStatsSensorTest {
     sensor = new ScmStatsSensor(scmConfiguration, checker, scmAdapterFactory);
   }
 
-  @Test
-  @Ignore
-  public void realHgTest() {
-    settings.setProperty(ScmStatsConstants.PERIOD_1, 0);
-    settings.setProperty(ScmStatsConstants.URL, "scm:hg:https://hg.keepitcloud.com/weather.marine.travel");
-    settings.setProperty(CoreProperties.PROJECT_DATE_PROPERTY, "2013-12-12");
-    settings.setProperty(CoreProperties.PROJECT_EXCLUSIONS_PROPERTY, "**/wredis/**/Get*.java,**/*.xml");
-    Project project = new Project("KEY");
-    project.setFileSystem(new SimpleProjectFileSystem(new File("C:/dev/kic/weather.marine.travel")));
-    ScmConfiguration scmConfiguration = new ScmConfiguration(settings, scmUrlGuess);
-    sensor = new ScmStatsSensor(scmConfiguration, checker, new ScmAdapterFactory(scmConfiguration, new ScmFacade(new SonarScmManager(), scmConfiguration), fileExclusions, moduleFileSystem));
-
-    sensor.analyse(project, context);
-  }
-
-  @Test
-  public void realGitTest() {
-    settings.setProperty(ScmStatsConstants.PERIOD_1, 0);
-    settings.setProperty(ScmStatsConstants.URL, "scm:git:https://github.com/SonarCommunity/sonar-scm-stats");
-    settings.setProperty(CoreProperties.PROJECT_DATE_PROPERTY, "2013-12-31");
-    settings.setProperty(CoreProperties.PROJECT_EXCLUSIONS_PROPERTY, "**/org/**/*.java");
-    Project project = new Project("KEY");
-    project.setFileSystem(new SimpleProjectFileSystem(new File("C:/dev/sonar/plugins/sonar-scm-stats")));
-    ScmConfiguration scmConfiguration = new ScmConfiguration(settings, scmUrlGuess);
-    sensor = new ScmStatsSensor(scmConfiguration, checker, new ScmAdapterFactory(scmConfiguration, new ScmFacade(new SonarScmManager(), scmConfiguration), fileExclusions, moduleFileSystem));
-
-    sensor.analyse(project, context);
-  }
 
   @Test
   public void shouldAnalyzeOnlyOnce() {
