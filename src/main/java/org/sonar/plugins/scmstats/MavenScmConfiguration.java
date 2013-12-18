@@ -50,7 +50,11 @@ public class MavenScmConfiguration implements BatchExtension {
 
   private String getDir(String dir) {
     String baseDir = mavenProject.getBasedir().getAbsolutePath();
-    return StringUtils.remove(dir,baseDir + "\\").replace("\\", "/");
+    String relativeBaseDir = StringUtils.remove(dir,baseDir).replace("\\", "/");
+    if (relativeBaseDir.charAt(0) == '/'){
+      relativeBaseDir = relativeBaseDir.substring(1);
+    } 
+    return relativeBaseDir;
   }
 
   public String getTestDir(){

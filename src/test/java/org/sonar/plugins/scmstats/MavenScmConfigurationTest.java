@@ -69,16 +69,17 @@ public class MavenScmConfigurationTest {
   @Test
   public void should_get_sourceDir() {
     Build build = mock(Build.class);
-    when(build.getSourceDirectory()).thenReturn("C:\\dev\\sonar\\plugins\\sonar-scm-stats\\src\\main\\java");
+    when(build.getSourceDirectory()).thenReturn("/dev/sonar/plugins/sonar-scm-stats/src/main/java");
     MavenProject mavenProject = mock(MavenProject.class);
     when(mavenProject.getBuild()).thenReturn(build);
-    when(mavenProject.getBasedir()).thenReturn(new File("C:\\dev\\sonar\\plugins\\sonar-scm-stats"));
+    File baseDir = mock(File.class);
+    when(baseDir.getAbsolutePath()).thenReturn("/dev/sonar/plugins/sonar-scm-stats");
+    when(mavenProject.getBasedir()).thenReturn(baseDir);
     MavenScmConfiguration mavenConfig = new MavenScmConfiguration(mavenProject);
 
-    
     String expectedDir = "src/main/java";
     String sourceDir = mavenConfig.getSourceDir();
-    assertThat (expectedDir).isEqualTo(sourceDir);
+    assertThat (sourceDir).isEqualTo(expectedDir);
   }
 
   @Test
@@ -87,7 +88,9 @@ public class MavenScmConfigurationTest {
     when(build.getTestSourceDirectory()).thenReturn("C:\\dev\\sonar\\plugins\\sonar-scm-stats\\src\\test\\java");
     MavenProject mavenProject = mock(MavenProject.class);
     when(mavenProject.getBuild()).thenReturn(build);
-    when(mavenProject.getBasedir()).thenReturn(new File("C:\\dev\\sonar\\plugins\\sonar-scm-stats"));
+    File baseDir = mock(File.class);
+    when(baseDir.getAbsolutePath()).thenReturn("C:\\dev\\sonar\\plugins\\sonar-scm-stats");
+    when(mavenProject.getBasedir()).thenReturn(baseDir);
     MavenScmConfiguration mavenConfig = new MavenScmConfiguration(mavenProject);
 
     String expectedDir = "src/test/java";
