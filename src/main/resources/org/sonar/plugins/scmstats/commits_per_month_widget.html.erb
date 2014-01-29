@@ -1,6 +1,9 @@
 <% 
 widgetPeriod = widget_properties["Period"]
 days = Property.value('sonar.scm-stats.period' + widgetPeriod.to_s, @resource.id)
+if days == nil
+  days = Property.value('sonar.scm-stats.period' + widgetPeriod.to_s, nil)
+end
 if widgetPeriod == 1
   period_measure = "scm-commits-per-month"
 else 
