@@ -78,7 +78,7 @@ public final class ScmStatsPlugin extends SonarPlugin {
 
             PropertyDefinition.builder(ScmStatsConstants.PERIOD_3).
               defaultValue("0").
-              name("Period #2").
+              name("Period #3").
               description("See description of Period #1 property. If it's set to a non-positive value, then it's ignored").
               index(3).
               onQualifiers(Qualifiers.PROJECT, Qualifiers.MODULE).
