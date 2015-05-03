@@ -5,7 +5,7 @@ SonarQube SCM Stats Plugin
 Download and Version information: http://update.sonarsource.org/plugins/scmstats-confluence.html
 
 ## Build Status
-[![Build Status](https://sonarplugins.ci.cloudbees.com/job/scm-stats/buildStatus/icon?job=check-manifest)](https://sonarplugins.ci.cloudbees.com/job/scms-tats)
+[![Build Status](https://sonarplugins.ci.cloudbees.com/job/scm-stats/buildStatus/icon?job=check-manifest)](https://sonarplugins.ci.cloudbees.com/job/scms-stats)
 
 ## Upgrade from 0.1 to 0.2 or later
 If you upgrade from 0.1 to 0.2 or later you'll need to run a new analysis to see the Authors activity and commits per author widgets.
