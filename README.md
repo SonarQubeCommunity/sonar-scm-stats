@@ -90,3 +90,18 @@ Perforce is supported since version 0.3 and you need to set the Client Spec name
 Drill-down from the average abacus complexity of a module/project does not work due to the following issue in SonarQube: SONAR-3233.
 Differential views are not implemented.
 Compatibility with VIEWS: as each project can define its own abacus, this plug-in does not compute the abacus complexity and distribution for a view.
+
+
+## License
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
