@@ -3,7 +3,6 @@ sudo: false
 install: true
 
 jdk:
-  - oraclejdk8
   - openjdk7
 
 script:
