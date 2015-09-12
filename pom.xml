@@ -54,7 +54,7 @@
   <properties>
     <sonar.minversion>3.6</sonar.minversion>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.scm.version>1.8.1</maven.scm.version>
+    <maven.scm.version>1.9</maven.scm.version>
     <powermock.version>1.4.12</powermock.version>
     <sonar.pluginName>Scm Stats</sonar.pluginName>
     <sonar.pluginClass>org.sonar.plugins.scmstats.ScmStatsPlugin</sonar.pluginClass>
