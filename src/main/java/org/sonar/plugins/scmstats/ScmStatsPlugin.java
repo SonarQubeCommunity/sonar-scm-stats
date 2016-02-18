@@ -55,6 +55,26 @@ public final class ScmStatsPlugin extends SonarPlugin {
               type(PropertyType.BOOLEAN).
               build(),
             
+            PropertyDefinition.builder(ScmStatsConstants.USER).
+              defaultValue("").
+              name("SCM Username").
+              description("SCM Usernaame").
+              index(1).
+              onQualifiers(Qualifiers.PROJECT, Qualifiers.MODULE).
+              category(SCMSTATS_CATEGORY).
+              type(PropertyType.STRING).
+              build(),
+            
+            PropertyDefinition.builder(ScmStatsConstants.PASSWORD).
+              defaultValue("").
+              name("SCM Password").
+              description("SCM Password").
+              index(1).
+              onQualifiers(Qualifiers.PROJECT, Qualifiers.MODULE).
+              category(SCMSTATS_CATEGORY).
+              type(PropertyType.PASSWORD).
+              build(),
+            
             PropertyDefinition.builder(ScmStatsConstants.PERIOD_1).
               defaultValue("0").
               name("Period #1").
