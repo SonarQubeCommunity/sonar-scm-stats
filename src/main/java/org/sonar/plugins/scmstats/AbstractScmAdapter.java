@@ -83,7 +83,7 @@ public abstract class AbstractScmAdapter implements BatchExtension {
   protected Map<String, Integer> updateActivity (String resourceName, Map<String, Integer> fileStatus, String activity) {
     Resource resource = createResource(resourceName);
     LOG.warn(resource.getKey() + " is " + (isIncluded(resource) ? "NOT " : " ") + "excluded");
-    return (isIncluded(resource) ? MapUtils.updateMap(fileStatus, activity) : fileStatus);
+    return isIncluded(resource) ? MapUtils.updateMap(fileStatus, activity) : fileStatus;
   }
   
   Resource createResource(String resourceName) {
