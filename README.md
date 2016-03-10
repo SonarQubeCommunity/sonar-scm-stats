@@ -22,7 +22,7 @@ If you plan to use this plugin with non-Maven projects, or SCM access is availab
 <tr><td>Source Control</td><td></td><td></td><td></td></tr>
 <tr><td>SVN</td><td>Yes</td><td>Yes</td><td>Yes</td></tr>
 <tr><td>Git</td><td>Yes</td><td>Yes</td><td>Yes</td></tr>
-<tr><td>Mercurual</td><td>No</td><td>Authors activity not supported
+<tr><td>Mercurial</td><td>No</td><td>Authors activity not supported
 see SONARPLUGINS-3108</td><td>Authors activity not supported
 see SONARPLUGINS-3108</td></tr>
 <tr><td>Perforce</td><td>No</td><td>No</td><td>Yes</td></tr>
