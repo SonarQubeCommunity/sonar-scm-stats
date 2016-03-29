@@ -1,7 +1,7 @@
-
-
 SonarQube SCM Stats Plugin
 ==========================
+[![Nemo Quality Gate status](https://nemo.sonarqube.org/api/badges/gate?key=org.codehaus.sonar-plugins%3Asonar-scm-stats-plugin)](https://nemo.sonarqube.org/overview?id=org.codehaus.sonar-plugins%3Asonar-scm-stats-plugin)
+
 Download and Version information: http://update.sonarsource.org/plugins/scmstats-confluence.html
 
 ## Build Status
