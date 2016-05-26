@@ -1,11 +1,8 @@
 SonarQube SCM Stats Plugin
 ==========================
-[![Nemo Quality Gate status](https://nemo.sonarqube.org/api/badges/gate?key=org.codehaus.sonar-plugins%3Asonar-scm-stats-plugin)](https://nemo.sonarqube.org/overview?id=org.codehaus.sonar-plugins%3Asonar-scm-stats-plugin)
+[![Build Status](https://api.travis-ci.org/SonarQubeCommunity/sonar-scm-stats.svg)](https://travis-ci.org/SonarQubeCommunity/sonar-scm-stats) [![Nemo Quality Gate status](https://nemo.sonarqube.org/api/badges/gate?key=org.codehaus.sonar-plugins%3Asonar-scm-stats-plugin)](https://nemo.sonarqube.org/overview?id=org.codehaus.sonar-plugins%3Asonar-scm-stats-plugin)
 
 Download and Version information: http://update.sonarsource.org/plugins/scmstats-confluence.html
-
-## Build Status
-[![Build Status](https://sonarplugins.ci.cloudbees.com/job/scm-stats/buildStatus/icon?job=check-manifest)](https://sonarplugins.ci.cloudbees.com/job/scms-stats)
 
 ## Upgrade from 0.1 to 0.2 or later
 If you upgrade from 0.1 to 0.2 or later you'll need to run a new analysis to see the Authors activity and commits per author widgets.
