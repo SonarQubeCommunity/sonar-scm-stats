@@ -12,15 +12,11 @@
   <version>0.4-SNAPSHOT</version>
   <name>Sonar SCM Stats Plugin</name>
   <description>Feed SonarQube with Statistics about SCM system</description>
-  <url>http://docs.codehaus.org/display/SONAR/SCM+Stats+Plugin</url>
+  <url>https://github.com/SonarQubeCommunity/sonar-scm-stats</url>
   
-  <ciManagement>
-    <system>Jenkins</system>
-    <url>https://sonarplugins.ci.cloudbees.com/job/scm-stats/</url>
-  </ciManagement>
   <issueManagement>
-    <system>JIRA</system>
-    <url>http://jira.codehaus.org/browse/SONARPLUGINS/component/15608</url>
+    <system>GitHub Issues</system>
+    <url>https://github.com/SonarQubeCommunity/sonar-scm-stats/issues</url>
   </issueManagement>
   <inceptionYear>2012</inceptionYear>
   
@@ -37,9 +33,9 @@
   </licenses>
   
   <scm>
-    <connection>scm:git:git@github.com:SonarCommunity/sonar-scm-stats</connection>
-    <developerConnection>scm:git:git@github.com:SonarCommunity/sonar-scm-stats</developerConnection>
-    <url>https://github.com/SonarCommunity/sonar-scm-stats</url>
+    <connection>scm:git:git@github.com:SonarQubeCommunity/sonar-scm-stats</connection>
+    <developerConnection>scm:git:git@github.com:SonarQubeCommunity/sonar-scm-stats</developerConnection>
+    <url>https://github.com/SonarQubeCommunity/sonar-scm-stats</url>
     <tag>HEAD</tag>
   </scm>
   <developers>
