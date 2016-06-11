@@ -86,7 +86,7 @@ public class HgScmAdapter extends AbstractScmAdapter {
       LOG.info("Getting change log information for %s\n", baseDir.getAbsolutePath());
       if (!hgRepo.initFrom(baseDir)) {
         throw new HgRepositoryNotFoundException(
-                String.format("Can't find repository in: %s\n",baseDir.getAbsolutePath()));
+                String.format("Can't find repository in: %s%n",baseDir.getAbsolutePath()));
       }
       HgLogCommand cmd = hgRepo.createLogCommand();
       return cmd.execute();

@@ -90,7 +90,7 @@ public class ChangeLogHandler {
     authorActivity.putAll(map);
 
     final Map<String, Integer> activity = changeLogInfo.getActivity();
-    List<Integer> stats = (authorActivity.get(author) == null ? getInitialActivity(activity) : authorActivity.get(author).getCommits());
+    List<Integer> stats = authorActivity.get(author) == null ? getInitialActivity(activity) : authorActivity.get(author).getCommits();
 
     if (authorActivity.containsKey(author)) {
       final Integer commits = stats.get(0) + 1;
