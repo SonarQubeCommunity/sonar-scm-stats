@@ -200,7 +200,7 @@
   <repositories>
     <repository>
       <id>tmetesoft_releases</id>
-      <url>http://maven.tmatesoft.com/content/repositories/releases/</url>
+      <url>https://maven.tmatesoft.com/content/repositories/releases/</url>
     </repository>
   </repositories>
 
